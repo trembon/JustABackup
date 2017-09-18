@@ -1,0 +1,31 @@
+﻿@model JustABackup.Models.ListJobsModel
+
+@{
+    ViewData["Title"] = "Jobs";
+}
+
+<div class="">
+    <a href="@Url.Action("Create", "Job")" class="btn btn-default">Create Job</a>
+</div>
+
+<table class="table table-responsive table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Last run</th>
+            <th>Last run result</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var job in Model.Jobs)
+        {
+            <tr>
+                <td>@job.Name</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
