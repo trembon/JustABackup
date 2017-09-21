@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using JustABackup.Core.Extenssions;
 using JustABackup.Models;
 using JustABackup.DAL.Entities;
 using JustABackup.DAL.Contexts;
@@ -35,22 +36,13 @@ namespace JustABackup.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateJobModel model)
+        public IActionResult Create(CreateJobModel model)
         {
             if (ModelState.IsValid)
             {
                 CreateJob createJob = new CreateJob { Base = model };
-                HttpContext.Session.SetString("CreateJob", JsonConvert.SerializeObject(createJob));
+                HttpContext.Session.SetObject("CreateJob", createJob);
             }
-
-            //using (var context = new DefaultContext())
-            //{
-            //    var newJob = new BackupJob();
-            //    newJob.Name = model.Name;
-
-            //    context.Jobs.Add(newJob);
-            //    await context.SaveChangesAsync();
-            //}
 
             return RedirectToAction("CreateJobBackup");
         }
@@ -70,7 +62,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public IActionResult CreateJobBackup()
         {
-            CreateJob createJob = JsonConvert.DeserializeObject<CreateJob>(HttpContext.Session.GetString("CreateJob"));
+            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 
@@ -92,7 +84,7 @@ namespace JustABackup.Controllers
         [HttpPost]
         public IActionResult CreateJobBackup(CreateJobProviderModel model)
         {
-            CreateJob createJob = JsonConvert.DeserializeObject<CreateJob>(HttpContext.Session.GetString("CreateJob"));
+            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 
@@ -100,7 +92,7 @@ namespace JustABackup.Controllers
             {
                 createJob.BackupProvider = model;
 
-                HttpContext.Session.SetString("CreateJob", JsonConvert.SerializeObject(createJob));
+                HttpContext.Session.SetObject("CreateJob", createJob);
 
                 return RedirectToAction("CreateJobStorage");
             }
@@ -111,7 +103,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public IActionResult CreateJobStorage()
         {
-            CreateJob createJob = JsonConvert.DeserializeObject<CreateJob>(HttpContext.Session.GetString("CreateJob"));
+            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 
@@ -132,7 +124,7 @@ namespace JustABackup.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateJobStorage(CreateJobProviderModel model)
         {
-            CreateJob createJob = JsonConvert.DeserializeObject<CreateJob>(HttpContext.Session.GetString("CreateJob"));
+            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 

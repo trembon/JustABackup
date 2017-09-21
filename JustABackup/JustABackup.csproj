@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
+    <ProjectReference Include="..\JustABackup.Core\JustABackup.Core.csproj" />
     <ProjectReference Include="..\JustABackup.DAL\JustABackup.DAL.csproj" />
     <ProjectReference Include="..\JustABackup.Plugin.FileSystem\JustABackup.Plugin.FileSystem.csproj" />
   </ItemGroup>

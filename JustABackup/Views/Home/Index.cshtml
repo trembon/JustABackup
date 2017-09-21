@@ -22,8 +22,8 @@
         {
             <tr>
                 <td>@job.Name</td>
-                <td></td>
-                <td></td>
+                <td>@job.History.OrderByDescending(h => h.Completed).FirstOrDefault()?.Completed</td>
+                <td>@job.History.OrderByDescending(h => h.Completed).FirstOrDefault()?.Status</td>
                 <td></td>
             </tr>
         }

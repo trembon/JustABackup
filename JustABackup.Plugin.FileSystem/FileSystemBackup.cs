@@ -22,8 +22,12 @@ namespace JustABackup.Plugin.FileSystem
 
         public Task<IEnumerable<BackupItem>> GetItems()
         {
-            string[] foundFiles = Directory.GetFiles(TargetFolder, FileFilter, Subdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
+            string[] foundFiles = new string[0];
+            if(string.IsNullOrWhiteSpace(FileFilter))
+                foundFiles = Directory.GetFiles(TargetFolder);
+            else
+                foundFiles = Directory.GetFiles(TargetFolder, FileFilter, Subdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            
             IEnumerable<BackupItem> result = foundFiles.Select(x => new BackupItem
             {
                 Name = Path.GetFileName(x),
