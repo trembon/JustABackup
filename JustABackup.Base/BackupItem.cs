@@ -10,10 +10,5 @@ namespace JustABackup.Base
         public string Name { get; set; }
 
         public string Path { get; set; }
-
-        public virtual Stream OpenRead()
-        {
-            return new MemoryStream();
-        }
     }
 }
