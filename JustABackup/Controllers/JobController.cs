@@ -23,14 +23,14 @@ namespace JustABackup.Controllers
         {
             CreateJobModel model = new CreateJobModel();
 
-            using (var context = new DefaultContext())
-            {
-                var backupProviders = context.Providers.Where(p => p.Type == ProviderType.Backup).ToList();
-                model.BackupProviders = new SelectList(backupProviders, "ID", "Name");
+            //using (var context = new DefaultContext())
+            //{
+            //    var backupProviders = context.Providers.Where(p => p.Type == ProviderType.Backup).ToList();
+            //    model.BackupProviders = new SelectList(backupProviders, "ID", "Name");
 
-                var storageProviders = context.Providers.Where(p => p.Type == ProviderType.Storage).ToList();
-                model.StorageProviders = new SelectList(storageProviders, "ID", "Name");
-            }
+            //    var storageProviders = context.Providers.Where(p => p.Type == ProviderType.Storage).ToList();
+            //    model.StorageProviders = new SelectList(storageProviders, "ID", "Name");
+            //}
 
             return View(model);
         }
@@ -69,13 +69,13 @@ namespace JustABackup.Controllers
             CreateJobProviderModel model = new CreateJobProviderModel();
             model.Action = nameof(CreateJobBackup);
 
-            using (var context = new DefaultContext())
-            {
-                var provider = context.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
+            //using (var context = new DefaultContext())
+            //{
+            //    var provider = context.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
 
-                model.ProviderName = provider.Name;
-                model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
-            }
+            //    model.ProviderName = provider.Name;
+            //    model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
+            //}
 
             model.Action = nameof(CreateJobBackup);
             return View("CreateJobProvider", model);
@@ -110,13 +110,13 @@ namespace JustABackup.Controllers
             CreateJobProviderModel model = new CreateJobProviderModel();
             model.Action = nameof(CreateJobStorage);
 
-            using (var context = new DefaultContext())
-            {
-                var provider = context.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
+            //using (var context = new DefaultContext())
+            //{
+            //    var provider = context.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
 
-                model.ProviderName = provider.Name;
-                model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
-            }
+            //    model.ProviderName = provider.Name;
+            //    model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
+            //}
 
             return View("CreateJobProvider", model);
         }
@@ -132,39 +132,39 @@ namespace JustABackup.Controllers
             {
                 createJob.StorageProvider = model;
 
-                using (var context = new DefaultContext())
-                {
-                    BackupJob job = new BackupJob();
-                    job.Name = createJob.Base.Name;
+                //using (var context = new DefaultContext())
+                //{
+                //    BackupJob job = new BackupJob();
+                //    job.Name = createJob.Base.Name;
                     
-                    Provider dbBackupProvider = context.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
-                    Provider dbStorageProvider = context.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
+                //    Provider dbBackupProvider = context.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
+                //    Provider dbStorageProvider = context.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
 
-                    ProviderInstance backupProvider = new ProviderInstance();
-                    backupProvider.Provider = dbBackupProvider;
-                    foreach(var property in createJob.BackupProvider.Properties)
-                    {
-                        ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                        instanceProperty.Value = property.Value;
-                        instanceProperty.Property = dbBackupProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
-                        backupProvider.Values.Add(instanceProperty);
-                    }
-                    job.BackupProvider = backupProvider;
+                //    ProviderInstance backupProvider = new ProviderInstance();
+                //    backupProvider.Provider = dbBackupProvider;
+                //    foreach(var property in createJob.BackupProvider.Properties)
+                //    {
+                //        ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
+                //        instanceProperty.Value = property.Value;
+                //        instanceProperty.Property = dbBackupProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
+                //        backupProvider.Values.Add(instanceProperty);
+                //    }
+                //    job.BackupProvider = backupProvider;
 
-                    ProviderInstance storageProvider = new ProviderInstance();
-                    storageProvider.Provider = dbStorageProvider;
-                    foreach (var property in createJob.StorageProvider.Properties)
-                    {
-                        ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                        instanceProperty.Value = property.Value;
-                        instanceProperty.Property = dbStorageProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
-                        storageProvider.Values.Add(instanceProperty);
-                    }
-                    job.StorageProvider = storageProvider;
+                //    ProviderInstance storageProvider = new ProviderInstance();
+                //    storageProvider.Provider = dbStorageProvider;
+                //    foreach (var property in createJob.StorageProvider.Properties)
+                //    {
+                //        ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
+                //        instanceProperty.Value = property.Value;
+                //        instanceProperty.Property = dbStorageProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
+                //        storageProvider.Values.Add(instanceProperty);
+                //    }
+                //    job.StorageProvider = storageProvider;
 
-                    context.Jobs.Add(job);
-                    await context.SaveChangesAsync();
-                }
+                //    context.Jobs.Add(job);
+                //    await context.SaveChangesAsync();
+                //}
 
                 HttpContext.Session.Remove("CreateJob");
                 return RedirectToAction("Index", "Home");
@@ -176,57 +176,57 @@ namespace JustABackup.Controllers
 
         public async Task<IActionResult> Start(int id)
         {
-            using (var context = new DefaultContext())
-            {
-                BackupJob job = context.Jobs
-                    .Include(j => j.BackupProvider)
-                    .Include(j => j.BackupProvider.Provider)
-                    .Include(j => j.BackupProvider.Values)
-                    .ThenInclude(x => x.Property)
-                    .Include(j => j.StorageProvider)
-                    .Include(j => j.StorageProvider.Provider)
-                    .Include(j => j.StorageProvider.Values)
-                    .ThenInclude(x => x.Property)
-                    .FirstOrDefault(j => j.ID == id);
+            //using (var context = new DefaultContext())
+            //{
+            //    BackupJob job = context.Jobs
+            //        .Include(j => j.BackupProvider)
+            //        .Include(j => j.BackupProvider.Provider)
+            //        .Include(j => j.BackupProvider.Values)
+            //        .ThenInclude(x => x.Property)
+            //        .Include(j => j.StorageProvider)
+            //        .Include(j => j.StorageProvider.Provider)
+            //        .Include(j => j.StorageProvider.Values)
+            //        .ThenInclude(x => x.Property)
+            //        .FirstOrDefault(j => j.ID == id);
 
-                BackupJobHistory history = new BackupJobHistory();
-                history.Started = DateTime.Now;
+            //    BackupJobHistory history = new BackupJobHistory();
+            //    history.Started = DateTime.Now;
 
-                Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
-                IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
-                foreach(var property in job.BackupProvider.Values)
-                {
-                    PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
-                    object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+            //    Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
+            //    IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
+            //    foreach(var property in job.BackupProvider.Values)
+            //    {
+            //        PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
+            //        object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
 
-                    propertyInfo.SetValue(backupProvider, originalValueType);
-                }
+            //        propertyInfo.SetValue(backupProvider, originalValueType);
+            //    }
 
-                Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
-                IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
-                foreach (var property in job.StorageProvider.Values)
-                {
-                    PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
-                    object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+            //    Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
+            //    IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
+            //    foreach (var property in job.StorageProvider.Values)
+            //    {
+            //        PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
+            //        object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
 
-                    propertyInfo.SetValue(storageProvider, originalValueType);
-                }
+            //        propertyInfo.SetValue(storageProvider, originalValueType);
+            //    }
 
-                var items = await backupProvider.GetItems();
-                foreach(var item in items)
-                {
-                    using(var stream = await backupProvider.OpenRead(item))
-                    {
-                        await storageProvider.StoreItem(item, stream);
-                    }
-                }
+            //    var items = await backupProvider.GetItems();
+            //    foreach(var item in items)
+            //    {
+            //        using(var stream = await backupProvider.OpenRead(item))
+            //        {
+            //            await storageProvider.StoreItem(item, stream);
+            //        }
+            //    }
 
-                history.Completed = DateTime.Now;
-                history.Message = $"{items.Count()} files were copied.";
-                history.Status = ExitCode.Success;
-                job.History.Add(history);
-                await context.SaveChangesAsync();
-            }
+            //    history.Completed = DateTime.Now;
+            //    history.Message = $"{items.Count()} files were copied.";
+            //    history.Status = ExitCode.Success;
+            //    job.History.Add(history);
+            //    await context.SaveChangesAsync();
+            //}
 
             return View();
         }

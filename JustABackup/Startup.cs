@@ -15,6 +15,7 @@ using JustABackup.DAL.Contexts;
 using System.IO;
 using JustABackup.Core.Services;
 using JustABackup.Core.Implementations;
+using Microsoft.EntityFrameworkCore;
 
 namespace JustABackup
 {
@@ -34,13 +35,19 @@ namespace JustABackup
             services.AddMvc();
             services.AddSession();
 
+            // register database context
+            services.AddDbContext<DefaultContext>(options =>
+                options.UseSqlite("Data Source=demo.db")
+            );
+
             // register services
+            services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddSingleton<IPluginService, PluginService>();
             services.AddSingleton<IProviderModelService, ProviderModelService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IDatabaseService databaseService)
         {
             if (env.IsDevelopment())
             {
@@ -62,7 +69,10 @@ namespace JustABackup
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.ApplicationServices.GetService<IPluginService>().LoadPlugins();
+            databaseService.VerifyDatabase();
+
+            //app.ApplicationServices.GetService<IDatabaseService>().VerifyDatabase();
+            //app.ApplicationServices.GetService<IPluginService>().LoadPlugins();
         }
     }
 }

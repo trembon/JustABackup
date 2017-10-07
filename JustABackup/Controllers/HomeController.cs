@@ -15,10 +15,10 @@ namespace JustABackup.Controllers
         {
             var model = new ListJobsModel();
 
-            using (var context = new DefaultContext())
-            {
-                model.Jobs = context.Jobs.Include(x => x.History).ToList();
-            }
+            //using (var context = new DefaultContext())
+            //{
+            //    model.Jobs = context.Jobs.Include(x => x.History).ToList();
+            //}
 
             return View(model);
         }

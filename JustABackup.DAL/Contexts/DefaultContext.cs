@@ -14,9 +14,8 @@ namespace JustABackup.DAL.Contexts
 
         public DbSet<Provider> Providers { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public DefaultContext(DbContextOptions options) : base(options)
         {
-            optionsBuilder.UseSqlite("Data Source=demo.db");
         }
     }
 }
