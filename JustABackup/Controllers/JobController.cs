@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using JustABackup.Core.Extenssions;
 using JustABackup.Models;
-using JustABackup.DAL.Entities;
-using JustABackup.DAL.Contexts;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;

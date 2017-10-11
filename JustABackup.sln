@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Base", "JustABa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Core", "JustABackup.Core\JustABackup.Core.csproj", "{C662C115-CABB-4F58-A0BA-C5CEE69D4C5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.DAL", "JustABackup.DAL\JustABackup.DAL.csproj", "{F5618CD0-DF71-4741-9B46-118786A49F87}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{C662C115-CABB-4F58-A0BA-C5CEE69D4C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C662C115-CABB-4F58-A0BA-C5CEE69D4C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C662C115-CABB-4F58-A0BA-C5CEE69D4C5F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5618CD0-DF71-4741-9B46-118786A49F87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5618CD0-DF71-4741-9B46-118786A49F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5618CD0-DF71-4741-9B46-118786A49F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5618CD0-DF71-4741-9B46-118786A49F87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

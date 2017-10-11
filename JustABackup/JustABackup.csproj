@@ -16,8 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
@@ -29,7 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
     <ProjectReference Include="..\JustABackup.Core\JustABackup.Core.csproj" />
-    <ProjectReference Include="..\JustABackup.DAL\JustABackup.DAL.csproj" />
     <ProjectReference Include="..\JustABackup.Plugin.FileSystem\JustABackup.Plugin.FileSystem.csproj" />
   </ItemGroup>
 

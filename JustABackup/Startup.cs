@@ -8,14 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using JustABackup.Base;
-using JustABackup.DAL.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using JustABackup.DAL.Contexts;
 using System.IO;
 using JustABackup.Core.Services;
 using JustABackup.Core.Implementations;
 using Microsoft.EntityFrameworkCore;
+using JustABackup.Core.Contexts;
 
 namespace JustABackup
 {
@@ -42,12 +41,12 @@ namespace JustABackup
 
             // register services
             services.AddScoped<IDatabaseService, DatabaseService>();
-            services.AddSingleton<IPluginService, PluginService>();
-            services.AddSingleton<IProviderModelService, ProviderModelService>();
+            services.AddScoped<IPluginService, PluginService>();
+            services.AddScoped<IProviderModelService, ProviderModelService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IDatabaseService databaseService)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IDatabaseService databaseService, IPluginService pluginService)
         {
             if (env.IsDevelopment())
             {
@@ -70,9 +69,7 @@ namespace JustABackup
             });
 
             databaseService.VerifyDatabase();
-
-            //app.ApplicationServices.GetService<IDatabaseService>().VerifyDatabase();
-            //app.ApplicationServices.GetService<IPluginService>().LoadPlugins();
+            pluginService.LoadPlugins();
         }
     }
 }

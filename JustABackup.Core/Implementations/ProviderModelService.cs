@@ -1,57 +1,75 @@
-﻿using JustABackup.Core.Services;
+﻿using JustABackup.Core.Contexts;
+using JustABackup.Core.Entities;
+using JustABackup.Core.Entities.Database;
+using JustABackup.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JustABackup.Core.Implementations
 {
     public class ProviderModelService : IProviderModelService
     {
-        public void ProcessBackupProvider(Type type)
+        private DefaultContext defaultContext;
+
+        public ProviderModelService(DefaultContext defaultContext)
         {
-            //Provider provider = new Provider();
-            //provider.Name = type.Name;
-            //provider.Namespace = type.AssemblyQualifiedName;
-            //provider.Type = type.ImplementedInterfaces.Contains(typeof(IBackupProvider)) ? ProviderType.Backup : ProviderType.Storage;
-            //provider.Version = type.Assembly.GetName().Version.ToString();
-            //provider.Properties = GetProperties(type);
-
-            //using (var context = new DefaultContext())
-            //{
-            //    context.Database.EnsureCreated();
-
-            //    var existingProviders = context.Providers.ToDictionary(k => k.Namespace, v => v);
-
-            //    foreach (var provider in providers)
-            //    {
-            //        if (existingProviders.ContainsKey(provider.Namespace))
-            //        {
-            //            // TODO: check version and update or validate
-
-            //            existingProviders.Remove(provider.Namespace);
-            //        }
-            //        else
-            //        {
-            //            context.Add(provider);
-            //        }
-            //    }
-
-            //    foreach (var kvp in existingProviders)
-            //        context.Providers.Remove(kvp.Value); // TODO: dont remove, just flag as inactive
-
-            //    context.SaveChanges();
-            //}
+            this.defaultContext = defaultContext;
         }
 
-        public void ProcessStorageProvider(Type type)
+        public async Task ProcessBackupProvider(Type type)
         {
+            await ProcessProvider(type, ProviderType.Backup);
         }
 
-        public void ProcessTransformProvider(Type type)
+        public async Task ProcessStorageProvider(Type type)
         {
+            await ProcessProvider(type, ProviderType.Storage);
         }
 
+        public async Task ProcessTransformProvider(Type type)
+        {
+            await ProcessProvider(type, ProviderType.Transform);
+        }
+
+        private async Task ProcessProvider(Type type, ProviderType providerType)
+        {
+            Provider provider = new Provider();
+
+            DisplayNameAttribute displayAttribute = type.GetCustomAttribute<DisplayNameAttribute>();
+            if (displayAttribute != null)
+            {
+                provider.Name = displayAttribute.DisplayName;
+            }
+            else
+            {
+                provider.Name = type.Name;
+            }
+
+            provider.FullName = type.FullName;
+            provider.Namespace = type.AssemblyQualifiedName;
+            provider.Type = providerType;
+            provider.Version = type.Assembly.GetName().Version.ToString();
+            provider.Properties = GetProperties(type);
+            provider.IsProcessed = true;
+
+            var existingProvider = defaultContext.Providers.FirstOrDefault(p => p.FullName.Equals(provider.FullName));
+            if(existingProvider != null)
+            {
+                // TODO: update provider and mark as changed in existing jobs
+            }
+            else
+            {
+                await defaultContext.Providers.AddAsync(provider);
+            }
+
+            await defaultContext.SaveChangesAsync();
+        }
 
         private int GetTypeFromProperty(PropertyInfo property)
         {
@@ -66,38 +84,37 @@ namespace JustABackup.Core.Implementations
 
             return -1;
         }
+        
+        private List<ProviderProperty> GetProperties(Type type)
+        {
+            List<ProviderProperty> result = new List<ProviderProperty>();
 
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var property in properties)
+            {
+                ProviderProperty providerProperty = new ProviderProperty();
+                providerProperty.Name = property.Name;
+                providerProperty.TypeName = property.Name;
+                providerProperty.Type = GetTypeFromProperty(property);
+                if (providerProperty.Type == -1)
+                    continue;
 
-        //private List<ProviderProperty> GetProperties(Type type)
-        //{
-        //    List<ProviderProperty> result = new List<ProviderProperty>();
+                var attributes = property.GetCustomAttributes(true);
+                foreach (var attribute in attributes)
+                {
+                    switch (attribute)
+                    {
+                        case DisplayAttribute da:
+                            providerProperty.Name = da.Name;
+                            providerProperty.Description = da.Description;
+                            break;
+                    }
+                }
 
-        //    var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        //    foreach (var property in properties)
-        //    {
-        //        ProviderProperty providerProperty = new ProviderProperty();
-        //        providerProperty.Name = property.Name;
-        //        providerProperty.TypeName = property.Name;
-        //        providerProperty.Type = GetTypeFromProperty(property);
-        //        if (providerProperty.Type == -1)
-        //            continue;
+                result.Add(providerProperty);
+            }
 
-        //        var attributes = property.GetCustomAttributes(true);
-        //        foreach (var attribute in attributes)
-        //        {
-        //            switch (attribute)
-        //            {
-        //                case DisplayAttribute da:
-        //                    providerProperty.Name = da.Name;
-        //                    providerProperty.Description = da.Description;
-        //                    break;
-        //            }
-        //        }
-
-        //        result.Add(providerProperty);
-        //    }
-
-        //    return result;
-        //}
+            return result;
+        }
     }
 }
