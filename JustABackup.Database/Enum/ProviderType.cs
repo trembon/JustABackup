@@ -1,4 +1,4 @@
-﻿namespace JustABackup.Core.Entities
+﻿namespace JustABackup.Database.Enum
 {
     public enum ProviderType
     {

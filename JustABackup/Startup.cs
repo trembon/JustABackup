@@ -14,7 +14,7 @@ using System.IO;
 using JustABackup.Core.Services;
 using JustABackup.Core.Implementations;
 using Microsoft.EntityFrameworkCore;
-using JustABackup.Core.Contexts;
+using JustABackup.Database;
 
 namespace JustABackup
 {
@@ -40,13 +40,13 @@ namespace JustABackup
             );
 
             // register services
-            services.AddScoped<IDatabaseService, DatabaseService>();
+            services.AddScoped<IInitializationService, InitializationService>();
             services.AddScoped<IPluginService, PluginService>();
             services.AddScoped<IProviderModelService, ProviderModelService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IDatabaseService databaseService, IPluginService pluginService)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IInitializationService databaseService, IPluginService pluginService)
         {
             if (env.IsDevelopment())
             {

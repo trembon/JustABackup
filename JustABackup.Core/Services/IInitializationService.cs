@@ -4,7 +4,7 @@ using System.Text;
 
 namespace JustABackup.Core.Services
 {
-    public interface IDatabaseService
+    public interface IInitializationService
     {
         void VerifyDatabase();
     }

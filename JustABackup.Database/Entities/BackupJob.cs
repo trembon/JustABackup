@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace JustABackup.Core.Entities.Database
+namespace JustABackup.Database.Entities
 {
-    internal class BackupJob
+    public class BackupJob
     {
         [Key]
         [Required]

@@ -7,6 +7,6 @@ namespace JustABackup.Models
 {
     public class ListJobsModel
     {
-        //public List<BackupJob> Jobs { get; set; }
+        public List<RunHistoryItem> JobHistory { get; set; }
     }
 }

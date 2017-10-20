@@ -1,16 +1,16 @@
 ﻿using JustABackup.Core.Services;
-using JustABackup.Core.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JustABackup.Database;
 
 namespace JustABackup.Core.Implementations
 {
-    public class DatabaseService : IDatabaseService
+    public class InitializationService : IInitializationService
     {
         private DefaultContext context;
 
-        public DatabaseService(DefaultContext context)
+        public InitializationService(DefaultContext context)
         {
             this.context = context;
         }

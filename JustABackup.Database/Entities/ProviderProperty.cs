@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace JustABackup.DAL.Entities
+namespace JustABackup.Database.Entities
 {
     public class ProviderProperty
     {

@@ -1,7 +1,7 @@
-﻿using JustABackup.Core.Contexts;
-using JustABackup.Core.Entities;
-using JustABackup.Core.Entities.Database;
-using JustABackup.Core.Services;
+﻿using JustABackup.Core.Services;
+using JustABackup.Database;
+using JustABackup.Database.Entities;
+using JustABackup.Database.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

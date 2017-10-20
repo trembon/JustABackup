@@ -1,9 +1,10 @@
-﻿using System;
+﻿using JustABackup.Database.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace JustABackup.DAL.Entities
+namespace JustABackup.Database.Entities
 {
     public class BackupJobHistory
     {

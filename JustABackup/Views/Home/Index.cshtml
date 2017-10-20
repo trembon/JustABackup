@@ -18,12 +18,12 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var job in Model.Jobs)
+        @foreach(var job in Model.JobHistory)
         {
             <tr>
-                <td>@job.Name</td>
-                <td>@job.History.OrderByDescending(h => h.Completed).FirstOrDefault()?.Completed</td>
-                <td>@job.History.OrderByDescending(h => h.Completed).FirstOrDefault()?.Status</td>
+                <td>@job.JobName</td>
+                <td>@job.Started</td>
+                <td>@job.Status</td>
                 <td></td>
             </tr>
         }

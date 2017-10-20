@@ -1,8 +1,9 @@
-﻿using System;
+﻿using JustABackup.Database.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JustABackup.Core.Entities
+namespace JustABackup.Models
 {
     public class RunHistoryItem
     {
