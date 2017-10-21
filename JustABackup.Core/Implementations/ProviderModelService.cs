@@ -15,11 +15,11 @@ namespace JustABackup.Core.Implementations
 {
     public class ProviderModelService : IProviderModelService
     {
-        private DefaultContext defaultContext;
+        private DefaultContext dbContext;
 
-        public ProviderModelService(DefaultContext defaultContext)
+        public ProviderModelService(DefaultContext dbContext)
         {
-            this.defaultContext = defaultContext;
+            this.dbContext = dbContext;
         }
 
         public async Task ProcessBackupProvider(Type type)
@@ -58,17 +58,18 @@ namespace JustABackup.Core.Implementations
             provider.Properties = GetProperties(type);
             provider.IsProcessed = true;
 
-            var existingProvider = defaultContext.Providers.FirstOrDefault(p => p.FullName.Equals(provider.FullName));
+            var existingProvider = dbContext.Providers.FirstOrDefault(p => p.FullName.Equals(provider.FullName));
             if(existingProvider != null)
             {
-                // TODO: update provider and mark as changed in existing jobs
+                // TODO: verify provider and mark as invalid, if properties has changed
+                existingProvider.IsProcessed = true;
             }
             else
             {
-                await defaultContext.Providers.AddAsync(provider);
+                await dbContext.Providers.AddAsync(provider);
             }
 
-            await defaultContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
 
         private int GetTypeFromProperty(PropertyInfo property)

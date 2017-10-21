@@ -41,12 +41,11 @@ namespace JustABackup
 
             // register services
             services.AddScoped<IInitializationService, InitializationService>();
-            services.AddScoped<IPluginService, PluginService>();
             services.AddScoped<IProviderModelService, ProviderModelService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IInitializationService databaseService, IPluginService pluginService)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IInitializationService initializationService)
         {
             if (env.IsDevelopment())
             {
@@ -68,8 +67,8 @@ namespace JustABackup
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            databaseService.VerifyDatabase();
-            pluginService.LoadPlugins();
+            await initializationService.VerifyDatabase();
+            initializationService.LoadPlugins();
         }
     }
 }

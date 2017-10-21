@@ -27,6 +27,7 @@ namespace JustABackup.Database.Entities
         [Required]
         public string Version { get; set; }
 
+        // TODO: change name? something more like "IsValid"
         [Required]
         public bool IsProcessed { get; set; }
 

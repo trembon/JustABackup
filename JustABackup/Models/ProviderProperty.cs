@@ -15,15 +15,4 @@ namespace JustABackup.Models
 
         public string Template { get; set; }
     }
-
-    //public class ProviderPropertyList : List<ProviderProperty>
-    //{
-    //    public ProviderPropertyList() : base()
-    //    {
-    //    }
-
-    //    public ProviderPropertyList(IEnumerable<ProviderProperty> collection) : base(collection)
-    //    {
-    //    }
-    //}
 }
