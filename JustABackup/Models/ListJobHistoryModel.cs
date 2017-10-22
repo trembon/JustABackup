@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models
 {
-    public class ListJobsModel
+    public class ListJobHistoryModel
     {
-        public List<JobModel> Jobs { get; set; }
+        public List<JobHistoryModel> JobHistory { get; set; }
     }
 }

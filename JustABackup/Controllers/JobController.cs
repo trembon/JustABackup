@@ -27,6 +27,26 @@ namespace JustABackup.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            ListJobsModel model = new ListJobsModel();
+
+            model.Jobs = dbContext
+                .Jobs
+                .OrderBy(j => j.Name)
+                .Select(j => new JobModel
+                {
+                    ID = j.ID,
+                    Name = j.Name,
+                    BackupProvider = j.BackupProvider.Provider.Name,
+                    StorageProvider = j.StorageProvider.Provider.Name
+                })
+                .ToList();
+
+            return View(model);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             CreateJobModel model = new CreateJobModel();
@@ -172,59 +192,58 @@ namespace JustABackup.Controllers
 
         public async Task<IActionResult> Start(int id)
         {
-            //using (var context = new DefaultContext())
-            //{
-            //    BackupJob job = context.Jobs
-            //        .Include(j => j.BackupProvider)
-            //        .Include(j => j.BackupProvider.Provider)
-            //        .Include(j => j.BackupProvider.Values)
-            //        .ThenInclude(x => x.Property)
-            //        .Include(j => j.StorageProvider)
-            //        .Include(j => j.StorageProvider.Provider)
-            //        .Include(j => j.StorageProvider.Values)
-            //        .ThenInclude(x => x.Property)
-            //        .FirstOrDefault(j => j.ID == id);
+            BackupJob job = dbContext.Jobs
+                .Include(j => j.BackupProvider)
+                .Include(j => j.BackupProvider.Provider)
+                .Include(j => j.BackupProvider.Values)
+                .ThenInclude(x => x.Property)
+                .Include(j => j.StorageProvider)
+                .Include(j => j.StorageProvider.Provider)
+                .Include(j => j.StorageProvider.Values)
+                .ThenInclude(x => x.Property)
+                .FirstOrDefault(j => j.ID == id);
 
-            //    BackupJobHistory history = new BackupJobHistory();
-            //    history.Started = DateTime.Now;
+            BackupJobHistory history = new BackupJobHistory();
+            history.Started = DateTime.Now;
 
-            //    Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
-            //    IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
-            //    foreach(var property in job.BackupProvider.Values)
-            //    {
-            //        PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
-            //        object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+            job.History.Add(history);
+            await dbContext.SaveChangesAsync();
 
-            //        propertyInfo.SetValue(backupProvider, originalValueType);
-            //    }
+            Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
+            IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
+            foreach (var property in job.BackupProvider.Values)
+            {
+                PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
+                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
 
-            //    Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
-            //    IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
-            //    foreach (var property in job.StorageProvider.Values)
-            //    {
-            //        PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
-            //        object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+                propertyInfo.SetValue(backupProvider, originalValueType);
+            }
 
-            //        propertyInfo.SetValue(storageProvider, originalValueType);
-            //    }
+            Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
+            IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
+            foreach (var property in job.StorageProvider.Values)
+            {
+                PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
+                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
 
-            //    var items = await backupProvider.GetItems();
-            //    foreach(var item in items)
-            //    {
-            //        using(var stream = await backupProvider.OpenRead(item))
-            //        {
-            //            await storageProvider.StoreItem(item, stream);
-            //        }
-            //    }
+                propertyInfo.SetValue(storageProvider, originalValueType);
+            }
 
-            //    history.Completed = DateTime.Now;
-            //    history.Message = $"{items.Count()} files were copied.";
-            //    history.Status = ExitCode.Success;
-            //    job.History.Add(history);
-            //    await context.SaveChangesAsync();
-            //}
+            var items = await backupProvider.GetItems();
+            foreach (var item in items)
+            {
+                using (var stream = await backupProvider.OpenRead(item))
+                {
+                    await storageProvider.StoreItem(item, stream);
+                }
+            }
 
-            return View();
+            history.Completed = DateTime.Now;
+            history.Message = $"{items.Count()} files were copied.";
+            history.Status = ExitCode.Success;
+            await dbContext.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

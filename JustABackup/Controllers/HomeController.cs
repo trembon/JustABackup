@@ -20,17 +20,18 @@ namespace JustABackup.Controllers
 
         public IActionResult Index()
         {
-            var model = new ListJobsModel();
+            var model = new ListJobHistoryModel();
 
             model.JobHistory = context
                 .JobHistory
                 .OrderByDescending(jh => jh.Started)
                 .Take(15)
-                .Select(jh => new RunHistoryItem
+                .Select(jh => new JobHistoryModel
                 {
                     JobID = jh.Job.ID,
                     JobName = jh.Job.Name,
                     Started = jh.Started,
+                    RunTime = jh.Completed - jh.Started,
                     Status = jh.Status,
                     Message = jh.Message
                 })

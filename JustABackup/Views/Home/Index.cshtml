@@ -1,19 +1,18 @@
-﻿@model JustABackup.Models.ListJobsModel
+﻿@model JustABackup.Models.ListJobHistoryModel
 
 @{
-    ViewData["Title"] = "Jobs";
+    ViewData["Title"] = "Latest runs";
 }
 
-<div class="">
-    <a href="@Url.Action("Create", "Job")" class="btn btn-default">Create Job</a>
-</div>
+<h1>Latest runs</h1>
 
 <table class="table table-responsive table-striped">
     <thead>
         <tr>
             <th>Name</th>
             <th>Started</th>
-            <th>Statu</th>
+            <th>Run time</th>
+            <th>Status</th>
             <th></th>
         </tr>
     </thead>
@@ -23,6 +22,7 @@
             <tr>
                 <td>@job.JobName</td>
                 <td>@job.Started</td>
+                <td>@job.RunTime</td>
                 <td>@job.Status</td>
                 <td></td>
             </tr>

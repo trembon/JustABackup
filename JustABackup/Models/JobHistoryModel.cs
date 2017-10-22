@@ -5,13 +5,15 @@ using System.Text;
 
 namespace JustABackup.Models
 {
-    public class RunHistoryItem
+    public class JobHistoryModel
     {
         public int JobID { get; set; }
 
         public string JobName { get; set; }
 
         public DateTime Started { get; set; }
+
+        public TimeSpan RunTime { get; set; }
 
         public ExitCode Status { get; set; }
 

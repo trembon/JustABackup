@@ -1,0 +1,42 @@
+﻿@model JustABackup.Models.ListJobsModel
+
+@{
+    ViewData["Title"] = "Scheduled Jobs";
+}
+
+<h2>Scheduled Jobs</h2>
+
+<table class="table table-responsive table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Backup provider</th>
+            <th>Storage provider</th>
+            <th>Next run</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var job in Model.Jobs)
+        {
+            <tr>
+                <td>@job.Name</td>
+                <td>@job.BackupProvider</td>
+                <td>@job.StorageProvider</td>
+                <td></td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Actions <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Another action</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a asp-controller="Job" asp-action="Start" asp-route-id="@job.ID">Start manually</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
