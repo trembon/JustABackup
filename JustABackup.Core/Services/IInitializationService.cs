@@ -9,6 +9,8 @@ namespace JustABackup.Core.Services
     {
         Task VerifyDatabase();
 
+        Task VerifyScheduledJobs();
+
         void LoadPlugins();
     }
 }

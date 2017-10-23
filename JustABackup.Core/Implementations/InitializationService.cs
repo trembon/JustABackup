@@ -68,5 +68,11 @@ namespace JustABackup.Core.Implementations
                 }
             }
         }
+
+        public Task VerifyScheduledJobs()
+        {
+            // TODO: implement
+            return Task.CompletedTask;
+        }
     }
 }

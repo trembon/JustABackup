@@ -9,7 +9,7 @@
 <h4>CreateJobModel</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -19,11 +19,15 @@
             </div>
             <div class="form-group">
                 <label asp-for="BackupProvider" class="control-label"></label>
-                <select asp-for="BackupProvider" asp-items="Model.BackupProviders"></select>
+                <select asp-for="BackupProvider" asp-items="Model.BackupProviders" class="form-control"></select>
             </div>
             <div class="form-group">
                 <label asp-for="StorageProvider" class="control-label"></label>
-                <select asp-for="StorageProvider" asp-items="Model.StorageProviders"></select>
+                <select asp-for="StorageProvider" asp-items="Model.StorageProviders" class="form-control"></select>
+            </div>
+            <div>
+                <label asp-for="CronSchedule">Schedule</label>
+                <input class="cron-selector" type="hidden" asp-for="CronSchedule" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />

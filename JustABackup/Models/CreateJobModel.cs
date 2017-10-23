@@ -14,6 +14,9 @@ namespace JustABackup.Models
         public string Name { get; set; }
 
         [Required]
+        public string CronSchedule { get; set; }
+
+        [Required]
         public int StorageProvider { get; set; }
 
         [Required]

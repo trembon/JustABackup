@@ -14,16 +14,21 @@ using System.Reflection;
 using JustABackup.Database;
 using JustABackup.Database.Enum;
 using JustABackup.Database.Entities;
+using Quartz;
+using Quartz.Impl;
+using JustABackup.Core.Services;
 
 namespace JustABackup.Controllers
 {
     public class JobController : Controller
     {
         private DefaultContext dbContext;
+        private ISchedulerService schedulerService;
 
-        public JobController(DefaultContext dbContext)
+        public JobController(DefaultContext dbContext, ISchedulerService schedulerService)
         {
             this.dbContext = dbContext;
+            this.schedulerService = schedulerService;
         }
 
         [HttpGet]
@@ -182,6 +187,8 @@ namespace JustABackup.Controllers
                 dbContext.Jobs.Add(job);
                 await dbContext.SaveChangesAsync();
 
+                await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
+
                 HttpContext.Session.Remove("CreateJob");
                 return RedirectToAction("Index", "Home");
             }
@@ -192,57 +199,7 @@ namespace JustABackup.Controllers
 
         public async Task<IActionResult> Start(int id)
         {
-            BackupJob job = dbContext.Jobs
-                .Include(j => j.BackupProvider)
-                .Include(j => j.BackupProvider.Provider)
-                .Include(j => j.BackupProvider.Values)
-                .ThenInclude(x => x.Property)
-                .Include(j => j.StorageProvider)
-                .Include(j => j.StorageProvider.Provider)
-                .Include(j => j.StorageProvider.Values)
-                .ThenInclude(x => x.Property)
-                .FirstOrDefault(j => j.ID == id);
-
-            BackupJobHistory history = new BackupJobHistory();
-            history.Started = DateTime.Now;
-
-            job.History.Add(history);
-            await dbContext.SaveChangesAsync();
-
-            Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
-            IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
-            foreach (var property in job.BackupProvider.Values)
-            {
-                PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
-
-                propertyInfo.SetValue(backupProvider, originalValueType);
-            }
-
-            Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
-            IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
-            foreach (var property in job.StorageProvider.Values)
-            {
-                PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
-
-                propertyInfo.SetValue(storageProvider, originalValueType);
-            }
-
-            var items = await backupProvider.GetItems();
-            foreach (var item in items)
-            {
-                using (var stream = await backupProvider.OpenRead(item))
-                {
-                    await storageProvider.StoreItem(item, stream);
-                }
-            }
-
-            history.Completed = DateTime.Now;
-            history.Message = $"{items.Count()} files were copied.";
-            history.Status = ExitCode.Success;
-            await dbContext.SaveChangesAsync();
-
+            await schedulerService.TriggerJob(id);
             return RedirectToAction("Index", "Home");
         }
     }
