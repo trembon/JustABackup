@@ -18,6 +18,7 @@ using JustABackup.Database;
 using System.Collections.Specialized;
 using Quartz;
 using Quartz.Impl;
+using JustABackup.Core.Extensions;
 
 namespace JustABackup
 {
@@ -42,14 +43,27 @@ namespace JustABackup
                 options.UseSqlite(Configuration.GetConnectionString("Default"))
             );
 
+            services.AddQuartz(options =>
+            {
+                options.Add("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
+                options.Add("quartz.jobStore.useProperties", "true");
+                options.Add("quartz.jobStore.dataSource", "default");
+                options.Add("quartz.jobStore.tablePrefix", "QRTZ_");
+                options.Add("quartz.jobStore.driverDelegateType", "Quartz.Impl.AdoJobStore.SQLiteDelegate, Quartz");
+                options.Add("quartz.dataSource.default.provider", "SQLite-Microsoft");
+                options.Add("quartz.dataSource.default.connectionString", "Data Source=quartz.sqlite");
+                options.Add("quartz.serializer.type", "binary");
+            });
+
             // register services
             services.AddScoped<IInitializationService, InitializationService>();
             services.AddScoped<IProviderModelService, ProviderModelService>();
+
             services.AddSingleton<ISchedulerService, SchedulerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IInitializationService initializationService, ISchedulerService schedulerService)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IInitializationService initializationService)
         {
             if (env.IsDevelopment())
             {
@@ -73,19 +87,8 @@ namespace JustABackup
 
             await initializationService.VerifyDatabase();
             initializationService.LoadPlugins();
-            
-            var properties = new NameValueCollection
-            {
-                ["quartz.jobStore.type"] = "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz",
-                ["quartz.jobStore.useProperties"] = "true",
-                ["quartz.jobStore.dataSource"] = "default",
-                ["quartz.jobStore.tablePrefix"] = "QRTZ_",
-                ["quartz.jobStore.driverDelegateType"] = "Quartz.Impl.AdoJobStore.SQLiteDelegate, Quartz",
-                ["quartz.dataSource.default.provider"] = "SQLite-Microsoft",
-                ["quartz.dataSource.default.connectionString"] = "Data Source=quartz.sqlite",
-                ["quartz.serializer.type"] = "binary"
-            };
-            await schedulerService.CreateScheduler(properties, app.ApplicationServices);
+
+            app.UseQuartz();
         }
     }
 }
