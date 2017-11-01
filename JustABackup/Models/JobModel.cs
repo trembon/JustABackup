@@ -1,4 +1,6 @@
-﻿namespace JustABackup.Models
+﻿using System;
+
+namespace JustABackup.Models
 {
     public class JobModel
     {
@@ -9,5 +11,7 @@
         public string BackupProvider { get; set; }
 
         public string StorageProvider { get; set; }
+
+        public DateTime? NextRun { get; set; }
     }
 }

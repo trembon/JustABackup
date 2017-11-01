@@ -48,6 +48,8 @@ namespace JustABackup.Controllers
                 })
                 .ToList();
 
+            model.Jobs.ForEach(async j => j.NextRun = await schedulerService.GetNextRunTime(j.ID));
+
             return View(model);
         }
 
