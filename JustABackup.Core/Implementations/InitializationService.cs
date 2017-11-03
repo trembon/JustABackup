@@ -22,18 +22,16 @@ namespace JustABackup.Core.Implementations
             this.providerModelService = providerModelService;
         }
 
-        public async Task VerifyDatabase()
+        public Task VerifyDatabase()
         {
             dbContext.Database.EnsureCreated();
 
-            var providers = dbContext.Providers;
-            foreach (var provider in providers)
-                provider.IsProcessed = false;
+            // TODO: create quartz db if needed
 
-            await dbContext.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
-        public void LoadPlugins()
+        public async Task LoadPlugins()
         {
             PreLoadAssembliesFromPath();
 
@@ -43,13 +41,13 @@ namespace JustABackup.Core.Implementations
                 foreach (var type in assembly.DefinedTypes)
                 {
                     if (type.ImplementedInterfaces.Contains(typeof(IBackupProvider)))
-                        providerModelService.ProcessBackupProvider(type);
+                        await providerModelService.ProcessBackupProvider(type);
 
                     if (type.ImplementedInterfaces.Contains(typeof(IStorageProvider)))
-                        providerModelService.ProcessStorageProvider(type);
+                        await providerModelService.ProcessStorageProvider(type);
 
                     if (type.ImplementedInterfaces.Contains(typeof(ITransformerProvider)))
-                        providerModelService.ProcessTransformProvider(type);
+                        await providerModelService.ProcessTransformProvider(type);
                 }
             }
         }
@@ -71,7 +69,8 @@ namespace JustABackup.Core.Implementations
 
         public Task VerifyScheduledJobs()
         {
-            // TODO: implement
+            // TODO: verify that all backup jobs has a scheduled job with correct cron
+            // TODO: pause all scheduled jobs with HasChangedModel on the backup jobs
             return Task.CompletedTask;
         }
     }

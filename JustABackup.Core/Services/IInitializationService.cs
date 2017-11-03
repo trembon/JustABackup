@@ -11,6 +11,6 @@ namespace JustABackup.Core.Services
 
         Task VerifyScheduledJobs();
 
-        void LoadPlugins();
+        Task LoadPlugins();
     }
 }

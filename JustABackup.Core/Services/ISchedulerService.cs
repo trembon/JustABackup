@@ -14,5 +14,9 @@ namespace JustABackup.Core.Services
         Task<DateTime?> GetNextRunTime(int jobId);
 
         Task TriggerJob(int jobId);
+
+        Task PauseJob(int jobId);
+
+        Task ResumeJob(int jobId);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models
 {
-    public class ProviderProperty
+    public class ProviderPropertyModel
     {
         public string Name { get; set; }
 

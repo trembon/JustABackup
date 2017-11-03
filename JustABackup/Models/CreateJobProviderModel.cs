@@ -12,6 +12,6 @@ namespace JustABackup.Models
 
         public string ProviderName { get; set; }
         
-        public List<ProviderProperty> Properties { get; set; }
+        public List<ProviderPropertyModel> Properties { get; set; }
     }
 }

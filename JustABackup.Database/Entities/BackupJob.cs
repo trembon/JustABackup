@@ -20,10 +20,14 @@ namespace JustABackup.Database.Entities
         [Required]
         public ProviderInstance BackupProvider { get; set; }
 
+        [Required]
+        public bool HasChangedModel { get; set; }
+
         public List<BackupJobHistory> History { get; set; }
 
         public BackupJob()
         {
+            HasChangedModel = false;
             History = new List<BackupJobHistory>();
         }
     }

@@ -24,11 +24,13 @@ namespace JustABackup.Controllers
     {
         private DefaultContext dbContext;
         private ISchedulerService schedulerService;
+        private ITypeMappingService typeMappingService;
 
-        public JobController(DefaultContext dbContext, ISchedulerService schedulerService)
+        public JobController(DefaultContext dbContext, ISchedulerService schedulerService, ITypeMappingService typeMappingService)
         {
             this.dbContext = dbContext;
             this.schedulerService = schedulerService;
+            this.typeMappingService = typeMappingService;
         }
 
         [HttpGet]
@@ -79,18 +81,6 @@ namespace JustABackup.Controllers
             return RedirectToAction("CreateJobBackup");
         }
 
-        private string TypeToTemplate(int type)
-        {
-            switch (type)
-            {
-                case 0: return "String";
-                case 1: return "Number";
-                case 2: return "Boolean";
-
-                default: return "String";
-            }
-        }
-
         [HttpGet]
         public IActionResult CreateJobBackup()
         {
@@ -104,7 +94,7 @@ namespace JustABackup.Controllers
             var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
 
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
+            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
 
             model.Action = nameof(CreateJobBackup);
             return View("CreateJobProvider", model);
@@ -142,7 +132,7 @@ namespace JustABackup.Controllers
             var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
 
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderProperty { Name = x.Name, Description = x.Description, Template = TypeToTemplate(x.Type) }).ToList();
+            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
 
             return View("CreateJobProvider", model);
         }

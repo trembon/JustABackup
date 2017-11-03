@@ -43,6 +43,18 @@ namespace JustABackup.Core.Implementations
             return triggers.FirstOrDefault()?.GetNextFireTimeUtc().Value.UtcDateTime;
         }
 
+        public async Task PauseJob(int jobId)
+        {
+            JobKey jobKey = JobKey.Create(jobId.ToString());
+            await scheduler.PauseJob(jobKey);
+        }
+
+        public async Task ResumeJob(int jobId)
+        {
+            JobKey jobKey = JobKey.Create(jobId.ToString());
+            await scheduler.ResumeJob(jobKey);
+        }
+
         public async Task TriggerJob(int jobId)
         {
             JobKey jobKey = JobKey.Create(jobId.ToString());
