@@ -60,6 +60,7 @@ namespace JustABackup
             services.AddScoped<IProviderModelService, ProviderModelService>();
 
             services.AddSingleton<ISchedulerService, SchedulerService>();
+            services.AddSingleton<ITypeMappingService, TypeMappingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

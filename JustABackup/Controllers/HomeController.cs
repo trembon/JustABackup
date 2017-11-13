@@ -9,7 +9,7 @@ using JustABackup.Database;
 
 namespace JustABackup.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : ControllerBase
     {
         private DefaultContext context;
 
@@ -20,7 +20,7 @@ namespace JustABackup.Controllers
 
         public IActionResult Index()
         {
-            var model = new ListJobHistoryModel();
+            var model = CreateModel<ListJobHistoryModel>("Backup History");
 
             model.JobHistory = context
                 .JobHistory

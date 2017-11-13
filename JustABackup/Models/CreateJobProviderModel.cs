@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models
 {
-    public class CreateJobProviderModel
+    public class CreateJobProviderModel : BaseViewModel
     {
         public string Action { get; set; }
 

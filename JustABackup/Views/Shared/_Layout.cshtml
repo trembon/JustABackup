@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@model BaseViewModel
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Just A Backup</title>
+    <title>@Model.Title - Just A Backup</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -37,12 +39,18 @@
         </div>
     </nav>
     <div class="container body-content">
-        @RenderBody()
+        <h1>@Model.Title</h1>
+
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - JustABackup</p>
-        </footer>
+
+        <div class="main-content">
+            @RenderBody()
+        </div>
     </div>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year - JustABackup</p>
+    </footer>
 
     <environment names="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>

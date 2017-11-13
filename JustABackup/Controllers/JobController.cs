@@ -20,7 +20,7 @@ using JustABackup.Core.Services;
 
 namespace JustABackup.Controllers
 {
-    public class JobController : Controller
+    public class JobController : ControllerBase
     {
         private DefaultContext dbContext;
         private ISchedulerService schedulerService;
@@ -36,7 +36,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            ListJobsModel model = new ListJobsModel();
+            ListJobsModel model = CreateModel<ListJobsModel>("Scheduled Backups");
 
             model.Jobs = dbContext
                 .Jobs
@@ -58,7 +58,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CreateJobModel model = new CreateJobModel();
+            CreateJobModel model = CreateModel<CreateJobModel>("Create Schedule");
             
             var backupProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Backup).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
             model.BackupProviders = new SelectList(backupProviders, "ID", "Name");
@@ -88,7 +88,7 @@ namespace JustABackup.Controllers
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 
-            CreateJobProviderModel model = new CreateJobProviderModel();
+            CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
             model.Action = nameof(CreateJobBackup);
             
             var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
@@ -126,7 +126,7 @@ namespace JustABackup.Controllers
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
 
-            CreateJobProviderModel model = new CreateJobProviderModel();
+            CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
             model.Action = nameof(CreateJobStorage);
             
             var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
