@@ -9,7 +9,7 @@
         multiple_time_minutes: true,
         default_period: 'week',
         default_value: '15 10-12 * * 1-5',
-        no_reset_button: false,
+        no_reset_button: true,
         lang: 'en'
     });
 });

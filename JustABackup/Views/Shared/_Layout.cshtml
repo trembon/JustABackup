@@ -29,11 +29,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Just A Backup</a>
+                <a asp-controller="Home" asp-action="Index" class="navbar-brand">Just A Backup</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Job" asp-action="Index">Scheduled Jobs</a></li>
+                    <li><a asp-controller="Job" asp-action="Index">Scheduled Jobs</a></li>
                 </ul>
             </div>
         </div>
@@ -49,7 +49,9 @@
     </div>
 
     <footer>
-        <p>&copy; @DateTime.Now.Year - JustABackup</p>
+        <div class="container text-center">
+            <p><a href="https://github.com/trembon/JustABackup" target="_blank" rel="noreferrer">Just A Backup</a> &copy; @DateTime.Now.Year</p>
+        </div>
     </footer>
 
     <environment names="Development">

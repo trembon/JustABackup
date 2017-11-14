@@ -1,0 +1,10 @@
+﻿@model ProviderPropertyModel
+
+@Html.HiddenFor(m => m.Name)
+@Html.HiddenFor(m => m.Description)
+@Html.HiddenFor(m => m.Template)
+
+<div class="form-group">
+    <label asp-for="Value" class="control-label">@Model.Name</label>
+    @Html.EditorFor(m => m.Value, Model.Template)
+</div>
