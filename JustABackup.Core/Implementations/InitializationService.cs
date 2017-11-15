@@ -8,6 +8,8 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 
 namespace JustABackup.Core.Implementations
 {
@@ -15,20 +17,34 @@ namespace JustABackup.Core.Implementations
     {
         private DefaultContext dbContext;
         private IProviderModelService providerModelService;
+        private IConfiguration configuration;
 
-        public InitializationService(DefaultContext dbContext, IProviderModelService providerModelService)
+        public InitializationService(DefaultContext dbContext, IConfiguration configuration, IProviderModelService providerModelService)
         {
             this.dbContext = dbContext;
+            this.configuration = configuration;
             this.providerModelService = providerModelService;
         }
 
-        public Task VerifyDatabase()
+        public async Task VerifyDatabase()
         {
             dbContext.Database.EnsureCreated();
 
-            // TODO: create quartz db if needed
+            using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
+            {
+                await quartzConnection.OpenAsync();
 
-            return Task.CompletedTask;
+                if(new FileInfo(quartzConnection.DataSource).Length == 0)
+                {
+                    string script = File.ReadAllText(configuration["Quartz:SchemaFile"]);
+
+                    using (var command = quartzConnection.CreateCommand())
+                    {
+                        command.CommandText = script;
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
         }
 
         public async Task LoadPlugins()

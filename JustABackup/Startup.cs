@@ -51,7 +51,7 @@ namespace JustABackup
                 options.Add("quartz.jobStore.tablePrefix", "QRTZ_");
                 options.Add("quartz.jobStore.driverDelegateType", "Quartz.Impl.AdoJobStore.SQLiteDelegate, Quartz");
                 options.Add("quartz.dataSource.default.provider", "SQLite-Microsoft");
-                options.Add("quartz.dataSource.default.connectionString", "Data Source=quartz.sqlite");
+                options.Add("quartz.dataSource.default.connectionString", Configuration.GetConnectionString("Quartz"));
                 options.Add("quartz.serializer.type", "binary");
             });
 
@@ -87,7 +87,7 @@ namespace JustABackup
             });
 
             await initializationService.VerifyDatabase();
-            initializationService.LoadPlugins();
+            await initializationService.LoadPlugins();
 
             app.UseQuartz();
         }
