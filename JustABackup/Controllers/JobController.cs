@@ -66,6 +66,9 @@ namespace JustABackup.Controllers
             var storageProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Storage).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
             model.StorageProviders = new SelectList(storageProviders, "ID", "Name");
 
+            var transformProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Transform).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            model.TransformProviders = new SelectList(transformProviders, "ID", "Name");
+
             return View(model);
         }
 
@@ -153,28 +156,16 @@ namespace JustABackup.Controllers
 
                 Provider dbBackupProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
                 Provider dbStorageProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
+                
+                job.BackupProvider = createJob.BackupProvider.CreateProviderInstance(dbBackupProvider);
+                job.StorageProvider = createJob.StorageProvider.CreateProviderInstance(dbStorageProvider);
 
-                ProviderInstance backupProvider = new ProviderInstance();
-                backupProvider.Provider = dbBackupProvider;
-                foreach (var property in createJob.BackupProvider.Properties)
+                foreach(var transformer in createJob.Base.TransformProvider)
                 {
-                    ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                    instanceProperty.Value = property.Value;
-                    instanceProperty.Property = dbBackupProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
-                    backupProvider.Values.Add(instanceProperty);
+                    ProviderInstance transformerInstance = new ProviderInstance();
+                    transformerInstance.Provider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == transformer);
+                    job.TransformProviders.Add(transformerInstance);
                 }
-                job.BackupProvider = backupProvider;
-
-                ProviderInstance storageProvider = new ProviderInstance();
-                storageProvider.Provider = dbStorageProvider;
-                foreach (var property in createJob.StorageProvider.Properties)
-                {
-                    ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                    instanceProperty.Value = property.Value;
-                    instanceProperty.Property = dbStorageProvider.Properties.FirstOrDefault(p => p.Name == property.Name);
-                    storageProvider.Values.Add(instanceProperty);
-                }
-                job.StorageProvider = storageProvider;
 
                 dbContext.Jobs.Add(job);
                 await dbContext.SaveChangesAsync();

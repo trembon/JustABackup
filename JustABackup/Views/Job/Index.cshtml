@@ -24,7 +24,7 @@
                 <td>@job.BackupProvider</td>
                 <td>@job.StorageProvider</td>
                 <td>@job.NextRun</td>
-                <td></td>
+                <td><a asp-action="start" asp-route-id="@job.ID">Start</a></td>
             </tr>
         }
     </tbody>

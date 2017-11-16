@@ -35,6 +35,11 @@ namespace JustABackup.Core.ScheduledJobs
                 .Include(j => j.StorageProvider.Provider)
                 .Include(j => j.StorageProvider.Values)
                 .ThenInclude(x => x.Property)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Provider)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Values)
+                .ThenInclude(x => x.Property)
                 .FirstOrDefault(j => j.ID == jobId);
 
             BackupJobHistory history = new BackupJobHistory();
@@ -43,29 +48,29 @@ namespace JustABackup.Core.ScheduledJobs
             job.History.Add(history);
             await databaseContext.SaveChangesAsync();
 
-            Type backupProviderType = Type.GetType(job.BackupProvider.Provider.Namespace);
-            IBackupProvider backupProvider = Activator.CreateInstance(backupProviderType) as IBackupProvider;
-            foreach (var property in job.BackupProvider.Values)
-            {
-                PropertyInfo propertyInfo = backupProviderType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+            IBackupProvider backupProvider = ConvertToProvider<IBackupProvider>(job.BackupProvider);
+            IStorageProvider storageProvider = ConvertToProvider<IStorageProvider>(job.StorageProvider);
 
-                propertyInfo.SetValue(backupProvider, originalValueType);
-            }
-
-            Type storageProviderType = Type.GetType(job.StorageProvider.Provider.Namespace);
-            IStorageProvider storageProvider = Activator.CreateInstance(storageProviderType) as IStorageProvider;
-            foreach (var property in job.StorageProvider.Values)
-            {
-                PropertyInfo propertyInfo = storageProviderType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
-
-                propertyInfo.SetValue(storageProvider, originalValueType);
-            }
+            IEnumerable<ITransformProvider> transformProviders = job.TransformProviders.Select(tp => ConvertToProvider<ITransformProvider>(tp));
 
             var items = await backupProvider.GetItems();
             foreach (var item in items)
             {
+                Dictionary<ITransformProvider, Dictionary<BackupItem, IEnumerable<BackupItem>>> transformers = new Dictionary<ITransformProvider, Dictionary<BackupItem, IEnumerable<BackupItem>>>(transformProviders.Count());
+                foreach(var transformProvider in transformProviders)
+                {
+                    if (transformers.Count > 0)
+                    {
+                        var mappedItems = await transformProvider.TransformList(transformers.Last().Value.Select(x => x.Key));
+                        transformers.Add(transformProvider, mappedItems);
+                    }
+                    else
+                    {
+                        var mappedItems = await transformProvider.TransformList(items);
+                        transformers.Add(transformProvider, mappedItems);
+                    }
+                }
+
                 using (var stream = await backupProvider.OpenRead(item))
                 {
                     await storageProvider.StoreItem(item, stream);
@@ -77,6 +82,22 @@ namespace JustABackup.Core.ScheduledJobs
             history.Status = ExitCode.Success;
 
             await databaseContext.SaveChangesAsync();
+        }
+
+        private T ConvertToProvider<T>(ProviderInstance providerInstance) where T : class
+        {
+            Type providerType = Type.GetType(providerInstance.Provider.Namespace);
+            T convertedProvider = Activator.CreateInstance(providerType) as T;
+
+            foreach (var property in providerInstance.Values)
+            {
+                PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
+                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
+
+                propertyInfo.SetValue(convertedProvider, originalValueType);
+            }
+
+            return convertedProvider;
         }
     }
 }

@@ -62,7 +62,7 @@ namespace JustABackup.Core.Implementations
                     if (type.ImplementedInterfaces.Contains(typeof(IStorageProvider)))
                         await providerModelService.ProcessStorageProvider(type);
 
-                    if (type.ImplementedInterfaces.Contains(typeof(ITransformerProvider)))
+                    if (type.ImplementedInterfaces.Contains(typeof(ITransformProvider)))
                         await providerModelService.ProcessTransformProvider(type);
                 }
             }

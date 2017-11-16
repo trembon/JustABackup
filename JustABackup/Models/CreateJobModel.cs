@@ -22,7 +22,11 @@ namespace JustABackup.Models
         [Required]
         public int BackupProvider { get; set; }
 
+        [Required]
+        public int[] TransformProvider { get; set; }
+
         public SelectList StorageProviders { get; set; }
         public SelectList BackupProviders { get; set; }
+        public SelectList TransformProviders { get; set; }
     }
 }

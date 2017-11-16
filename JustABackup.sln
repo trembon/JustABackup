@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Base", "JustABa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Core", "JustABackup.Core\JustABackup.Core.csproj", "{C662C115-CABB-4F58-A0BA-C5CEE69D4C5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Database", "JustABackup.Database\JustABackup.Database.csproj", "{EDAD1398-3338-462A-A845-7570B84A006A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database", "JustABackup.Database\JustABackup.Database.csproj", "{EDAD1398-3338-462A-A845-7570B84A006A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Plugin.ZipTransformer", "JustABackup.Plugin.ZipTransformer\JustABackup.Plugin.ZipTransformer.csproj", "{801A63A9-E7EB-4DD2-AF97-D408BB4690BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Plugin.RijndaelEncryptTransformer", "JustABackup.Plugin.RijndaelEncryptTransformer\JustABackup.Plugin.RijndaelEncryptTransformer.csproj", "{7942E937-F73B-4828-BEB7-F9141F9A791C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{EDAD1398-3338-462A-A845-7570B84A006A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDAD1398-3338-462A-A845-7570B84A006A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDAD1398-3338-462A-A845-7570B84A006A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{801A63A9-E7EB-4DD2-AF97-D408BB4690BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{801A63A9-E7EB-4DD2-AF97-D408BB4690BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{801A63A9-E7EB-4DD2-AF97-D408BB4690BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{801A63A9-E7EB-4DD2-AF97-D408BB4690BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7942E937-F73B-4828-BEB7-F9141F9A791C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7942E937-F73B-4828-BEB7-F9141F9A791C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7942E937-F73B-4828-BEB7-F9141F9A791C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7942E937-F73B-4828-BEB7-F9141F9A791C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

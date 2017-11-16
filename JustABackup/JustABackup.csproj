@@ -35,6 +35,8 @@
     <ProjectReference Include="..\JustABackup.Core\JustABackup.Core.csproj" />
     <ProjectReference Include="..\JustABackup.Database\JustABackup.Database.csproj" />
     <ProjectReference Include="..\JustABackup.Plugin.FileSystem\JustABackup.Plugin.FileSystem.csproj" />
+    <ProjectReference Include="..\JustABackup.Plugin.RijndaelEncryptTransformer\JustABackup.Plugin.RijndaelEncryptTransformer.csproj" />
+    <ProjectReference Include="..\JustABackup.Plugin.ZipTransformer\JustABackup.Plugin.ZipTransformer.csproj" />
   </ItemGroup>
 
 </Project>
