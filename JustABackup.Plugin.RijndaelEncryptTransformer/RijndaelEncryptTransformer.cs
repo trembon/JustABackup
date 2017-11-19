@@ -8,14 +8,14 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
 {
     public class RijndaelEncryptTransformer : ITransformProvider
     {
-        public Task<Stream> TransformItem(Dictionary<BackupItem, Stream> backupItems)
+        public Task TransformItem(Stream transformStream, Dictionary<BackupItem, Stream> inputFiles)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Dictionary<BackupItem, IEnumerable<BackupItem>>> TransformList(IEnumerable<BackupItem> files)
+        public Task<IEnumerable<MappedBackupItem>> TransformList(IEnumerable<BackupItem> files)
         {
-            Dictionary<BackupItem, IEnumerable<BackupItem>> result = new Dictionary<BackupItem, IEnumerable<BackupItem>>();
+            List<MappedBackupItem> result = new List<MappedBackupItem>();
 
             foreach(var file in files)
             {
@@ -23,10 +23,10 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
                 encryptedBackupItem.Name = $"{file.Name}.enc";
                 encryptedBackupItem.Path = file.Path;
 
-                result.Add(encryptedBackupItem, new []{ file });
+                result.Add(new MappedBackupItem { Output = encryptedBackupItem, Input = new[] { file } });
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult((IEnumerable<MappedBackupItem>)result);
         }
     }
 }

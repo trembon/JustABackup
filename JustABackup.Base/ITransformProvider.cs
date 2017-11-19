@@ -8,8 +8,8 @@ namespace JustABackup.Base
 {
     public interface ITransformProvider
     {
-        Task<Dictionary<BackupItem, IEnumerable<BackupItem>>> TransformList(IEnumerable<BackupItem> files);
+        Task<IEnumerable<MappedBackupItem>> TransformList(IEnumerable<BackupItem> files);
 
-        Task<Stream> TransformItem(Dictionary<BackupItem, Stream> backupItems);
+        Task TransformItem(Stream transformStream, Dictionary<BackupItem, Stream> inputFiles);
     }
 }

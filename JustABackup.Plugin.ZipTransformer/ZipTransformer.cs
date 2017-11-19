@@ -2,28 +2,39 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.ZipTransformer
 {
     public class ZipTransformer : ITransformProvider
     {
-        public Task<Stream> TransformItem(Dictionary<BackupItem, Stream> backupItems)
+        public async Task TransformItem(Stream transformStream, Dictionary<BackupItem, Stream> inputFiles)
         {
-            throw new NotImplementedException();
+            using (ZipArchive zipArchive = new ZipArchive(transformStream, ZipArchiveMode.Create))
+            {
+                foreach(var file in inputFiles)
+                {
+                    ZipArchiveEntry entry = zipArchive.CreateEntry(file.Key.FullPath);
+                    using (var entryStream = entry.Open())
+                    {
+                        await file.Value.CopyToAsync(entryStream);
+                    }
+                }
+            }
         }
 
-        public Task<Dictionary<BackupItem, IEnumerable<BackupItem>>> TransformList(IEnumerable<BackupItem> files)
+        public Task<IEnumerable<MappedBackupItem>> TransformList(IEnumerable<BackupItem> files)
         {
-            Dictionary<BackupItem, IEnumerable<BackupItem>> result = new Dictionary<BackupItem, IEnumerable<BackupItem>>();
+            List<MappedBackupItem> result = new List<MappedBackupItem>();
 
             BackupItem zippedBackupItem = new BackupItem();
             zippedBackupItem.Name = "complete.zip";
             zippedBackupItem.Path = "";
 
-            result.Add(zippedBackupItem, files);
+            result.Add(new MappedBackupItem { Output = zippedBackupItem, Input = files });
 
-            return Task.FromResult(result);
+            return Task.FromResult((IEnumerable<MappedBackupItem>)result);
         }
     }
 }
