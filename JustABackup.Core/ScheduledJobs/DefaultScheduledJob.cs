@@ -16,6 +16,15 @@ namespace JustABackup.Core.ScheduledJobs
 {
     public class DefaultScheduledJob : IJob
     {
+        private class TransformBackupItem
+        {
+            public MappedBackupItem MappedBackupItem { get; set; }
+
+            public Func<Stream, Task> Execute { get; set; }
+
+            public int ID { get; set; }
+        }
+
         private DefaultContext databaseContext;
 
         public DefaultScheduledJob(DefaultContext databaseContext)
@@ -51,24 +60,77 @@ namespace JustABackup.Core.ScheduledJobs
 
             IBackupProvider backupProvider = ConvertToProvider<IBackupProvider>(job.BackupProvider);
             IStorageProvider storageProvider = ConvertToProvider<IStorageProvider>(job.StorageProvider);
-            IEnumerable<ITransformProvider> transformProviders = job.TransformProviders.Select(tp => ConvertToProvider<ITransformProvider>(tp));
+            List<ITransformProvider> transformProviders = job.TransformProviders.Select(tp => ConvertToProvider<ITransformProvider>(tp)).ToList();
 
             var items = await backupProvider.GetItems();
 
+            List<List<TransformBackupItem>> transformExecuteList = new List<List<TransformBackupItem>>(transformProviders.Count());
+
             Dictionary<ITransformProvider, IEnumerable<MappedBackupItem>> transformers = new Dictionary<ITransformProvider, IEnumerable<MappedBackupItem>>(transformProviders.Count());
-            foreach (var transformProvider in transformProviders)
+            for (int i = 0; i < transformProviders.Count(); i++)
             {
-                if (transformers.Count > 0)
+                if (i > 0)
                 {
-                    var mappedItems = await transformProvider.TransformList(transformers.Last().Value.Select(x => x.Output));
-                    transformers.Add(transformProvider, mappedItems);
+                    var mappedItems = await transformProviders[i].TransformList(transformers.Last().Value.Select(x => x.Output));
+                    transformers.Add(transformProviders[i], mappedItems);
+
+                    List<TransformBackupItem> subTransformExecuteList = new List<TransformBackupItem>();
+                    foreach (var mappedItem in mappedItems)
+                    {
+                        int currentMappedIndex = i;
+                        Func<Stream, Task> action = async (stream) =>
+                        {
+                            Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
+                            foreach (var backupItem in mappedItem.Input)
+                            {
+                                MemoryStream ms = new MemoryStream();
+                                var transformBackupItem = transformExecuteList[currentMappedIndex - 1].FirstOrDefault(x => x.MappedBackupItem.Output == backupItem);
+                                await transformBackupItem.Execute(ms);
+                                ms.Seek(0, SeekOrigin.Begin);
+                                dictionary.Add(backupItem, ms);
+                            }
+
+                            await transformProviders[currentMappedIndex].TransformItem(mappedItem.Output, stream, dictionary);
+                        };
+
+                        subTransformExecuteList.Add(new TransformBackupItem { MappedBackupItem = mappedItem, Execute = action });
+                    }
+                    transformExecuteList.Add(subTransformExecuteList);
                 }
                 else
                 {
-                    var mappedItems = await transformProvider.TransformList(items);
-                    transformers.Add(transformProvider, mappedItems);
+                    var mappedItems = await transformProviders[i].TransformList(items);
+                    transformers.Add(transformProviders[i], mappedItems);
+
+                    List<TransformBackupItem> subTransformExecuteList = new List<TransformBackupItem>();
+                    foreach (var mappedItem in mappedItems)
+                    {
+                        int currentMappedIndex = i;
+                        Func<Stream, Task> action = async (stream) =>
+                        {
+                            Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
+                            foreach (var backupItem in mappedItem.Input)
+                                dictionary.Add(backupItem, await backupProvider.OpenRead(backupItem));
+
+                            await transformProviders[currentMappedIndex].TransformItem(mappedItem.Output, stream, dictionary);
+                        };
+
+                        subTransformExecuteList.Add(new TransformBackupItem { MappedBackupItem = mappedItem, Execute = action });
+                    }
+                    transformExecuteList.Add(subTransformExecuteList);
                 }
             }
+
+            //foreach (var item in transformers.Last().Value)
+            //{
+            //    using (MemoryStream ms = new MemoryStream())
+            //    {
+            //        for (int i = transformers.Count - 1; i >= 0; i--)
+            //        {
+
+            //        }
+            //    }
+            //}
 
             //List<Stream> openStreams = new List<Stream>();
             //foreach(var transformProcessor in transformers.Reverse())
@@ -88,11 +150,26 @@ namespace JustABackup.Core.ScheduledJobs
             //    }
             //}
 
-            foreach (var item in items)
+            if (transformProviders.Count() > 0)
             {
-                using (var stream = await backupProvider.OpenRead(item))
+                foreach(var mappedItem in transformExecuteList.Last())
                 {
-                    await storageProvider.StoreItem(item, stream);
+                    using(MemoryStream ms = new MemoryStream())
+                    {
+                        await mappedItem.Execute(ms);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, ms);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    using (var stream = await backupProvider.OpenRead(item))
+                    {
+                        await storageProvider.StoreItem(item, stream);
+                    }
                 }
             }
 

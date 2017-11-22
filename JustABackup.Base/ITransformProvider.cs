@@ -10,6 +10,6 @@ namespace JustABackup.Base
     {
         Task<IEnumerable<MappedBackupItem>> TransformList(IEnumerable<BackupItem> files);
 
-        Task TransformItem(Stream transformStream, Dictionary<BackupItem, Stream> inputFiles);
+        Task TransformItem(BackupItem item, Stream transformStream, Dictionary<BackupItem, Stream> inputFiles);
     }
 }

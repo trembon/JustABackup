@@ -9,11 +9,11 @@ namespace JustABackup.Plugin.ZipTransformer
 {
     public class ZipTransformer : ITransformProvider
     {
-        public async Task TransformItem(Stream transformStream, Dictionary<BackupItem, Stream> inputFiles)
+        public async Task TransformItem(BackupItem item, Stream transformStream, Dictionary<BackupItem, Stream> inputFiles)
         {
-            using (ZipArchive zipArchive = new ZipArchive(transformStream, ZipArchiveMode.Create))
+            using (ZipArchive zipArchive = new ZipArchive(transformStream, ZipArchiveMode.Create, true))
             {
-                foreach(var file in inputFiles)
+                foreach (var file in inputFiles)
                 {
                     ZipArchiveEntry entry = zipArchive.CreateEntry(file.Key.FullPath);
                     using (var entryStream = entry.Open())
