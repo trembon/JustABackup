@@ -1,6 +1,7 @@
 ﻿using JustABackup.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.FileSystem
 {
+    [DisplayName("File System Backup")]
     public class FileSystemBackup : IBackupProvider
     {
         [Display(Name = "Folder")]

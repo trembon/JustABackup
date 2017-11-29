@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using JustABackup.Database.Entities;
 
 namespace JustABackup.Core.Implementations
 {
@@ -18,12 +19,14 @@ namespace JustABackup.Core.Implementations
         private DefaultContext dbContext;
         private IProviderModelService providerModelService;
         private IConfiguration configuration;
+        private ISchedulerService schedulerService;
 
-        public InitializationService(DefaultContext dbContext, IConfiguration configuration, IProviderModelService providerModelService)
+        public InitializationService(DefaultContext dbContext, IConfiguration configuration, IProviderModelService providerModelService, ISchedulerService schedulerService)
         {
             this.dbContext = dbContext;
             this.configuration = configuration;
             this.providerModelService = providerModelService;
+            this.schedulerService = schedulerService;
         }
 
         public async Task VerifyDatabase()
@@ -83,11 +86,15 @@ namespace JustABackup.Core.Implementations
             }
         }
 
-        public Task VerifyScheduledJobs()
+        public async Task VerifyScheduledJobs()
         {
-            // TODO: verify that all backup jobs has a scheduled job with correct cron
-            // TODO: pause all scheduled jobs with HasChangedModel on the backup jobs
-            return Task.CompletedTask;
+            foreach(BackupJob job in dbContext.Jobs)
+            {
+                if (job.HasChangedModel)
+                    await schedulerService.PauseJob(job.ID);
+                else
+                    await schedulerService.ResumeJob(job.ID);
+            }
         }
     }
 }

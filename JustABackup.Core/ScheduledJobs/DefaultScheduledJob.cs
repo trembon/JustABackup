@@ -71,7 +71,7 @@ namespace JustABackup.Core.ScheduledJobs
             {
                 if (i > 0)
                 {
-                    var mappedItems = await transformProviders[i].TransformList(transformers.Last().Value.Select(x => x.Output));
+                    var mappedItems = await transformProviders[i].MapInput(transformers.Last().Value.Select(x => x.Output));
                     transformers.Add(transformProviders[i], mappedItems);
 
                     List<TransformBackupItem> subTransformExecuteList = new List<TransformBackupItem>();
@@ -99,7 +99,7 @@ namespace JustABackup.Core.ScheduledJobs
                 }
                 else
                 {
-                    var mappedItems = await transformProviders[i].TransformList(items);
+                    var mappedItems = await transformProviders[i].MapInput(items);
                     transformers.Add(transformProviders[i], mappedItems);
 
                     List<TransformBackupItem> subTransformExecuteList = new List<TransformBackupItem>();

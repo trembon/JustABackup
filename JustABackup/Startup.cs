@@ -88,6 +88,7 @@ namespace JustABackup
 
             await initializationService.VerifyDatabase();
             await initializationService.LoadPlugins();
+            await initializationService.VerifyScheduledJobs();
 
             app.UseQuartz();
         }

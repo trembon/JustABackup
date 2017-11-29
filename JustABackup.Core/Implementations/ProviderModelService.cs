@@ -114,8 +114,8 @@ namespace JustABackup.Core.Implementations
                 {
                     var jobsWithChangedModels = dbContext
                         .Jobs
-                        .Where(j => j.StorageProvider.ID == existingProvider.ID)
-                        .Where(j => j.BackupProvider.ID == existingProvider.ID);
+                        .Include(j => j.TransformProviders)
+                        .Where(j => j.StorageProvider.ID == existingProvider.ID || j.BackupProvider.ID == existingProvider.ID || j.TransformProviders.Any(t => t.ID == existingProvider.ID));
 
                     foreach(BackupJob job in jobsWithChangedModels)
                         job.HasChangedModel = true;
