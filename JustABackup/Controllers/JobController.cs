@@ -81,30 +81,28 @@ namespace JustABackup.Controllers
                 HttpContext.Session.SetObject("CreateJob", createJob);
             }
 
-            return RedirectToAction("CreateJobBackup");
+            return RedirectToAction("ConfigureJobProvider");
         }
 
         [HttpGet]
-        public IActionResult CreateJobBackup()
+        public IActionResult ConfigureJobProvider(int index = 0)
         {
             CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
                 return RedirectToAction("Index", "Home");
-
-            CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
-            model.Action = nameof(CreateJobBackup);
             
-            var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
+            var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.ProviderIDs[index]);
 
+            ConfigureJobProviderModel model = CreateModel<ConfigureJobProviderModel>("Create Schedule");
+            model.CurrentIndex = index;
             model.ProviderName = provider.Name;
             model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
 
-            model.Action = nameof(CreateJobBackup);
-            return View("CreateJobProvider", model);
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult CreateJobBackup(CreateJobProviderModel model)
+        public async Task<IActionResult> ConfigureJobProvider(ConfigureJobProviderModel model)
         {
             CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
             if (createJob == null)
@@ -112,73 +110,152 @@ namespace JustABackup.Controllers
 
             if (ModelState.IsValid)
             {
-                createJob.BackupProvider = model;
+                createJob.Providers.Add(model);
 
                 HttpContext.Session.SetObject("CreateJob", createJob);
 
-                return RedirectToAction("CreateJobStorage");
-            }
-
-            return View("CreateJobProvider", model);
-        }
-
-        [HttpGet]
-        public IActionResult CreateJobStorage()
-        {
-            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
-            if (createJob == null)
-                return RedirectToAction("Index", "Home");
-
-            CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
-            model.Action = nameof(CreateJobStorage);
-            
-            var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
-
-            model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
-
-            return View("CreateJobProvider", model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateJobStorage(CreateJobProviderModel model)
-        {
-            CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
-            if (createJob == null)
-                return RedirectToAction("Index", "Home");
-
-            if (ModelState.IsValid)
-            {
-                createJob.StorageProvider = model;
-                
-                BackupJob job = new BackupJob();
-                job.Name = createJob.Base.Name;
-
-                Provider dbBackupProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
-                Provider dbStorageProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
-                
-                job.BackupProvider = createJob.BackupProvider.CreateProviderInstance(dbBackupProvider);
-                job.StorageProvider = createJob.StorageProvider.CreateProviderInstance(dbStorageProvider);
-
-                foreach(var transformer in createJob.Base.TransformProvider)
+                int nextIndex = model.CurrentIndex + 1;
+                if (nextIndex >= createJob.ProviderIDs.Length)
                 {
-                    ProviderInstance transformerInstance = new ProviderInstance();
-                    transformerInstance.Provider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == transformer);
-                    job.TransformProviders.Add(transformerInstance);
+                    await AddJobToDatabase(createJob);
+                    HttpContext.Session.Remove("CreateJob");
+
+                    return RedirectToAction("Index", "Home");
                 }
-
-                dbContext.Jobs.Add(job);
-                await dbContext.SaveChangesAsync();
-
-                await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
-
-                HttpContext.Session.Remove("CreateJob");
-                return RedirectToAction("Index", "Home");
+                else
+                {
+                    return RedirectToAction("ConfigureJobProvider", new { index = nextIndex });
+                }
             }
 
-            model.Action = nameof(CreateJobStorage);
-            return View("CreateJobProvider", model);
+            return View(model);
         }
+
+        //[HttpGet]
+        //public IActionResult CreateJobBackup()
+        //{
+        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
+        //    if (createJob == null)
+        //        return RedirectToAction("Index", "Home");
+
+        //    CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
+        //    model.Action = nameof(CreateJobBackup);
+
+        //    var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
+
+        //    model.ProviderName = provider.Name;
+        //    model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
+
+        //    model.Action = nameof(CreateJobBackup);
+        //    return View("CreateJobProvider", model);
+        //}
+
+        //[HttpPost]
+        //public IActionResult CreateJobBackup(CreateJobProviderModel model)
+        //{
+        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
+        //    if (createJob == null)
+        //        return RedirectToAction("Index", "Home");
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        createJob.BackupProvider = model;
+
+        //        HttpContext.Session.SetObject("CreateJob", createJob);
+
+        //        return RedirectToAction("CreateJobStorage");
+        //    }
+
+        //    return View("CreateJobProvider", model);
+        //}
+
+        //[HttpGet]
+        //public IActionResult CreateJobStorage()
+        //{
+        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
+        //    if (createJob == null)
+        //        return RedirectToAction("Index", "Home");
+
+        //    CreateJobProviderModel model = CreateModel<CreateJobProviderModel>("Create Schedule");
+        //    model.Action = nameof(CreateJobStorage);
+
+        //    var provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
+
+        //    model.ProviderName = provider.Name;
+        //    model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
+
+        //    return View("CreateJobProvider", model);
+        //}
+
+        private async Task AddJobToDatabase(CreateJob createJob)
+        {
+            BackupJob job = new BackupJob();
+            job.Name = createJob.Base.Name;
+            
+            for(int i = 0; i < createJob.Providers.Count; i++)
+            {
+                Provider provider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.ProviderIDs[i]);
+                ProviderInstance providerInstance = createJob.Providers[i].CreateProviderInstance(provider);
+
+                if (i == 0)
+                {
+                    job.BackupProvider = providerInstance;
+                }
+                else if (i >= createJob.Providers.Count - 1)
+                {
+                    job.StorageProvider = providerInstance;
+                }
+                else
+                {
+                    job.TransformProviders.Add(providerInstance);
+                }
+            }
+
+            dbContext.Jobs.Add(job);
+            await dbContext.SaveChangesAsync();
+
+            await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CreateJobStorage(CreateJobProviderModel model)
+        //{
+        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>("CreateJob");
+        //    if (createJob == null)
+        //        return RedirectToAction("Index", "Home");
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        createJob.StorageProvider = model;
+                
+        //        BackupJob job = new BackupJob();
+        //        job.Name = createJob.Base.Name;
+
+        //        Provider dbBackupProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.BackupProvider);
+        //        Provider dbStorageProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.Base.StorageProvider);
+                
+        //        job.BackupProvider = createJob.BackupProvider.CreateProviderInstance(dbBackupProvider);
+        //        job.StorageProvider = createJob.StorageProvider.CreateProviderInstance(dbStorageProvider);
+
+        //        foreach(var transformer in createJob.Base.TransformProvider)
+        //        {
+        //            ProviderInstance transformerInstance = new ProviderInstance();
+        //            transformerInstance.Provider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == transformer);
+        //            job.TransformProviders.Add(transformerInstance);
+        //        }
+
+        //        dbContext.Jobs.Add(job);
+        //        await dbContext.SaveChangesAsync();
+
+        //        await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
+
+        //        HttpContext.Session.Remove("CreateJob");
+        //        return RedirectToAction("Index", "Home");
+        //    }
+
+        //    model.Action = nameof(CreateJobStorage);
+        //    return View("CreateJobProvider", model);
+        //}
 
         public async Task<IActionResult> Start(int id)
         {

@@ -33,20 +33,27 @@ namespace JustABackup.Core.Implementations
         {
             dbContext.Database.EnsureCreated();
 
-            using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
+            try
             {
-                await quartzConnection.OpenAsync();
-
-                if(new FileInfo(quartzConnection.DataSource).Length == 0)
+                using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
                 {
-                    string script = File.ReadAllText(configuration["Quartz:SchemaFile"]);
+                    await quartzConnection.OpenAsync();
 
-                    using (var command = quartzConnection.CreateCommand())
+                    if (new FileInfo(quartzConnection.DataSource).Length == 0)
                     {
-                        command.CommandText = script;
-                        await command.ExecuteNonQueryAsync();
+                        string script = File.ReadAllText(configuration["Quartz:SchemaFile"]);
+
+                        using (var command = quartzConnection.CreateCommand())
+                        {
+                            command.CommandText = script;
+                            await command.ExecuteNonQueryAsync();
+                        }
                     }
                 }
+            }
+            catch
+            {
+                // TODO: log
             }
         }
 
@@ -77,11 +84,18 @@ namespace JustABackup.Core.Implementations
 
             foreach (var fi in files)
             {
-                string s = fi.FullName;
-                AssemblyName a = AssemblyName.GetAssemblyName(s);
-                if (!AppDomain.CurrentDomain.GetAssemblies().Any(assembly => AssemblyName.ReferenceMatchesDefinition(a, assembly.GetName())))
+                try
                 {
-                    Assembly.Load(a);
+                    string s = fi.FullName;
+                    AssemblyName a = AssemblyName.GetAssemblyName(s);
+                    if (!AppDomain.CurrentDomain.GetAssemblies().Any(assembly => AssemblyName.ReferenceMatchesDefinition(a, assembly.GetName())))
+                    {
+                        Assembly.Load(a);
+                    }
+                }
+                catch
+                {
+                    // TODO: log
                 }
             }
         }

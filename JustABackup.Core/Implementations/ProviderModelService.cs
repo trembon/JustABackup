@@ -112,11 +112,13 @@ namespace JustABackup.Core.Implementations
 
                 if (modelHasChanged)
                 {
+                    // find all jobs that uses the changed model
                     var jobsWithChangedModels = dbContext
                         .Jobs
                         .Include(j => j.TransformProviders)
                         .Where(j => j.StorageProvider.ID == existingProvider.ID || j.BackupProvider.ID == existingProvider.ID || j.TransformProviders.Any(t => t.ID == existingProvider.ID));
 
+                    // set the jobs to have a changed model
                     foreach(BackupJob job in jobsWithChangedModels)
                         job.HasChangedModel = true;
                 }
@@ -126,7 +128,14 @@ namespace JustABackup.Core.Implementations
                 await dbContext.Providers.AddAsync(provider);
             }
 
-            await dbContext.SaveChangesAsync();
+            try
+            {
+                await dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                // TODO: log
+            }
         }
         
         private List<ProviderProperty> GetProperties(Type type)

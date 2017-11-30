@@ -1,0 +1,20 @@
+﻿@model JustABackup.Models.ConfigureJobProviderModel
+
+@{
+    ViewData["Title"] = "ConfigureJobProvider";
+}
+
+<h4>Configure - @Model.ProviderName</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <form>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.EditorFor(m => m.Properties)
+            <div class="form-group text-right">
+                <input type="submit" value="Continue" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
