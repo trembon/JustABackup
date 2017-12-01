@@ -9,7 +9,9 @@
 
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
-        <form>
+        <form method="post">
+            <input type="hidden" asp-for="CurrentIndex" />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.EditorFor(m => m.Properties)
             <div class="form-group text-right">

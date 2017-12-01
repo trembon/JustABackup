@@ -12,6 +12,8 @@ namespace JustABackup.Models
 
         public string StorageProvider { get; set; }
 
+        public bool HasChangedModel { get; set; }
+
         public DateTime? NextRun { get; set; }
     }
 }

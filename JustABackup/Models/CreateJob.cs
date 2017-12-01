@@ -26,10 +26,6 @@ namespace JustABackup.Models
 
         public CreateJobModel Base { get; set; }
 
-        //public ConfigureJobProviderModel BackupProvider { get; set; }
-
-        //public ConfigureJobProviderModel StorageProvider { get; set; }
-
         public List<ConfigureJobProviderModel> Providers { get; set; }
 
         public CreateJob()

@@ -39,8 +39,16 @@ namespace JustABackup.Core.Implementations
         {
             JobKey jobKey = JobKey.Create(jobId.ToString());
             var triggers = await scheduler.GetTriggersOfJob(jobKey);
+            if (triggers.Count != 1)
+                return null;
 
-            return triggers.FirstOrDefault()?.GetNextFireTimeUtc().Value.LocalDateTime;
+            var trigger = triggers.FirstOrDefault();
+            var triggerState = await scheduler.GetTriggerState(trigger.Key);
+
+            if (triggerState == TriggerState.Paused)
+                return null;
+
+            return trigger.GetNextFireTimeUtc()?.LocalDateTime;
         }
 
         public async Task PauseJob(int jobId)

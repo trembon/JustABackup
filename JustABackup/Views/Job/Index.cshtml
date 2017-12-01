@@ -19,11 +19,11 @@
     <tbody>
         @foreach (var job in Model.Jobs)
         {
-            <tr>
+            <tr class="@(job.HasChangedModel ? "danger" : null)">
                 <td>@job.Name</td>
                 <td>@job.BackupProvider</td>
                 <td>@job.StorageProvider</td>
-                <td>@job.NextRun</td>
+                <td>@(job.NextRun != null ? job.NextRun.ToString() : "Paused")</td>
                 <td><a asp-action="start" asp-route-id="@job.ID">Start</a></td>
             </tr>
         }
