@@ -45,8 +45,7 @@ namespace JustABackup.Controllers
                 {
                     ID = j.ID,
                     Name = j.Name,
-                    BackupProvider = j.BackupProvider.Provider.Name,
-                    StorageProvider = j.StorageProvider.Provider.Name,
+                    LastRun = j.History.OrderByDescending(h => h.Started).Select(h => h.Started).FirstOrDefault(),
                     HasChangedModel = j.HasChangedModel
                 })
                 .ToList();
@@ -162,10 +161,38 @@ namespace JustABackup.Controllers
             await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
         }
 
-        public async Task<IActionResult> Start(int id)
+        public async Task<IActionResult> Start(int[] ids)
         {
-            await schedulerService.TriggerJob(id);
-            return RedirectToAction("Index", "Home");
+            foreach (int id in ids)
+                await schedulerService.TriggerJob(id);
+
+            return Ok(true);
+        }
+
+        public async Task<IActionResult> Resume(int[] ids)
+        {
+            Dictionary<int, DateTime?> result = new Dictionary<int, DateTime?>(ids.Length);
+
+            foreach (int id in ids)
+            {
+                await schedulerService.ResumeJob(id);
+                result.Add(id, await schedulerService.GetNextRunTime(id));
+            }
+
+            return Ok(result);
+        }
+
+        public async Task<IActionResult> Pause(int[] ids)
+        {
+            Dictionary<int, DateTime?> result = new Dictionary<int, DateTime?>(ids.Length);
+
+            foreach (int id in ids)
+            {
+                await schedulerService.PauseJob(id);
+                result.Add(id, await schedulerService.GetNextRunTime(id));
+            }
+
+            return Ok(result);
         }
     }
 }

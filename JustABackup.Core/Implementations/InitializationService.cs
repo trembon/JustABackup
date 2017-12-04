@@ -105,9 +105,9 @@ namespace JustABackup.Core.Implementations
             foreach(BackupJob job in dbContext.Jobs)
             {
                 if (job.HasChangedModel)
+                {
                     await schedulerService.PauseJob(job.ID);
-                else
-                    await schedulerService.ResumeJob(job.ID);
+                }
             }
         }
     }

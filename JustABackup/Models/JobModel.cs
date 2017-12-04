@@ -8,12 +8,10 @@ namespace JustABackup.Models
 
         public string Name { get; set; }
 
-        public string BackupProvider { get; set; }
-
-        public string StorageProvider { get; set; }
-
         public bool HasChangedModel { get; set; }
 
         public DateTime? NextRun { get; set; }
+
+        public DateTime? LastRun { get; set; }
     }
 }
