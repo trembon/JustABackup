@@ -30,7 +30,7 @@
                 <td>@job.Name</td>
                 <td>@(job.LastRun != null ? job.LastRun.ToString() : "Never")</td>
                 <td class="next-run">@(job.NextRun != null ? job.NextRun.ToString() : "Paused")</td>
-                <td><input type="checkbox" disabled="@(job.HasChangedModel ? "disabled" : null)" /> @*<a asp-action="start" asp-route-id="@job.ID">Start</a>*@</td>
+                <td><input type="checkbox" disabled="@(job.HasChangedModel ? "disabled" : null)" /></td>
             </tr>
         }
     </tbody>
