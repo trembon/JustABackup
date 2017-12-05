@@ -18,5 +18,7 @@ namespace JustABackup.Core.Services
         Task PauseJob(int jobId);
 
         Task ResumeJob(int jobId);
+
+        Task<string> GetCronSchedule(int jobId);
     }
 }

@@ -27,7 +27,7 @@
         @foreach (var job in Model.Jobs)
         {
             <tr data-id="@job.ID" class="@(job.HasChangedModel ? "danger" : null)">
-                <td>@job.Name</td>
+                <td><a asp-action="Details" asp-route-id="@job.ID">@job.Name</a></td>
                 <td>@(job.LastRun != null ? job.LastRun.ToString() : "Never")</td>
                 <td class="next-run">@(job.NextRun != null ? job.NextRun.ToString() : "Paused")</td>
                 <td><input type="checkbox" disabled="@(job.HasChangedModel ? "disabled" : null)" /></td>

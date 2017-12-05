@@ -34,11 +34,11 @@ namespace JustABackup.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ListJobsModel model = CreateModel<ListJobsModel>("Scheduled Backups");
 
-            model.Jobs = dbContext
+            model.Jobs = await dbContext
                 .Jobs
                 .OrderBy(j => j.Name)
                 .Select(j => new JobModel
@@ -48,9 +48,46 @@ namespace JustABackup.Controllers
                     LastRun = j.History.OrderByDescending(h => h.Started).Select(h => h.Started).FirstOrDefault(),
                     HasChangedModel = j.HasChangedModel
                 })
-                .ToList();
+                .ToListAsync();
 
             model.Jobs.ForEach(async j => j.NextRun = await schedulerService.GetNextRunTime(j.ID));
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            JobDetailModel model = CreateModel<JobDetailModel>("Scheduled Backup");
+
+            BackupJob job = await dbContext
+                .Jobs
+                .Include(j => j.BackupProvider)
+                .Include(j => j.BackupProvider.Provider)
+                .Include(j => j.BackupProvider.Values)
+                .ThenInclude(x => x.Property)
+                .Include(j => j.StorageProvider)
+                .Include(j => j.StorageProvider.Provider)
+                .Include(j => j.StorageProvider.Values)
+                .ThenInclude(x => x.Property)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Provider)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Values)
+                .ThenInclude(x => x.Property)
+                .FirstOrDefaultAsync(j => j.ID == id);
+
+            if (job == null)
+                return NotFound();
+
+            model.ID = id;
+            model.Name = job.Name;
+            model.HasChangedModel = job.HasChangedModel;
+            model.BackupProvider = job.BackupProvider.Provider.Name;
+            model.StorageProvider = job.StorageProvider.Provider.Name;
+            model.TransformProviders = job.TransformProviders.Select(tp => tp.Provider.Name);
+
+            model.CronSchedule = await schedulerService.GetCronSchedule(id);
 
             return View(model);
         }

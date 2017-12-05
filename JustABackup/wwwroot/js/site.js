@@ -13,6 +13,10 @@
         lang: 'en'
     });
 
+    $('.cron-selector.read-only').each(function (i, el) {
+        $(el).jqCronGetInstance().disable();
+    });
+
     $('#job-list').on('change', 'input[type="checkbox"]', function () {
         var list = $('#job-list input[type="checkbox"]');
         if (list.is(':checked')) {

@@ -1,0 +1,45 @@
+﻿@model JobDetailModel
+
+<h4>Details: @Model.Name</h4>
+<hr />
+
+@if (Model.HasChangedModel)
+{
+    <div class="alert alert-warning" role="alert">This scheduled job is paused because one or more of the providers has changed their model.<br/>This job will not be activated before you modify this job and verify all properties.</div>
+}
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CronSchedule)
+        </dt>
+        <dd>
+            <input class="cron-selector read-only hidden" value="@Model.CronSchedule" />
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BackupProvider)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BackupProvider)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StorageProvider)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StorageProvider)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransformProviders)
+        </dt>
+        <dd>
+            @foreach(string transformProvider in Model.TransformProviders)
+            {
+                <p>@transformProvider</p>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index" class="btn btn-default">Back to List</a>
+    <a asp-action="Modify" asp-route-id="@Model.ID" class="btn btn-success">Modify</a>
+</div>

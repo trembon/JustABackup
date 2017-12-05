@@ -35,6 +35,18 @@ namespace JustABackup.Core.Implementations
             await scheduler.ScheduleJob(jobDetail, trigger);
         }
 
+        public async Task<string> GetCronSchedule(int jobId)
+        {
+            JobKey jobKey = JobKey.Create(jobId.ToString());
+            var triggers = await scheduler.GetTriggersOfJob(jobKey);
+
+            var defaultTrigger = triggers.FirstOrDefault() as Quartz.Impl.Triggers.CronTriggerImpl;
+            if (defaultTrigger != null)
+                return defaultTrigger.CronExpressionString;
+
+            return null;
+        }
+
         public async Task<DateTime?> GetNextRunTime(int jobId)
         {
             JobKey jobKey = JobKey.Create(jobId.ToString());
