@@ -1,0 +1,55 @@
+﻿@model JustABackup.Models.ModifyJobModel
+
+@{
+    ViewData["Title"] = "Modify";
+}
+
+<h2>Modify</h2>
+
+<h4>ModifyJobModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Modify">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ID" class="control-label"></label>
+                <input asp-for="ID" class="form-control" />
+                <span asp-validation-for="ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CronSchedule" class="control-label"></label>
+                <input asp-for="CronSchedule" class="form-control" />
+                <span asp-validation-for="CronSchedule" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StorageProvider" class="control-label"></label>
+                <input asp-for="StorageProvider" class="form-control" />
+                <span asp-validation-for="StorageProvider" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BackupProvider" class="control-label"></label>
+                <input asp-for="BackupProvider" class="form-control" />
+                <span asp-validation-for="BackupProvider" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -58,8 +58,6 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            JobDetailModel model = CreateModel<JobDetailModel>("Scheduled Backup");
-
             BackupJob job = await dbContext
                 .Jobs
                 .Include(j => j.BackupProvider)
@@ -80,6 +78,8 @@ namespace JustABackup.Controllers
             if (job == null)
                 return NotFound();
 
+            JobDetailModel model = CreateModel<JobDetailModel>("Scheduled Backup");
+
             model.ID = id;
             model.Name = job.Name;
             model.HasChangedModel = job.HasChangedModel;
@@ -92,6 +92,7 @@ namespace JustABackup.Controllers
             return View(model);
         }
 
+        #region Create scheduled job
         [HttpGet]
         public IActionResult Create()
         {
@@ -167,6 +168,59 @@ namespace JustABackup.Controllers
 
             return View(model);
         }
+        #endregion
+
+        #region Modify scheduled job
+        [HttpGet]
+        public async Task<IActionResult> Modify(int id)
+        {
+            BackupJob job = await dbContext
+                .Jobs
+                .Include(j => j.BackupProvider)
+                .Include(j => j.BackupProvider.Provider)
+                .Include(j => j.BackupProvider.Values)
+                .ThenInclude(x => x.Property)
+                .Include(j => j.StorageProvider)
+                .Include(j => j.StorageProvider.Provider)
+                .Include(j => j.StorageProvider.Values)
+                .ThenInclude(x => x.Property)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Provider)
+                .Include(j => j.TransformProviders)
+                .ThenInclude(x => x.Values)
+                .ThenInclude(x => x.Property)
+                .FirstOrDefaultAsync(j => j.ID == id);
+            
+            if (job == null)
+                return NotFound();
+
+            ModifyJobModel model = CreateModel<ModifyJobModel>("Modify Schedule");
+            model.ID = job.ID;
+            model.Name = job.Name;
+            model.CronSchedule = await schedulerService.GetCronSchedule(id);
+            model.BackupProvider = job.BackupProvider.Provider.ID;
+            model.StorageProvider = job.StorageProvider.Provider.ID;
+            model.TransformProvider = job.TransformProviders.Select(tp => tp.Provider.ID).ToArray();
+
+            var backupProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Backup).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            model.BackupProviders = new SelectList(backupProviders, "ID", "Name");
+
+            var storageProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Storage).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            model.StorageProviders = new SelectList(storageProviders, "ID", "Name");
+
+            var transformProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Transform).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            model.TransformProviders = new SelectList(transformProviders, "ID", "Name");
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Modify()
+        {
+
+            return View();
+        }
+        #endregion
 
         private async Task AddJobToDatabase(CreateJob createJob)
         {
