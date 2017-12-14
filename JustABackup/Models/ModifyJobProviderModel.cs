@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models
 {
-    public class ModifyJobModel : CreateJobModel
+    public class ModifyJobProviderModel : CreateJobProviderModel
     {
         [Required]
         [Range(0, int.MaxValue)]

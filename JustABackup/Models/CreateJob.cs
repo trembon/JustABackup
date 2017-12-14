@@ -26,11 +26,11 @@ namespace JustABackup.Models
 
         public CreateJobModel Base { get; set; }
 
-        public List<ConfigureJobProviderModel> Providers { get; set; }
+        public List<CreateJobProviderModel> Providers { get; set; }
 
         public CreateJob()
         {
-            Providers = new List<ConfigureJobProviderModel>();
+            Providers = new List<CreateJobProviderModel>();
         }
     }
 }

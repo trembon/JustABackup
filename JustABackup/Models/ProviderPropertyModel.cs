@@ -12,7 +12,7 @@ namespace JustABackup.Models
 
         public string Description { get; set; }
 
-        public string Value { get; set; }
+        public dynamic Value { get; set; }
 
         public string Template { get; set; }
     }

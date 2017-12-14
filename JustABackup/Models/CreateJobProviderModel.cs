@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models
 {
-    public class ConfigureJobProviderModel : BaseViewModel
+    public class CreateJobProviderModel : BaseViewModel
     {
+        public virtual int ID { get; set; }
+
         public int CurrentIndex { get; set; }
 
         public string ProviderName { get; set; }
@@ -21,7 +23,7 @@ namespace JustABackup.Models
             foreach (var property in Properties)
             {
                 ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                instanceProperty.Value = property.Value;
+                instanceProperty.Value = property.Value.ToString();
                 instanceProperty.Property = provider.Properties.FirstOrDefault(p => p.Name == property.Name);
                 backupProvider.Values.Add(instanceProperty);
             }
