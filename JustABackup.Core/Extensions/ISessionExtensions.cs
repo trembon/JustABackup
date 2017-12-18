@@ -17,7 +17,7 @@ namespace JustABackup.Core.Extenssions
 
         public static T GetObject<T>(this ISession session, string key)
         {
-            string serializedValue = session.GetString("CreateJob");
+            string serializedValue = session.GetString(key);
             if (string.IsNullOrWhiteSpace(serializedValue))
                 return default(T);
 

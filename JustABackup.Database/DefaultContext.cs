@@ -14,6 +14,9 @@ namespace JustABackup.Database
 
         public DbSet<Provider> Providers { get; set; }
 
+        // TODO: add s
+        public DbSet<ProviderInstance> ProviderInstance { get; set; }
+
         public DefaultContext(DbContextOptions options) : base(options)
         {
         }

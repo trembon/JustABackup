@@ -202,7 +202,7 @@ namespace JustABackup.Controllers
                 model = CreateModel<CreateJobProviderModel>("Create Schedule");
                 model.CurrentIndex = index;
                 model.ProviderName = provider.Name;
-                model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description, Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
+                model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel { Name = x.Name, Description = x.Description,  Template = typeMappingService.GetTemplateFromType(x.Type) }).ToList();
             }
 
             return View(model);
@@ -231,7 +231,14 @@ namespace JustABackup.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("ConfigureJobProvider", new { index = nextIndex });
+                    int? nextId = null;
+                    if(createJob.Base.ID > 0)
+                    {
+                        var firstJob = await dbContext.Jobs.Where(j => j.ID == createJob.Base.ID).SelectMany(j => j.TransformProviders).Skip(nextIndex - 1).Take(1).FirstOrDefaultAsync();
+                        nextId = firstJob?.ID;
+                    }
+
+                    return RedirectToAction("ConfigureJobProvider", new { index = nextIndex, id = nextId });
                 }
             }
 

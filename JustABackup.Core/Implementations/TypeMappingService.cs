@@ -9,6 +9,26 @@ namespace JustABackup.Core.Implementations
 {
     public class TypeMappingService : ITypeMappingService
     {
+        public object GetObjectFromString(string value, PropertyType propertyType)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            switch (propertyType)
+            {
+                case PropertyType.Bool:
+                    return Convert.ToBoolean(value);
+
+                case PropertyType.Number:
+                    return Convert.ToInt64(value);
+
+                case PropertyType.String:
+                    return value;
+            }
+
+            return null;
+        }
+
         public string GetTemplateFromType(PropertyType type)
         {
             switch (type)

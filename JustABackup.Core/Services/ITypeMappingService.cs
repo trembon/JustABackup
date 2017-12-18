@@ -11,5 +11,7 @@ namespace JustABackup.Core.Services
         PropertyType GetTypeFromProperty(PropertyInfo property);
 
         string GetTemplateFromType(PropertyType type);
+
+        object GetObjectFromString(string value, PropertyType propertyType);
     }
 }
