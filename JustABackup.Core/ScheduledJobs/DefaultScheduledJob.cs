@@ -37,17 +37,9 @@ namespace JustABackup.Core.ScheduledJobs
             int jobId = int.Parse(context.JobDetail.Key.Name);
 
             BackupJob job = databaseContext.Jobs
-                .Include(j => j.BackupProvider)
-                .Include(j => j.BackupProvider.Provider)
-                .Include(j => j.BackupProvider.Values)
-                .ThenInclude(x => x.Property)
-                .Include(j => j.StorageProvider)
-                .Include(j => j.StorageProvider.Provider)
-                .Include(j => j.StorageProvider.Values)
-                .ThenInclude(x => x.Property)
-                .Include(j => j.TransformProviders)
+                .Include(j => j.Providers)
                 .ThenInclude(x => x.Provider)
-                .Include(j => j.TransformProviders)
+                .Include(j => j.Providers)
                 .ThenInclude(x => x.Values)
                 .ThenInclude(x => x.Property)
                 .FirstOrDefault(j => j.ID == jobId);
@@ -58,9 +50,11 @@ namespace JustABackup.Core.ScheduledJobs
             job.History.Add(history);
             await databaseContext.SaveChangesAsync();
 
-            IBackupProvider backupProvider = ConvertToProvider<IBackupProvider>(job.BackupProvider);
-            IStorageProvider storageProvider = ConvertToProvider<IStorageProvider>(job.StorageProvider);
-            List<ITransformProvider> transformProviders = job.TransformProviders.Select(tp => ConvertToProvider<ITransformProvider>(tp)).ToList();
+            var providers = job.Providers.OrderBy(p => p.Order);
+
+            IBackupProvider backupProvider = ConvertToProvider<IBackupProvider>(providers.FirstOrDefault());
+            IStorageProvider storageProvider = ConvertToProvider<IStorageProvider>(providers.LastOrDefault());
+            List<ITransformProvider> transformProviders = providers.Where(p => p.Provider.Type == ProviderType.Transform).Select(tp => ConvertToProvider<ITransformProvider>(tp)).ToList();
 
             var items = await backupProvider.GetItems();
 

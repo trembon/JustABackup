@@ -13,9 +13,8 @@ namespace JustABackup.Database
         public DbSet<BackupJobHistory> JobHistory { get; set; }
 
         public DbSet<Provider> Providers { get; set; }
-
-        // TODO: add s
-        public DbSet<ProviderInstance> ProviderInstance { get; set; }
+        
+        public DbSet<ProviderInstance> ProviderInstances { get; set; }
 
         public DefaultContext(DbContextOptions options) : base(options)
         {

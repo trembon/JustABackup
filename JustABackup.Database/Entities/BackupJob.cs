@@ -13,14 +13,8 @@ namespace JustABackup.Database.Entities
 
         [Required]
         public string Name { get; set; }
-        
-        [Required]
-        public ProviderInstance StorageProvider { get; set; }
 
-        [Required]
-        public ProviderInstance BackupProvider { get; set; }
-
-        public List<ProviderInstance> TransformProviders { get; set; }
+        public List<ProviderInstance> Providers { get; set; }
 
         [Required]
         public bool HasChangedModel { get; set; }
@@ -30,7 +24,7 @@ namespace JustABackup.Database.Entities
         public BackupJob()
         {
             HasChangedModel = false;
-            TransformProviders = new List<ProviderInstance>();
+            Providers = new List<ProviderInstance>();
             History = new List<BackupJobHistory>();
         }
     }

@@ -14,6 +14,11 @@ namespace JustABackup.Database.Entities
         [Required]
         public Provider Provider { get; set; }
 
+        [Required]
+        public int Order { get; set; }
+        
+        public BackupJob Job { get; set; }
+
         public List<ProviderInstanceProperty> Values { get; set; }
 
         public ProviderInstance()
