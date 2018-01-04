@@ -16,6 +16,8 @@ namespace JustABackup.Database
         
         public DbSet<ProviderInstance> ProviderInstances { get; set; }
 
+        public DbSet<AuthenticatedSession> AuthenticatedSessions { get; set; }
+
         public DefaultContext(DbContextOptions options) : base(options)
         {
         }

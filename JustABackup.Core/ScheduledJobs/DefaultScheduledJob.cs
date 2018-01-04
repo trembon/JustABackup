@@ -115,35 +115,6 @@ namespace JustABackup.Core.ScheduledJobs
                 }
             }
 
-            //foreach (var item in transformers.Last().Value)
-            //{
-            //    using (MemoryStream ms = new MemoryStream())
-            //    {
-            //        for (int i = transformers.Count - 1; i >= 0; i--)
-            //        {
-
-            //        }
-            //    }
-            //}
-
-            //List<Stream> openStreams = new List<Stream>();
-            //foreach(var transformProcessor in transformers.Reverse())
-            //{
-            //    foreach(var mappedItem in transformProcessor.Value)
-            //    {
-            //        using(MemoryStream ms = new MemoryStream())
-            //        {
-            //            Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
-            //            foreach (var backupItem in mappedItem.Input)
-            //                dictionary.Add(backupItem, await backupProvider.OpenRead(backupItem));
-
-            //            await transformProcessor.Key.TransformItem(ms, dictionary);
-
-            //            await storageProvider.StoreItem(mappedItem.Output, ms);
-            //        }
-            //    }
-            //}
-
             if (transformProviders.Count() > 0)
             {
                 foreach(var mappedItem in transformExecuteList.Last())
@@ -174,6 +145,7 @@ namespace JustABackup.Core.ScheduledJobs
             await databaseContext.SaveChangesAsync();
         }
 
+        // TODO: place in service
         private T ConvertToProvider<T>(ProviderInstance providerInstance) where T : class
         {
             Type providerType = Type.GetType(providerInstance.Provider.Namespace);

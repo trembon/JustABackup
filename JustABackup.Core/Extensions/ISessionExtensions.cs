@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Extenssions
+namespace JustABackup.Core.Extensions
 {
     public static class ISessionExtensions
     {

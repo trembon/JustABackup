@@ -61,11 +61,15 @@ namespace JustABackup.Core.Implementations
         {
             PreLoadAssembliesFromPath();
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
-                foreach (var type in assembly.DefinedTypes)
+                foreach (TypeInfo type in assembly.DefinedTypes)
                 {
+                    Type authenticationInterface = type.ImplementedInterfaces.Where(i => i.IsGenericType).FirstOrDefault(i => i.GetGenericTypeDefinition() == typeof(IAuthenticationProvider<>));
+                    if (authenticationInterface != null)
+                        await providerModelService.ProcessAuthenticationProvider(type, authenticationInterface);
+
                     if (type.ImplementedInterfaces.Contains(typeof(IBackupProvider)))
                         await providerModelService.ProcessBackupProvider(type);
 

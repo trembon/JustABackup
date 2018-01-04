@@ -26,10 +26,12 @@ namespace JustABackup.Database.Entities
 
         [Required]
         public string Version { get; set; }
+
+        public string GenericType { get; set; }
         
         public List<ProviderProperty> Properties { get; set; }
 
-
+        #region Overrides
         public override bool Equals(object obj)
         {
             return Equals(obj as Provider);
@@ -77,5 +79,6 @@ namespace JustABackup.Database.Entities
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
             return hashCode;
         }
+        #endregion
     }
 }

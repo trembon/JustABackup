@@ -12,5 +12,7 @@ namespace JustABackup.Core.Services
         Task ProcessStorageProvider(Type type);
 
         Task ProcessTransformProvider(Type type);
+
+        Task ProcessAuthenticationProvider(Type type, Type interfaceType);
     }
 }

@@ -27,20 +27,25 @@ namespace JustABackup.Core.Implementations
 
         public async Task ProcessBackupProvider(Type type)
         {
-            await ProcessProvider(type, ProviderType.Backup);
+            await ProcessProvider(type, null, ProviderType.Backup);
         }
 
         public async Task ProcessStorageProvider(Type type)
         {
-            await ProcessProvider(type, ProviderType.Storage);
+            await ProcessProvider(type, null, ProviderType.Storage);
         }
 
         public async Task ProcessTransformProvider(Type type)
         {
-            await ProcessProvider(type, ProviderType.Transform);
+            await ProcessProvider(type, null, ProviderType.Transform);
         }
 
-        private async Task ProcessProvider(Type type, ProviderType providerType)
+        public async Task ProcessAuthenticationProvider(Type type, Type interfaceType)
+        {
+            await ProcessProvider(type, interfaceType.GenericTypeArguments[0], ProviderType.Authentication);
+        }
+
+        private async Task ProcessProvider(Type type, Type genericType, ProviderType providerType)
         {
             Provider provider = new Provider();
 
@@ -58,6 +63,7 @@ namespace JustABackup.Core.Implementations
             provider.Namespace = type.AssemblyQualifiedName;
             provider.Type = providerType;
             provider.Version = type.Assembly.GetName().Version.ToString();
+            provider.GenericType = genericType?.AssemblyQualifiedName;
             provider.Properties = GetProperties(type);
 
             var existingProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.FullName.Equals(provider.FullName));
