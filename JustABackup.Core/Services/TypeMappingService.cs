@@ -1,12 +1,20 @@
-﻿using JustABackup.Core.Services;
+﻿using JustABackup.Database.Enum;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using JustABackup.Database.Enum;
 using System.Reflection;
+using System.Text;
 
-namespace JustABackup.Core.Implementations
+namespace JustABackup.Core.Services
 {
+    public interface ITypeMappingService
+    {
+        PropertyType GetTypeFromProperty(PropertyInfo property);
+
+        string GetTemplateFromType(PropertyType type);
+
+        object GetObjectFromString(string value, PropertyType propertyType);
+    }
+
     public class TypeMappingService : ITypeMappingService
     {
         public object GetObjectFromString(string value, PropertyType propertyType)
@@ -48,7 +56,7 @@ namespace JustABackup.Core.Implementations
 
             if (property.PropertyType == typeof(int))
                 return PropertyType.Number;
-            
+
             if (property.PropertyType == typeof(long))
                 return PropertyType.Number;
 

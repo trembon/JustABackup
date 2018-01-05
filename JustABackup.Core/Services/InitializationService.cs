@@ -1,19 +1,27 @@
-﻿using JustABackup.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using JustABackup.Base;
 using JustABackup.Database;
-using JustABackup.Base;
-using System.Linq;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
+using JustABackup.Database.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
-using JustABackup.Database.Entities;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace JustABackup.Core.Implementations
+namespace JustABackup.Core.Services
 {
+    public interface IInitializationService
+    {
+        Task VerifyDatabase();
+
+        Task VerifyScheduledJobs();
+
+        Task LoadPlugins();
+    }
+
     public class InitializationService : IInitializationService
     {
         private DefaultContext dbContext;
@@ -106,7 +114,7 @@ namespace JustABackup.Core.Implementations
 
         public async Task VerifyScheduledJobs()
         {
-            foreach(BackupJob job in dbContext.Jobs)
+            foreach (BackupJob job in dbContext.Jobs)
             {
                 if (job.HasChangedModel)
                 {

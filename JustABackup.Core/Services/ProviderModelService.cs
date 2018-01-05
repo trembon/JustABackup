@@ -1,5 +1,4 @@
-﻿using JustABackup.Core.Services;
-using JustABackup.Database;
+﻿using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +11,19 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Implementations
+namespace JustABackup.Core.Services
 {
+    public interface IProviderModelService
+    {
+        Task ProcessBackupProvider(Type type);
+
+        Task ProcessStorageProvider(Type type);
+
+        Task ProcessTransformProvider(Type type);
+
+        Task ProcessAuthenticationProvider(Type type, Type interfaceType);
+    }
+
     public class ProviderModelService : IProviderModelService
     {
         private DefaultContext dbContext;
@@ -67,10 +77,10 @@ namespace JustABackup.Core.Implementations
             provider.Properties = GetProperties(type);
 
             var existingProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.FullName.Equals(provider.FullName));
-            if(existingProvider != null)
+            if (existingProvider != null)
             {
                 bool modelHasChanged = false;
-                
+
                 // check if the metadata of the provider has changed
                 if (!existingProvider.Equals(provider, false))
                 {
@@ -86,26 +96,26 @@ namespace JustABackup.Core.Implementations
 
                 // check if the properties of the provider has changed
                 // remove non longer existing properties
-                for(int i = existingProvider.Properties.Count - 1; i >= 0; i--)
+                for (int i = existingProvider.Properties.Count - 1; i >= 0; i--)
                 {
                     ProviderProperty providerProperty = provider.Properties.FirstOrDefault(p => p.TypeName == existingProvider.Properties[i].TypeName);
-                    if(providerProperty == null)
+                    if (providerProperty == null)
                     {
                         existingProvider.Properties.RemoveAt(i);
                         modelHasChanged = true;
                     }
                 }
-                
+
                 // add or update properties
-                foreach(var property in provider.Properties)
+                foreach (var property in provider.Properties)
                 {
                     ProviderProperty existingProperty = existingProvider.Properties.FirstOrDefault(p => p.TypeName == property.TypeName);
-                    if(existingProperty == null)
+                    if (existingProperty == null)
                     {
                         existingProvider.Properties.Add(property);
                         modelHasChanged = true;
                     }
-                    else if(!existingProperty.Equals(property, false))
+                    else if (!existingProperty.Equals(property, false))
                     {
                         existingProperty.Name = property.Name;
                         existingProperty.TypeName = property.TypeName;
@@ -125,7 +135,7 @@ namespace JustABackup.Core.Implementations
                         .Where(j => j.Providers.Any(t => t.ID == existingProvider.ID));
 
                     // set the jobs to have a changed model
-                    foreach(BackupJob job in jobsWithChangedModels)
+                    foreach (BackupJob job in jobsWithChangedModels)
                         job.HasChangedModel = true;
                 }
             }
@@ -143,7 +153,7 @@ namespace JustABackup.Core.Implementations
                 // TODO: log
             }
         }
-        
+
         private List<ProviderProperty> GetProperties(Type type)
         {
             List<ProviderProperty> result = new List<ProviderProperty>();

@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using JustABackup.Base;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using System.IO;
 using JustABackup.Core.Services;
-using JustABackup.Core.Implementations;
 using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
-using System.Collections.Specialized;
-using Quartz;
-using Quartz.Impl;
 using JustABackup.Core.Extensions;
 
 namespace JustABackup

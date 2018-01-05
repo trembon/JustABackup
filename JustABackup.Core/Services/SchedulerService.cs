@@ -1,16 +1,29 @@
-﻿using JustABackup.Core.Services;
+﻿using JustABackup.Core.ScheduledJobs;
+using Quartz;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Quartz;
-using System.Threading.Tasks;
-using Quartz.Impl;
 using System.Collections.Specialized;
 using System.Linq;
-using JustABackup.Core.ScheduledJobs;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace JustABackup.Core.Implementations
+namespace JustABackup.Core.Services
 {
+    public interface ISchedulerService
+    {
+        Task CreateScheduledJob(int jobId, string cronSchedule);
+
+        Task<DateTime?> GetNextRunTime(int jobId);
+
+        Task TriggerJob(int jobId);
+
+        Task PauseJob(int jobId);
+
+        Task ResumeJob(int jobId);
+
+        Task<string> GetCronSchedule(int jobId);
+    }
+
     public class SchedulerService : ISchedulerService
     {
         private IScheduler scheduler;
