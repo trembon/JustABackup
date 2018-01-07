@@ -8,6 +8,7 @@ namespace JustABackup.Database.Enum
     {
         String = 0,
         Number = 1,
-        Bool = 2
+        Bool = 2,
+        Authentication = 3
     }
 }

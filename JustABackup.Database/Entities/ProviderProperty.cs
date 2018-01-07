@@ -23,6 +23,8 @@ namespace JustABackup.Database.Entities
         [Required]
         public PropertyType Type { get; set; }
 
+        public string GenericType { get; set; }
+
 
         public override bool Equals(object obj)
         {

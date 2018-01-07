@@ -24,11 +24,11 @@ namespace JustABackup.Controllers
     {
         private DefaultContext dbContext;
         private ISchedulerService schedulerService;
-        private ITypeMappingService typeMappingService;
+        private IProviderMappingService typeMappingService;
 
         private const string JOB_STORAGE_KEY = "ConfigureJob";
 
-        public JobController(DefaultContext dbContext, ISchedulerService schedulerService, ITypeMappingService typeMappingService)
+        public JobController(DefaultContext dbContext, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
         {
             this.dbContext = dbContext;
             this.schedulerService = schedulerService;
@@ -181,12 +181,13 @@ namespace JustABackup.Controllers
             
             model.CurrentIndex = index;
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel
+            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel // TODO: place in a common place?
             {
                 Name = x.Name,
                 Description = x.Description,
                 Template = typeMappingService.GetTemplateFromType(x.Type),
-                Value = values.ContainsKey(x.ID) ? typeMappingService.GetObjectFromString(values[x.ID], x.Type) : null
+                Value = values.ContainsKey(x.ID) ? typeMappingService.GetObjectFromString(values[x.ID], x.Type) : null,
+                ViewData = x.GenericType != null ? new { Type = x.GenericType } : null
             }).ToList();
 
             return View(model);

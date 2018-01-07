@@ -19,6 +19,8 @@ namespace JustABackup.Models
         public object Value { get; set; }
 
         public string Template { get; set; }
+
+        public object ViewData { get; set; }
     }
 
     public class ProviderPropertyValueModelBinder : IModelBinder

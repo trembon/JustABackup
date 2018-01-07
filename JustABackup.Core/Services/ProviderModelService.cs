@@ -27,9 +27,9 @@ namespace JustABackup.Core.Services
     public class ProviderModelService : IProviderModelService
     {
         private DefaultContext dbContext;
-        private ITypeMappingService typeMappingService;
+        private IProviderMappingService typeMappingService;
 
-        public ProviderModelService(DefaultContext dbContext, ITypeMappingService typeMappingService)
+        public ProviderModelService(DefaultContext dbContext, IProviderMappingService typeMappingService)
         {
             this.dbContext = dbContext;
             this.typeMappingService = typeMappingService;
@@ -166,7 +166,8 @@ namespace JustABackup.Core.Services
                     ProviderProperty providerProperty = new ProviderProperty();
                     providerProperty.Name = property.Name;
                     providerProperty.TypeName = property.Name;
-                    providerProperty.Type = typeMappingService.GetTypeFromProperty(property);
+                    providerProperty.Type = typeMappingService.GetTypeFromProperty(property, out Type genericParameter);
+                    providerProperty.GenericType = genericParameter?.AssemblyQualifiedName;
 
                     var attributes = property.GetCustomAttributes(true);
                     foreach (var attribute in attributes)

@@ -1,4 +1,6 @@
-﻿using JustABackup.Database.Enum;
+﻿using JustABackup.Base;
+using JustABackup.Core.Entities;
+using JustABackup.Database.Enum;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -6,16 +8,16 @@ using System.Text;
 
 namespace JustABackup.Core.Services
 {
-    public interface ITypeMappingService
+    public interface IProviderMappingService
     {
-        PropertyType GetTypeFromProperty(PropertyInfo property);
+        PropertyType GetTypeFromProperty(PropertyInfo property, out Type genericParameter);
 
         string GetTemplateFromType(PropertyType type);
 
         object GetObjectFromString(string value, PropertyType propertyType);
     }
 
-    public class TypeMappingService : ITypeMappingService
+    public class ProviderMappingService : IProviderMappingService
     {
         public object GetObjectFromString(string value, PropertyType propertyType)
         {
@@ -32,6 +34,9 @@ namespace JustABackup.Core.Services
 
                 case PropertyType.String:
                     return value;
+
+                case PropertyType.Authentication:
+                    return new AuthenticatedClient<object>(Convert.ToInt64(value));
             }
 
             return null;
@@ -44,13 +49,16 @@ namespace JustABackup.Core.Services
                 case PropertyType.String: return "String";
                 case PropertyType.Number: return "Number";
                 case PropertyType.Bool: return "Boolean";
+                case PropertyType.Authentication: return "AuthenticationProvider";
 
                 default: return "String";
             }
         }
 
-        public PropertyType GetTypeFromProperty(PropertyInfo property)
+        public PropertyType GetTypeFromProperty(PropertyInfo property, out Type genericParameter)
         {
+            genericParameter = null;
+
             if (property.PropertyType == typeof(string))
                 return PropertyType.String;
 
@@ -62,6 +70,12 @@ namespace JustABackup.Core.Services
 
             if (property.PropertyType == typeof(bool))
                 return PropertyType.Bool;
+
+            if (property.PropertyType.GetGenericTypeDefinition() == typeof(IAuthenticatedClient<>))
+            {
+                genericParameter = property.PropertyType.GenericTypeArguments[0];
+                return PropertyType.Authentication;
+            }
 
             throw new ArgumentOutOfRangeException(nameof(property));
         }

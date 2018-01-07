@@ -7,6 +7,7 @@ using JustABackup.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
 using JustABackup.Core.Extensions;
+using JustABackup.Core.Repositories;
 
 namespace JustABackup
 {
@@ -48,7 +49,10 @@ namespace JustABackup
             services.AddScoped<IProviderModelService, ProviderModelService>();
 
             services.AddSingleton<ISchedulerService, SchedulerService>();
-            services.AddSingleton<ITypeMappingService, TypeMappingService>();
+            services.AddSingleton<IProviderMappingService, ProviderMappingService>();
+
+            // add repositories
+            services.AddScoped<IAuthenticatedSessionRepository, AuthenticatedSessionRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

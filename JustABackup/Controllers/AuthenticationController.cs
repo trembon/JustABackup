@@ -21,9 +21,9 @@ namespace JustABackup.Controllers
         private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
 
         private DefaultContext dbContext;
-        private ITypeMappingService typeMappingService;
+        private IProviderMappingService typeMappingService;
 
-        public AuthenticationController(DefaultContext dbContext, ITypeMappingService typeMappingService)
+        public AuthenticationController(DefaultContext dbContext, IProviderMappingService typeMappingService)
         {
             this.dbContext = dbContext;
             this.typeMappingService = typeMappingService;
@@ -88,11 +88,12 @@ namespace JustABackup.Controllers
             CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
             
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel
+            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel // TODO: place in a common place?
             {
                 Name = x.Name,
                 Description = x.Description,
-                Template = typeMappingService.GetTemplateFromType(x.Type)
+                Template = typeMappingService.GetTemplateFromType(x.Type),
+                ViewData = x.GenericType != null ? new { Type = x.GenericType } : null
             }).ToList();
 
             return View(model);

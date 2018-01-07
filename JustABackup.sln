@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.ZipTrans
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.RijndaelEncryptTransformer", "JustABackup.Plugin.RijndaelEncryptTransformer\JustABackup.Plugin.RijndaelEncryptTransformer.csproj", "{7942E937-F73B-4828-BEB7-F9141F9A791C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Plugin.OneDrive", "JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj", "{9DE019D0-FA38-4B71-8521-48966086377C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.OneDrive", "JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj", "{9DE019D0-FA38-4B71-8521-48966086377C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
