@@ -10,11 +10,17 @@ namespace JustABackup.Plugin.OneDrive
 {
     public class OneDriveStorageProvider : IStorageProvider
     {
+        public string Folder { get; set; }
+
         public IAuthenticatedClient<IOneDriveClient> Client { get; set; }
 
-        public Task<bool> StoreItem(BackupItem item, Stream source)
+        public async Task<bool> StoreItem(BackupItem item, Stream source)
         {
-            throw new NotImplementedException();
+            string itemPath = Path.Combine(Folder, item.FullPath);
+
+            var client = await Client.GetClient();
+            await client.Drive.Root.ItemWithPath(itemPath).Content.Request().PutAsync<Item>(source);
+            return true;
         }
     }
 }

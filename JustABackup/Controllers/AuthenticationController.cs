@@ -21,12 +21,12 @@ namespace JustABackup.Controllers
         private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
 
         private DefaultContext dbContext;
-        private IProviderMappingService typeMappingService;
+        private IProviderMappingService providerMappingService;
 
-        public AuthenticationController(DefaultContext dbContext, IProviderMappingService typeMappingService)
+        public AuthenticationController(DefaultContext dbContext, IProviderMappingService providerMappingService)
         {
             this.dbContext = dbContext;
-            this.typeMappingService = typeMappingService;
+            this.providerMappingService = providerMappingService;
         }
 
         [HttpGet]
@@ -92,7 +92,7 @@ namespace JustABackup.Controllers
             {
                 Name = x.Name,
                 Description = x.Description,
-                Template = typeMappingService.GetTemplateFromType(x.Type),
+                Template = providerMappingService.GetTemplateFromType(x.Type),
                 ViewData = x.GenericType != null ? new { Type = x.GenericType } : null
             }).ToList();
 
@@ -137,7 +137,7 @@ namespace JustABackup.Controllers
             if (providerInstance == null)
                 return RedirectToAction("Index", "Home");
 
-            IAuthenticationProvider<object>  authenticationProvider = ConvertToProvider<IAuthenticationProvider<object>>(providerInstance);
+            IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
             
             authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={redirectId}", data => StoreSession(providerInstance.ID, data));
             string redirectUrl = await authenticationProvider.GetOAuthUrl();
@@ -163,7 +163,7 @@ namespace JustABackup.Controllers
             if (providerInstance == null)
                 return RedirectToAction("Index", "Home");
 
-            IAuthenticationProvider<object>  authenticationProvider = ConvertToProvider<IAuthenticationProvider<object>>(providerInstance);
+            IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
             
             authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
             bool result = await authenticationProvider.Authenticate(Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()));
@@ -202,23 +202,6 @@ namespace JustABackup.Controllers
                     dbContext.SaveChanges();
                 }
             }
-        }
-
-        // TODO: place in service
-        private T ConvertToProvider<T>(ProviderInstance providerInstance) where T : class
-        {
-            Type providerType = Type.GetType(providerInstance.Provider.Namespace);
-            T convertedProvider = Activator.CreateInstance(providerType) as T;
-
-            foreach (var property in providerInstance.Values)
-            {
-                PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
-
-                propertyInfo.SetValue(convertedProvider, originalValueType);
-            }
-
-            return convertedProvider;
         }
     }
 }

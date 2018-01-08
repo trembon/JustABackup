@@ -1,25 +1,68 @@
 ﻿using JustABackup.Base;
 using JustABackup.Core.Entities;
+using JustABackup.Database;
+using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JustABackup.Core.Services
 {
     public interface IProviderMappingService
     {
+        Task<T> CreateProvider<T>(long providerInstanceId) where T : class;
+
+        Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class;
+
         PropertyType GetTypeFromProperty(PropertyInfo property, out Type genericParameter);
 
         string GetTemplateFromType(PropertyType type);
 
-        object GetObjectFromString(string value, PropertyType propertyType);
+        object GetObjectFromString(string value, PropertyType propertyType, string genericType = null);
     }
 
     public class ProviderMappingService : IProviderMappingService
     {
-        public object GetObjectFromString(string value, PropertyType propertyType)
+        private DefaultContext dbContext;
+
+        public ProviderMappingService(DefaultContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+        public async Task<T> CreateProvider<T>(long providerInstanceId) where T : class
+        {
+            ProviderInstance providerInstance = await dbContext
+                .ProviderInstances
+                .Include(pi => pi.Provider)
+                .Include(pi => pi.Values)
+                .ThenInclude(pip => pip.Property)
+                .FirstOrDefaultAsync(pi => pi.ID == providerInstanceId);
+
+            return await CreateProvider<T>(providerInstance);
+        }
+
+        public Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class
+        {
+            Type providerType = Type.GetType(providerInstance.Provider.Namespace);
+            T convertedProvider = Activator.CreateInstance(providerType) as T;
+
+            foreach (var property in providerInstance.Values)
+            {
+                PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
+                object originalValueType = this.GetObjectFromString(property.Value, property.Property.Type, property.Property.GenericType);
+
+                propertyInfo.SetValue(convertedProvider, originalValueType);
+            }
+
+            return Task.FromResult(convertedProvider);
+        }
+
+        public object GetObjectFromString(string value, PropertyType propertyType, string genericType = null)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -36,7 +79,16 @@ namespace JustABackup.Core.Services
                     return value;
 
                 case PropertyType.Authentication:
-                    return new AuthenticatedClient<object>(Convert.ToInt64(value));
+                    if (string.IsNullOrWhiteSpace(genericType))
+                    {
+                        return new AuthenticatedClient<object>(Convert.ToInt64(value), this, dbContext);
+                    }
+                    else
+                    {
+                        Type authenticatedClientType = typeof(AuthenticatedClient<>);
+                        authenticatedClientType = authenticatedClientType.MakeGenericType(Type.GetType(genericType));
+                        return Activator.CreateInstance(authenticatedClientType, Convert.ToInt64(value), this, dbContext);
+                    }
             }
 
             return null;

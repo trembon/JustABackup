@@ -31,7 +31,18 @@ namespace JustABackup
             services.AddDbContext<DefaultContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("Default"))
             );
+            
+            // register services
+            services.AddScoped<IInitializationService, InitializationService>();
+            services.AddScoped<IProviderModelService, ProviderModelService>();
+            services.AddScoped<IProviderMappingService, ProviderMappingService>();
 
+            services.AddSingleton<ISchedulerService, SchedulerService>();
+
+            // add repositories
+            services.AddScoped<IAuthenticatedSessionRepository, AuthenticatedSessionRepository>();
+            
+            // add quartz after all services
             services.AddQuartz(options =>
             {
                 options.Add("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
@@ -43,16 +54,6 @@ namespace JustABackup
                 options.Add("quartz.dataSource.default.connectionString", Configuration.GetConnectionString("Quartz"));
                 options.Add("quartz.serializer.type", "binary");
             });
-
-            // register services
-            services.AddScoped<IInitializationService, InitializationService>();
-            services.AddScoped<IProviderModelService, ProviderModelService>();
-
-            services.AddSingleton<ISchedulerService, SchedulerService>();
-            services.AddSingleton<IProviderMappingService, ProviderMappingService>();
-
-            // add repositories
-            services.AddScoped<IAuthenticatedSessionRepository, AuthenticatedSessionRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

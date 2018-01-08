@@ -1,4 +1,5 @@
 ﻿using JustABackup.Base;
+using JustABackup.Core.Services;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
@@ -27,9 +28,12 @@ namespace JustABackup.Core.ScheduledJobs
 
         private DefaultContext databaseContext;
 
-        public DefaultScheduledJob(DefaultContext databaseContext)
+        private IProviderMappingService providerMappingService;
+
+        public DefaultScheduledJob(DefaultContext databaseContext, IProviderMappingService providerMappingService)
         {
             this.databaseContext = databaseContext;
+            this.providerMappingService = providerMappingService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -52,9 +56,12 @@ namespace JustABackup.Core.ScheduledJobs
 
             var providers = job.Providers.OrderBy(p => p.Order);
 
-            IBackupProvider backupProvider = ConvertToProvider<IBackupProvider>(providers.FirstOrDefault());
-            IStorageProvider storageProvider = ConvertToProvider<IStorageProvider>(providers.LastOrDefault());
-            List<ITransformProvider> transformProviders = providers.Where(p => p.Provider.Type == ProviderType.Transform).Select(tp => ConvertToProvider<ITransformProvider>(tp)).ToList();
+            IBackupProvider backupProvider = await providerMappingService.CreateProvider<IBackupProvider>(providers.FirstOrDefault());
+            IStorageProvider storageProvider = await providerMappingService.CreateProvider<IStorageProvider>(providers.LastOrDefault());
+            
+            List<ITransformProvider> transformProviders = new List<ITransformProvider>();
+            foreach (var tp in providers.Where(p => p.Provider.Type == ProviderType.Transform))
+                transformProviders.Add(await providerMappingService.CreateProvider<ITransformProvider>(tp));
 
             var items = await backupProvider.GetItems();
 
@@ -143,23 +150,6 @@ namespace JustABackup.Core.ScheduledJobs
             history.Status = ExitCode.Success;
 
             await databaseContext.SaveChangesAsync();
-        }
-
-        // TODO: place in service
-        private T ConvertToProvider<T>(ProviderInstance providerInstance) where T : class
-        {
-            Type providerType = Type.GetType(providerInstance.Provider.Namespace);
-            T convertedProvider = Activator.CreateInstance(providerType) as T;
-
-            foreach (var property in providerInstance.Values)
-            {
-                PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
-                object originalValueType = Convert.ChangeType(property.Value, propertyInfo.PropertyType);
-
-                propertyInfo.SetValue(convertedProvider, originalValueType);
-            }
-
-            return convertedProvider;
         }
     }
 }
