@@ -23,17 +23,17 @@ namespace JustABackup.Controllers
 {
     public class JobController : ControllerBase
     {
-        private DefaultContext dbContext;
         private ISchedulerService schedulerService;
         private IProviderMappingService typeMappingService;
         private IBackupJobRepository backupJobRepository;
+        private IProviderRepository providerRepository;
 
         private const string JOB_STORAGE_KEY = "ConfigureJob";
 
-        public JobController(DefaultContext dbContext, IBackupJobRepository backupJobRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
+        public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
         {
-            this.dbContext = dbContext;
             this.backupJobRepository = backupJobRepository;
+            this.providerRepository = providerRepository;
             this.schedulerService = schedulerService;
             this.typeMappingService = typeMappingService;
         }
@@ -43,9 +43,9 @@ namespace JustABackup.Controllers
         {
             ListJobsModel model = CreateModel<ListJobsModel>("Scheduled Backups");
 
-            model.Jobs = await dbContext
-                .Jobs
-                .OrderBy(j => j.Name)
+            var jobs = await backupJobRepository.Get();
+
+            model.Jobs = jobs
                 .Select(j => new JobModel
                 {
                     ID = j.ID,
@@ -53,7 +53,7 @@ namespace JustABackup.Controllers
                     LastRun = j.History.OrderByDescending(h => h.Started).Select(h => h.Started).FirstOrDefault(),
                     HasChangedModel = j.HasChangedModel
                 })
-                .ToListAsync();
+                .ToList();
 
             model.Jobs.ForEach(async j => j.NextRun = await schedulerService.GetNextRunTime(j.ID));
 
@@ -63,7 +63,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            BackupJob job = await backupJobRepository.GetBackupJob(id);
+            BackupJob job = await backupJobRepository.Get(id);
             if (job == null)
                 return NotFound();
             
@@ -90,7 +90,7 @@ namespace JustABackup.Controllers
 
             if (id.HasValue && id > 0)
             {
-                BackupJob job = await backupJobRepository.GetBackupJob(id);
+                BackupJob job = await backupJobRepository.Get(id.Value);
                 if (job == null)
                     return NotFound();
 
@@ -108,14 +108,14 @@ namespace JustABackup.Controllers
             {
                 model = CreateModel<CreateJobModel>("Create Schedule");
             }
-            
-            var backupProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Backup).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+
+            var backupProviders = await providerRepository.Get(ProviderType.Backup);
             model.BackupProviders = new SelectList(backupProviders, "ID", "Name");
 
-            var storageProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Storage).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            var storageProviders = await providerRepository.Get(ProviderType.Storage);
             model.StorageProviders = new SelectList(storageProviders, "ID", "Name");
 
-            var transformProviders = dbContext.Providers.Where(p => p.Type == ProviderType.Transform).Select(p => new { ID = p.ID, Name = p.Name }).ToList();
+            var transformProviders = await providerRepository.Get(ProviderType.Transform);
             model.TransformProviders = new SelectList(transformProviders, "ID", "Name");
             
             return View(model);
@@ -128,15 +128,9 @@ namespace JustABackup.Controllers
             {
                 CreateJob createJob = new CreateJob { Base = model };
                 HttpContext.Session.SetObject(JOB_STORAGE_KEY, createJob);
-
-                if (model.ID > 0)
-                {
-                    var firstProvider = await dbContext.ProviderInstances.Where(pi => pi.Job.ID == model.ID).OrderBy(pi => pi.Order).FirstOrDefaultAsync();
-                    if(firstProvider != null)
-                        return RedirectToAction("ConfigureJobProvider", new { id = firstProvider.ID });
-                }
-
-                return RedirectToAction("ConfigureJobProvider");
+                
+                int? firstProvider = await providerRepository.GetInstanceID(model.ID, 0);
+                return RedirectToAction("ConfigureJobProvider", new { id = firstProvider });
             }
             
             return View(model);
@@ -151,7 +145,7 @@ namespace JustABackup.Controllers
 
             CreateJobProviderModel model = null;
 
-            Provider provider = dbContext.Providers.Include(x => x.Properties).FirstOrDefault(p => p.ID == createJob.ProviderIDs[index]);
+            Provider provider = await providerRepository.Get(createJob.ProviderIDs[index]);
             Dictionary<int, string> values = new Dictionary<int, string>();
             
             if (id > 0)
@@ -159,7 +153,7 @@ namespace JustABackup.Controllers
                 model = CreateModel<ModifyJobProviderModel>("Modify Schedule");
                 model.ID = id;
 
-                values = await dbContext.ProviderInstances.Where(pi => pi.ID == id).SelectMany(pi => pi.Values).Include(v => v.Property).ToDictionaryAsync(k => k.Property.ID, v => v.Value);
+                values = await providerRepository.GetProviderValues(id);
             }
             else
             {
@@ -190,27 +184,19 @@ namespace JustABackup.Controllers
             if (ModelState.IsValid)
             {
                 createJob.Providers.Add(model);
-
                 HttpContext.Session.SetObject(JOB_STORAGE_KEY, createJob);
 
                 int nextIndex = model.CurrentIndex + 1;
                 if (nextIndex >= createJob.ProviderIDs.Length)
                 {
-                    await AddJobToDatabase(createJob);
-                    HttpContext.Session.Remove(JOB_STORAGE_KEY);
+                    await SaveJob(createJob);
+                    HttpContext.Session.Clear();
 
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    int? nextId = null;
-                    if(createJob.Base.ID > 0)
-                    {
-                        var instances = await dbContext.ProviderInstances.Where(pi => pi.Job.ID == createJob.Base.ID).OrderBy(pi => pi.Order).ToListAsync();
-                        var nextJob = await dbContext.ProviderInstances.Where(pi => pi.Job.ID == createJob.Base.ID).OrderBy(pi => pi.Order).Skip(nextIndex).FirstOrDefaultAsync();
-                        nextId = nextJob?.ID;
-                    }
-
+                    int? nextId = await providerRepository.GetInstanceID(createJob.Base.ID, nextIndex);
                     return RedirectToAction("ConfigureJobProvider", new { index = nextIndex, id = nextId });
                 }
             }
@@ -219,40 +205,26 @@ namespace JustABackup.Controllers
         }
         #endregion
         
-        private async Task AddJobToDatabase(CreateJob createJob)
+        private async Task SaveJob(CreateJob createJob)
         {
-            BackupJob job = null;
-            if (createJob.Base.ID > 0)
+            List<ProviderInstance> providerInstances = new List<ProviderInstance>(createJob.Providers.Count);
+            for (int i = 0; i < createJob.Providers.Count; i++)
             {
-                job = await dbContext.Jobs.Include(j => j.Providers).FirstOrDefaultAsync(j => j.ID == createJob.Base.ID);
-                job.HasChangedModel = false;
-                job.Providers.Clear();
-            }
-            else
-            {
-                job = new BackupJob();
-                dbContext.Jobs.Add(job);
-            }
-
-            job.Name = createJob.Base.Name;
-            
-            for(int i = 0; i < createJob.Providers.Count; i++)
-            {
-                Provider provider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.ID == createJob.ProviderIDs[i]);
+                Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
                 ProviderInstance providerInstance = createJob.Providers[i].CreateProviderInstance(provider);
                 providerInstance.Order = i;
-                job.Providers.Add(providerInstance);
+                providerInstances.Add(providerInstance);
             }
 
-            await dbContext.SaveChangesAsync();
+            int jobId = await backupJobRepository.AddOrUpdate(createJob.Base.ID, createJob.Base.Name, providerInstances);
 
-            if (createJob.Base.ID > 0)
+            if (jobId > 0)
             {
                 // TODO: UpdateScheduledJob
             }
             else
             {
-                await schedulerService.CreateScheduledJob(job.ID, createJob.Base.CronSchedule);
+                await schedulerService.CreateScheduledJob(jobId, createJob.Base.CronSchedule);
             }
         }
 

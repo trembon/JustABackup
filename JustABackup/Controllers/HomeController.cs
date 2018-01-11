@@ -6,26 +6,26 @@ using Microsoft.AspNetCore.Mvc;
 using JustABackup.Models;
 using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
+using JustABackup.Database.Repositories;
 
 namespace JustABackup.Controllers
 {
     public class HomeController : ControllerBase
     {
-        private DefaultContext context;
+        private IBackupJobRepository backupJobRepository;
 
-        public HomeController(DefaultContext context)
+        public HomeController(IBackupJobRepository backupJobRepository)
         {
-            this.context = context;
+            this.backupJobRepository = backupJobRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var model = CreateModel<ListJobHistoryModel>("Backup History");
 
-            model.JobHistory = context
-                .JobHistory
-                .OrderByDescending(jh => jh.Started)
-                .Take(15)
+            var history = await backupJobRepository.GetHistory(15);
+
+            model.JobHistory = history
                 .Select(jh => new JobHistoryModel
                 {
                     JobID = jh.Job.ID,

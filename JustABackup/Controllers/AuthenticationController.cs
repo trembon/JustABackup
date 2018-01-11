@@ -4,6 +4,7 @@ using JustABackup.Core.Services;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
+using JustABackup.Database.Repositories;
 using JustABackup.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,14 +20,16 @@ namespace JustABackup.Controllers
     public class AuthenticationController : ControllerBase
     {
         private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
-
-        private DefaultContext dbContext;
+        
+        private IProviderRepository providerRepository;
         private IProviderMappingService providerMappingService;
+        private IAuthenticatedSessionRepository authenticatedSessionRepository;
 
-        public AuthenticationController(DefaultContext dbContext, IProviderMappingService providerMappingService)
+        public AuthenticationController(IAuthenticatedSessionRepository authenticatedSessionRepository, IProviderRepository providerRepository, IProviderMappingService providerMappingService)
         {
-            this.dbContext = dbContext;
+            this.providerRepository = providerRepository;
             this.providerMappingService = providerMappingService;
+            this.authenticatedSessionRepository = authenticatedSessionRepository;
         }
 
         [HttpGet]
@@ -34,11 +37,9 @@ namespace JustABackup.Controllers
         {
             ListAuthenticatedSessionModel model = CreateModel<ListAuthenticatedSessionModel>("Authenticated Sessions");
 
-            model.Sessions = await dbContext
-                .AuthenticatedSessions
-                .Include(api => api.Provider)
-                .ThenInclude(pi => pi.Provider)
-                .OrderBy(api => api.Name)
+            var sessions = await authenticatedSessionRepository.Get();
+
+            model.Sessions = sessions
                 .Select(api => new AuthenticatedSessionModel
                 {
                     ID = api.ID,
@@ -46,7 +47,7 @@ namespace JustABackup.Controllers
                     Provider = api.Provider.Provider.Name,
                     HasChangedModel = api.HasChangedModel
                 })
-                .ToListAsync();
+                .ToList();
 
             return View(model);
         }
@@ -56,7 +57,7 @@ namespace JustABackup.Controllers
         {
             CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>("Create Authenticated Session");
 
-            var authenticationProviders = await dbContext.Providers.Where(p => p.Type == ProviderType.Authentication).Select(p => new { p.ID, p.Name }).ToListAsync();
+            var authenticationProviders = await providerRepository.Get(ProviderType.Authentication);
             model.AuthenticationProviders = new SelectList(authenticationProviders, "ID", "Name");
 
             return View(model);
@@ -83,8 +84,7 @@ namespace JustABackup.Controllers
             if (createSession == null)
                 return RedirectToAction("Index", "Home");
             
-            Provider provider = await dbContext.Providers.Include(x => x.Properties).FirstOrDefaultAsync(p => p.ID == createSession.Base.AuthenticationProvider);
-
+            Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
             CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
             
             model.ProviderName = provider.Name;
@@ -127,7 +127,7 @@ namespace JustABackup.Controllers
             {
                 redirectId = Guid.NewGuid().ToString(); // TODO: move to create and store this in db
 
-                Provider provider = await dbContext.Providers.Include(x => x.Properties).FirstOrDefaultAsync(p => p.ID == createSession.Base.AuthenticationProvider);
+                Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
                 providerInstance = createSession.ProviderInstance.CreateProviderInstance(provider);
             }
             //else if(id > 0)
@@ -152,7 +152,7 @@ namespace JustABackup.Controllers
             CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
             if (createSession != null)
             {
-                Provider provider = await dbContext.Providers.Include(x => x.Properties).FirstOrDefaultAsync(p => p.ID == createSession.Base.AuthenticationProvider);
+                Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
                 providerInstance = createSession.ProviderInstance.CreateProviderInstance(provider);
             }
             //else if (id > 0)
@@ -173,19 +173,15 @@ namespace JustABackup.Controllers
                 // refresh the object
                 createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
 
-                AuthenticatedSession session = new AuthenticatedSession();
-                session.Name = createSession.Base.Name;
-                session.SessionData = createSession.SessionData;
-                session.Provider = providerInstance;
+                await authenticatedSessionRepository.Add(createSession.Base.Name, createSession.SessionData, providerInstance);
 
-                await dbContext.AuthenticatedSessions.AddAsync(session);
-                await dbContext.SaveChangesAsync();
+                HttpContext.Session.Clear();
             }
 
             return RedirectToAction("Index");
         }
 
-        private void StoreSession(long id, string sessionData)
+        private void StoreSession(int id, string sessionData)
         {
             CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
             if (createSession != null)
@@ -195,12 +191,7 @@ namespace JustABackup.Controllers
             }
             else
             {
-                var authenticated = dbContext.AuthenticatedSessions.FirstOrDefault(api => api.ID == id);
-                if (authenticated != null)
-                {
-                    authenticated.SessionData = sessionData;
-                    dbContext.SaveChanges();
-                }
+                authenticatedSessionRepository.StoreSession(id, sessionData).Wait();
             }
         }
     }

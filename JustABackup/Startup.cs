@@ -42,6 +42,7 @@ namespace JustABackup
             // add repositories
             services.AddScoped<IAuthenticatedSessionRepository, AuthenticatedSessionRepository>();
             services.AddScoped<IBackupJobRepository, BackupJobRepository>();
+            services.AddScoped<IProviderRepository, ProviderRepository>();
             
             // add quartz after all services
             services.AddQuartz(options =>
