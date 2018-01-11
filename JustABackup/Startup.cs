@@ -7,7 +7,7 @@ using JustABackup.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
 using JustABackup.Core.Extensions;
-using JustABackup.Core.Repositories;
+using JustABackup.Database.Repositories;
 
 namespace JustABackup
 {
@@ -41,6 +41,7 @@ namespace JustABackup
 
             // add repositories
             services.AddScoped<IAuthenticatedSessionRepository, AuthenticatedSessionRepository>();
+            services.AddScoped<IBackupJobRepository, BackupJobRepository>();
             
             // add quartz after all services
             services.AddQuartz(options =>

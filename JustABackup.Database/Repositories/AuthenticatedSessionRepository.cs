@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Repositories
+namespace JustABackup.Database.Repositories
 {
     public interface IAuthenticatedSessionRepository
     {
@@ -15,16 +15,16 @@ namespace JustABackup.Core.Repositories
 
     public class AuthenticatedSessionRepository : IAuthenticatedSessionRepository
     {
-        private DefaultContext dbContext;
+        private DefaultContext context;
 
-        public AuthenticatedSessionRepository(DefaultContext dbContext)
+        public AuthenticatedSessionRepository(DefaultContext context)
         {
-            this.dbContext = dbContext;
+            this.context = context;
         }
 
         public async Task<Dictionary<int, string>> GetAuthenticatedSessions(string type)
         {
-            return await dbContext
+            return await context
                 .AuthenticatedSessions
                 .Include(a => a.Provider)
                 .ThenInclude(p => p.Provider)

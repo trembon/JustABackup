@@ -31,6 +31,7 @@ namespace JustABackup.Core.Entities
 
         public async Task<T> GetClient()
         {
+            // TODO: place in service?
             AuthenticatedSession session = await dbContext
                 .AuthenticatedSessions
                 .Include(a => a.Provider)

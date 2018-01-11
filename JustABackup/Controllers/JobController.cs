@@ -17,6 +17,7 @@ using JustABackup.Database.Entities;
 using Quartz;
 using Quartz.Impl;
 using JustABackup.Core.Services;
+using JustABackup.Database.Repositories;
 
 namespace JustABackup.Controllers
 {
@@ -25,12 +26,14 @@ namespace JustABackup.Controllers
         private DefaultContext dbContext;
         private ISchedulerService schedulerService;
         private IProviderMappingService typeMappingService;
+        private IBackupJobRepository backupJobRepository;
 
         private const string JOB_STORAGE_KEY = "ConfigureJob";
 
-        public JobController(DefaultContext dbContext, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
+        public JobController(DefaultContext dbContext, IBackupJobRepository backupJobRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
         {
             this.dbContext = dbContext;
+            this.backupJobRepository = backupJobRepository;
             this.schedulerService = schedulerService;
             this.typeMappingService = typeMappingService;
         }
@@ -60,15 +63,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            BackupJob job = await dbContext
-                .Jobs
-                .Include(j => j.Providers)
-                .ThenInclude(x => x.Provider)
-                .Include(j => j.Providers)
-                .ThenInclude(x => x.Values)
-                .ThenInclude(x => x.Property)
-                .FirstOrDefaultAsync(j => j.ID == id);
-
+            BackupJob job = await backupJobRepository.GetBackupJob(id);
             if (job == null)
                 return NotFound();
             
@@ -95,15 +90,7 @@ namespace JustABackup.Controllers
 
             if (id.HasValue && id > 0)
             {
-                BackupJob job = await dbContext
-                    .Jobs
-                    .Include(j => j.Providers)
-                    .ThenInclude(x => x.Provider)
-                    .Include(j => j.Providers)
-                    .ThenInclude(x => x.Values)
-                    .ThenInclude(x => x.Property)
-                    .FirstOrDefaultAsync(j => j.ID == id);
-
+                BackupJob job = await backupJobRepository.GetBackupJob(id);
                 if (job == null)
                     return NotFound();
 

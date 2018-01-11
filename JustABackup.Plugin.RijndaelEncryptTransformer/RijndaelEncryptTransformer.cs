@@ -16,7 +16,7 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
 
         public async Task TransformItem(BackupItem output, Stream outputStream, Dictionary<BackupItem, Stream> inputFiles)
         {
-            byte[] key = Encoding.Unicode.GetBytes(this.EncyptionKey);
+            byte[] key = Encoding.Unicode.GetBytes(EncyptionKey);
 
             using (RijndaelManaged rmCrypto = new RijndaelManaged())
             {
