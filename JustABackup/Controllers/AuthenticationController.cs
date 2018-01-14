@@ -88,13 +88,7 @@ namespace JustABackup.Controllers
             CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
             
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel // TODO: place in a common place?
-            {
-                Name = x.Name,
-                Description = x.Description,
-                Template = providerMappingService.GetTemplateFromType(x.Type),
-                ViewData = x.GenericType != null ? new { Type = x.GenericType } : null
-            }).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, providerMappingService)).ToList();
 
             return View(model);
         }

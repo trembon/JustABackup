@@ -122,6 +122,9 @@ namespace JustABackup.Core.Services
                         existingProperty.Type = property.Type;
                         existingProperty.Description = property.Description;
 
+                        existingProperty.Attributes.Clear();
+                        existingProperty.Attributes = property.Attributes;
+
                         modelHasChanged = true;
                     }
                 }
@@ -167,7 +170,9 @@ namespace JustABackup.Core.Services
                     providerProperty.Name = property.Name;
                     providerProperty.TypeName = property.Name;
                     providerProperty.Type = typeMappingService.GetTypeFromProperty(property, out Type genericParameter);
-                    providerProperty.GenericType = genericParameter?.AssemblyQualifiedName;
+
+                    if (genericParameter != null)
+                        providerProperty.Attributes.Add(new ProviderPropertyAttribute(PropertyAttribute.GenericParameter, genericParameter.AssemblyQualifiedName));
 
                     var attributes = property.GetCustomAttributes(true);
                     foreach (var attribute in attributes)
@@ -178,6 +183,10 @@ namespace JustABackup.Core.Services
                                 providerProperty.Name = da.Name;
                                 providerProperty.Description = da.Description;
                                 break;
+
+                            case PasswordPropertyTextAttribute ppta:
+                                providerProperty.Attributes.Add(new ProviderPropertyAttribute(PropertyAttribute.Password, bool.TrueString));
+                                    break;
                         }
                     }
 

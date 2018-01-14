@@ -162,14 +162,7 @@ namespace JustABackup.Controllers
             
             model.CurrentIndex = index;
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new Models.ProviderPropertyModel // TODO: place in a common place?
-            {
-                Name = x.Name,
-                Description = x.Description,
-                Template = typeMappingService.GetTemplateFromType(x.Type),
-                Value = values.ContainsKey(x.ID) ? typeMappingService.GetObjectFromString(values[x.ID], x.Type) : null,
-                ViewData = x.GenericType != null ? new { Type = x.GenericType } : null
-            }).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, typeMappingService)).ToList();
 
             return View(model);
         }
@@ -217,15 +210,7 @@ namespace JustABackup.Controllers
             }
 
             int jobId = await backupJobRepository.AddOrUpdate(createJob.Base.ID, createJob.Base.Name, providerInstances);
-
-            if (jobId > 0)
-            {
-                // TODO: UpdateScheduledJob
-            }
-            else
-            {
-                await schedulerService.CreateScheduledJob(jobId, createJob.Base.CronSchedule);
-            }
+            await schedulerService.CreateOrUpdate(jobId, createJob.Base.CronSchedule);
         }
 
         public async Task<IActionResult> Start(int[] ids)

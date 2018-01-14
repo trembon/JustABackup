@@ -11,7 +11,7 @@ namespace JustABackup.Core.Services
 {
     public interface ISchedulerService
     {
-        Task CreateScheduledJob(int jobId, string cronSchedule);
+        Task CreateOrUpdate(int jobId, string cronSchedule);
 
         Task<DateTime?> GetNextRunTime(int jobId);
 
@@ -33,19 +33,28 @@ namespace JustABackup.Core.Services
             this.scheduler = scheduler;
         }
 
-        public async Task CreateScheduledJob(int jobId, string cronSchedule)
+        public async Task CreateOrUpdate(int jobId, string cronSchedule)
         {
-            IJobDetail jobDetail = JobBuilder.Create<DefaultScheduledJob>()
-                    .WithIdentity(jobId.ToString())
-                    .Build();
-
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity(jobId.ToString())
                 .WithCronSchedule(cronSchedule)
                 .ForJob(jobId.ToString())
                 .Build();
 
-            await scheduler.ScheduleJob(jobDetail, trigger);
+            JobKey jobKey = JobKey.Create(jobId.ToString());
+            IEnumerable<ITrigger> triggers = await scheduler.GetTriggersOfJob(jobKey);
+            if(triggers != null && triggers.Count() == 1)
+            {
+                await scheduler.RescheduleJob(triggers.First().Key, trigger);
+            }
+            else
+            {
+                IJobDetail jobDetail = JobBuilder.Create<DefaultScheduledJob>()
+                        .WithIdentity(jobId.ToString())
+                        .Build();
+
+                await scheduler.ScheduleJob(jobDetail, trigger);
+            }
         }
 
         public async Task<string> GetCronSchedule(int jobId)

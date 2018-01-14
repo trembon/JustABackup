@@ -23,9 +23,14 @@ namespace JustABackup.Database.Entities
         [Required]
         public PropertyType Type { get; set; }
 
-        public string GenericType { get; set; }
+        public List<ProviderPropertyAttribute> Attributes { get; set; }
 
+        public ProviderProperty()
+        {
+            Attributes = new List<ProviderPropertyAttribute>();
+        }
 
+        #region Overrides
         public override bool Equals(object obj)
         {
             return Equals(obj as ProviderProperty);
@@ -53,6 +58,8 @@ namespace JustABackup.Database.Entities
             if (Type != other.Type)
                 return false;
 
+            // TODO: compare attributes
+
             return true;
         }
 
@@ -65,5 +72,6 @@ namespace JustABackup.Database.Entities
             hashCode = hashCode * -1521134295 + Type.GetHashCode();
             return hashCode;
         }
+        #endregion
     }
 }

@@ -31,12 +31,12 @@ namespace JustABackup.Database.Repositories
 
         public async Task<Provider> Get(int id)
         {
-            return await context.Providers.Include(p => p.Properties).FirstOrDefaultAsync(p => p.ID == id);
+            return await context.Providers.Include(p => p.Properties).ThenInclude(pp => pp.Attributes).FirstOrDefaultAsync(p => p.ID == id);
         }
 
         public async Task<IEnumerable<Provider>> Get(ProviderType providerType)
         {
-            return await context.Providers.Where(p => p.Type == ProviderType.Backup).ToListAsync();
+            return await context.Providers.Where(p => p.Type == providerType).ToListAsync();
         }
 
         public async Task<int?> GetInstanceID(int jobId, int index)

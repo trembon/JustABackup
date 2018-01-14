@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,6 +19,7 @@ namespace JustABackup.Plugin.OneDrive
         
         public string ClientID { get; set; }
 
+        [PasswordPropertyText]
         public string ClientSecret { get; set; }
 
         public void Initialize(string callbackUrl, Action<string> storeSession)

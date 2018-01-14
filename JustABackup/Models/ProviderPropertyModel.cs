@@ -1,9 +1,12 @@
-﻿using JustABackup.Database.Entities;
+﻿using JustABackup.Core.Services;
+using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +23,28 @@ namespace JustABackup.Models
 
         public string Template { get; set; }
 
-        public object ViewData { get; set; }
+        public RouteValueDictionary ViewData { get; set; }
+
+        public ProviderPropertyModel()
+        {
+        }
+
+        public ProviderPropertyModel(ProviderProperty providerProperty, IProviderMappingService providerMappingService)
+        {
+            this.Name = providerProperty.Name;
+            this.Description = providerProperty.Description;
+            this.Template = providerMappingService.GetTemplateFromType(providerProperty.Type);
+
+            //var expandoObject = new ExpandoObject();
+            //foreach (var attribute in providerProperty.Attributes)
+            //    ((IDictionary<string, object>)expandoObject).Add(attribute.Name.ToString(), attribute.Value);
+
+            ViewData = new RouteValueDictionary();
+            foreach (var attribute in providerProperty.Attributes)
+                ViewData.Add(attribute.Name.ToString(), attribute.Value);
+
+            //this.ViewData = providerProperty.Attributes.ToDictionary(k => k.Name.ToString(),  => v.Value);
+        }
     }
 
     public class ProviderPropertyValueModelBinder : IModelBinder

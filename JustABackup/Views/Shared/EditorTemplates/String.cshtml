@@ -1,3 +1,6 @@
 ﻿@model string
+@{
+    string type = ViewBag.Password == bool.TrueString ? "password" : "text";
+}
 
-<input asp-for="@Model" class="form-control" />
+<input asp-for="@Model" type="@type" class="form-control" />

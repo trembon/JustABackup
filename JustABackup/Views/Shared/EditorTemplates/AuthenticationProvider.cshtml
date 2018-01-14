@@ -1,7 +1,7 @@
 ﻿@model JustABackup.Base.IAuthenticatedClient<object>
 @inject IAuthenticatedSessionRepository authenticatedSessionRepo
 @{ 
-    var sessions = await authenticatedSessionRepo.GetAuthenticatedSessions(ViewData["Type"] as string);
+    var sessions = await authenticatedSessionRepo.GetAuthenticatedSessions(ViewData["GenericParameter"] as string);
     var selectItems = sessions.Select(kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value });
 }
 

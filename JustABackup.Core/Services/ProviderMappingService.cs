@@ -6,6 +6,7 @@ using JustABackup.Database.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace JustABackup.Core.Services
                 .Include(pi => pi.Provider)
                 .Include(pi => pi.Values)
                 .ThenInclude(pip => pip.Property)
+                .ThenInclude(pp => pp.Attributes)
                 .FirstOrDefaultAsync(pi => pi.ID == providerInstanceId);
 
             return await CreateProvider<T>(providerInstance);
@@ -54,7 +56,9 @@ namespace JustABackup.Core.Services
             foreach (var property in providerInstance.Values)
             {
                 PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
-                object originalValueType = this.GetObjectFromString(property.Value, property.Property.Type, property.Property.GenericType);
+
+                string genericType = property.Property.Attributes.Where(a => a.Name == PropertyAttribute.GenericParameter).Select(a => a.Value).FirstOrDefault();
+                object originalValueType = this.GetObjectFromString(property.Value, property.Property.Type, genericType);
 
                 propertyInfo.SetValue(convertedProvider, originalValueType);
             }
