@@ -35,6 +35,8 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var result = await providerRepository.GetInstance(1);
+
             ListAuthenticatedSessionModel model = CreateModel<ListAuthenticatedSessionModel>("Authenticated Sessions");
 
             var sessions = await authenticatedSessionRepository.Get();

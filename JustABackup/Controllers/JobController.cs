@@ -153,7 +153,8 @@ namespace JustABackup.Controllers
                 model = CreateModel<ModifyJobProviderModel>("Modify Schedule");
                 model.ID = id;
 
-                values = await providerRepository.GetProviderValues(id);
+                var propertyValues = await providerRepository.GetProviderValues(id);
+                values = propertyValues.ToDictionary(k => k.Property.ID, v => v.Value);
             }
             else
             {
