@@ -15,6 +15,8 @@ namespace JustABackup.Database.Repositories
 
         Task<IEnumerable<Provider>> Get(ProviderType providerType);
 
+        Task<ProviderInstance> GetInstance(int id);
+
         Task<int?> GetInstanceID(int jobId, int index);
 
         Task<Dictionary<int, string>> GetProviderValues(int instanceId);
@@ -37,6 +39,17 @@ namespace JustABackup.Database.Repositories
         public async Task<IEnumerable<Provider>> Get(ProviderType providerType)
         {
             return await context.Providers.Where(p => p.Type == providerType).ToListAsync();
+        }
+
+        public async Task<ProviderInstance> GetInstance(int id)
+        {
+            return await context
+                .ProviderInstances
+                .Include(pi => pi.Provider)
+                .Include(pi => pi.Values)
+                .ThenInclude(pip => pip.Property)
+                .ThenInclude(pp => pp.Attributes)
+                .FirstOrDefaultAsync(pi => pi.ID == id);
         }
 
         public async Task<int?> GetInstanceID(int jobId, int index)

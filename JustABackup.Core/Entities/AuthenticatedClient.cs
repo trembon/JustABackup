@@ -2,6 +2,7 @@
 using JustABackup.Core.Services;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
+using JustABackup.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,29 +14,26 @@ namespace JustABackup.Core.Entities
     public class AuthenticatedClient<T> : IAuthenticatedClient<T> where T : class
     {
         private IProviderMappingService providerMappingService;
-        private DefaultContext dbContext;
+        private IAuthenticatedSessionRepository authenticatedSessionRepository;
 
-        public long ID { get; }
+        public int ID { get; }
 
-        public AuthenticatedClient(long id)
+        public AuthenticatedClient(int id)
         {
             this.ID = id;
         }
 
-        public AuthenticatedClient(long id, IProviderMappingService providerMappingService, DefaultContext dbContext)
+        public AuthenticatedClient(int id, IProviderMappingService providerMappingService, IAuthenticatedSessionRepository authenticatedSessionRepository)
             : this(id)
         {
             this.providerMappingService = providerMappingService;
-            this.dbContext = dbContext;
+            this.authenticatedSessionRepository = authenticatedSessionRepository;
         }
 
         public async Task<T> GetClient()
         {
             // TODO: place in service?
-            AuthenticatedSession session = await dbContext
-                .AuthenticatedSessions
-                .Include(a => a.Provider)
-                .FirstOrDefaultAsync(a => a.ID == ID);
+            AuthenticatedSession session = await authenticatedSessionRepository.Get(ID);
 
             IAuthenticationProvider<T> authenticationProvider = await providerMappingService?.CreateProvider<IAuthenticationProvider<T>>(session.Provider.ID);
             return authenticationProvider.GetAuthenticatedClient(session.SessionData);

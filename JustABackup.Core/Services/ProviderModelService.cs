@@ -137,6 +137,8 @@ namespace JustABackup.Core.Services
                         .Include(j => j.Providers)
                         .Where(j => j.Providers.Any(t => t.ID == existingProvider.ID));
 
+                    // TODO: handle authenticated sessions
+
                     // set the jobs to have a changed model
                     foreach (BackupJob job in jobsWithChangedModels)
                         job.HasChangedModel = true;

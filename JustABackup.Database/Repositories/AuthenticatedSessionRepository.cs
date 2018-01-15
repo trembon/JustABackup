@@ -13,6 +13,8 @@ namespace JustABackup.Database.Repositories
     {
         Task<IEnumerable<AuthenticatedSession>> Get();
 
+        Task<AuthenticatedSession> Get(int id);
+
         Task<Dictionary<int, string>> GetAuthenticatedSessions(string type);
 
         Task<int> Add(string name, string sessionData, ProviderInstance providerInstance);
@@ -75,6 +77,14 @@ namespace JustABackup.Database.Repositories
             }
 
             return false;
+        }
+
+        public async Task<AuthenticatedSession> Get(int id)
+        {
+            return await context
+                .AuthenticatedSessions
+                .Include(a => a.Provider)
+                .FirstOrDefaultAsync(a => a.ID == id);
         }
     }
 }

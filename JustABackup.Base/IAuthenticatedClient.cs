@@ -7,7 +7,7 @@ namespace JustABackup.Base
 {
     public interface IAuthenticatedClient<T> where T : class
     {
-        long ID { get; }
+        int ID { get; }
 
         Task<T> GetClient();
     }
