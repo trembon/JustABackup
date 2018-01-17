@@ -1,4 +1,5 @@
 ﻿using JustABackup.Database.Entities;
+using JustABackup.Database.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,10 @@ namespace JustABackup.Database.Repositories
 
         Task<IEnumerable<BackupJob>> Get();
 
+        Task<int> AddHistory(int id);
+
+        Task<bool> UpdateHistory(int historyId, ExitCode status, string message);
+
         Task<IEnumerable<BackupJobHistory>> GetHistory(int limit);
 
         Task<int> AddOrUpdate(int? id, string name, IEnumerable<ProviderInstance> providerInstances);
@@ -26,6 +31,17 @@ namespace JustABackup.Database.Repositories
         public BackupJobRepository(DefaultContext context)
         {
             this.context = context;
+        }
+
+        public async Task<int> AddHistory(int id)
+        {
+            BackupJobHistory history = new BackupJobHistory();
+            history.Started = DateTime.Now;
+
+            context.JobHistory.Add(history);
+            await context.SaveChangesAsync();
+
+            return history.ID;
         }
 
         public async Task<int> AddOrUpdate(int? id, string name, IEnumerable<ProviderInstance> providerInstances)
@@ -78,6 +94,20 @@ namespace JustABackup.Database.Repositories
                 .OrderByDescending(jh => jh.Started)
                 .Take(limit)
                 .ToListAsync();
+        }
+
+        public async Task<bool> UpdateHistory(int historyId, ExitCode status, string message)
+        {
+            BackupJobHistory history = await context.JobHistory.FirstOrDefaultAsync(jh => jh.ID == historyId);
+            if (history == null)
+                return false;
+
+            history.Completed = DateTime.Now;
+            history.Message = message;
+            history.Status = status;
+
+            await context.SaveChangesAsync();
+            return true;
         }
     }
 }
