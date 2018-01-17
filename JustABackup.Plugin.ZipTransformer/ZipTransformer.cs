@@ -57,5 +57,10 @@ namespace JustABackup.Plugin.ZipTransformer
 
             return Task.FromResult(result);
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

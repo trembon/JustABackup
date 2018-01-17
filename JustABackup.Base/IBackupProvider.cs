@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Base
 {
-    public interface IBackupProvider
+    public interface IBackupProvider : IDisposable
     {
         Task<IEnumerable<BackupItem>> GetItems(DateTime? lastRun);
 

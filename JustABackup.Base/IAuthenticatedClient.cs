@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Base
 {
-    public interface IAuthenticatedClient<T> where T : class
+    public interface IAuthenticatedClient<T> : IDisposable where T : class
     {
         int ID { get; }
 

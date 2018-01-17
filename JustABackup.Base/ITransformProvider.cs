@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Base
 {
-    public interface ITransformProvider
+    public interface ITransformProvider : IDisposable
     {
         Task<MappedBackupItemList> MapInput(IEnumerable<BackupItem> input);
 

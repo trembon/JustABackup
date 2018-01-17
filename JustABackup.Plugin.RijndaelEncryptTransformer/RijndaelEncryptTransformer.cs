@@ -11,8 +11,15 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
 {
     public class RijndaelEncryptTransformer : ITransformProvider
     {
+        private List<Stream> streams;
+
         [Display(Name = "Encryption key")]
         public string EncyptionKey { get; set; }
+
+        public RijndaelEncryptTransformer()
+        {
+            streams = new List<Stream>();
+        }
 
         public async Task TransformItem(BackupItem output, Stream outputStream, Dictionary<BackupItem, Stream> inputFiles)
         {
@@ -26,6 +33,7 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
                     await input.Value.CopyToAsync(cs);
 
                 cs.FlushFinalBlock();
+                streams.Add(cs);
             }
         }
 
@@ -43,6 +51,11 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
             }
 
             return Task.FromResult(result);
+        }
+
+        public void Dispose()
+        {
+            streams.ForEach(s => s.Dispose());
         }
     }
 }

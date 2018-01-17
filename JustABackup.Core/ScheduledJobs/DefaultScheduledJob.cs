@@ -138,6 +138,25 @@ namespace JustABackup.Core.ScheduledJobs
                     }
                 }
 
+                try
+                {
+                    backupProvider.Dispose();
+                }
+                catch { }
+                try
+                {
+                    storageProvider.Dispose();
+                }
+                catch { }
+                foreach(var transformProvider in transformProviders)
+                {
+                    try
+                    {
+                        transformProvider.Dispose();
+                    }
+                    catch { }
+                }
+
                 await backupJobRepository.UpdateHistory(historyId, ExitCode.Success, "Backup completed successfully.");
             }
             catch (Exception ex)

@@ -43,5 +43,10 @@ namespace JustABackup.Plugin.FileSystem
         {
             return Task.Run(() => File.OpenRead(Path.Combine(TargetFolder, item.Path, item.Name)) as Stream);
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

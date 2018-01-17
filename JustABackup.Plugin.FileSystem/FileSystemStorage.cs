@@ -29,5 +29,10 @@ namespace JustABackup.Plugin.FileSystem
                 return false;
             }
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

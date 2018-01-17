@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Base
 {
-    public interface IStorageProvider
+    public interface IStorageProvider : IDisposable
     {
         Task<bool> StoreItem(BackupItem item, Stream source);
     }

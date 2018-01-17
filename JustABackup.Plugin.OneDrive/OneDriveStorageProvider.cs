@@ -22,5 +22,10 @@ namespace JustABackup.Plugin.OneDrive
             await client.Drive.Root.ItemWithPath(itemPath).Content.Request().PutAsync<Item>(source);
             return true;
         }
+
+        public void Dispose()
+        {
+            Client.Dispose();
+        }
     }
 }
