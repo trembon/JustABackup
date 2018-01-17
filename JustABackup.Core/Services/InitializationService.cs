@@ -1,6 +1,7 @@
 ﻿using JustABackup.Base;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
+using JustABackup.Database.Helpers;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using System;

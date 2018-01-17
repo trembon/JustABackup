@@ -1,5 +1,6 @@
 ﻿using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
+using JustABackup.Database.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,37 +20,49 @@ namespace JustABackup.Database.Repositories
 
         Task<int?> GetInstanceID(int jobId, int index);
 
-        Task<Dictionary<int, string>> GetProviderValues(int instanceId);
+        Task<IEnumerable<ProviderInstanceProperty>> GetProviderValues(int instanceId);
     }
 
     public class ProviderRepository : IProviderRepository
     {
         private DefaultContext context;
+        private IDatabaseEncryptionHelper databaseEncryptionHelper;
 
-        public ProviderRepository(DefaultContext context)
+        public ProviderRepository(DefaultContext context, IDatabaseEncryptionHelper databaseEncryptionHelper)
         {
             this.context = context;
+            this.databaseEncryptionHelper = databaseEncryptionHelper;
         }
 
         public async Task<Provider> Get(int id)
         {
-            return await context.Providers.Include(p => p.Properties).ThenInclude(pp => pp.Attributes).FirstOrDefaultAsync(p => p.ID == id);
+            return await context
+                .Providers
+                .Include(p => p.Properties)
+                .ThenInclude(pp => pp.Attributes)
+                .FirstOrDefaultAsync(p => p.ID == id);
         }
 
         public async Task<IEnumerable<Provider>> Get(ProviderType providerType)
         {
-            return await context.Providers.Where(p => p.Type == providerType).ToListAsync();
+            return await context
+                .Providers
+                .Where(p => p.Type == providerType)
+                .ToListAsync();
         }
 
         public async Task<ProviderInstance> GetInstance(int id)
         {
-            return await context
+            ProviderInstance providerInstance = await context
                 .ProviderInstances
                 .Include(pi => pi.Provider)
                 .Include(pi => pi.Values)
                 .ThenInclude(pip => pip.Property)
                 .ThenInclude(pp => pp.Attributes)
                 .FirstOrDefaultAsync(pi => pi.ID == id);
+
+            await databaseEncryptionHelper.Decrypt(providerInstance);
+            return providerInstance;
         }
 
         public async Task<int?> GetInstanceID(int jobId, int index)
@@ -66,14 +79,17 @@ namespace JustABackup.Database.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Dictionary<int, string>> GetProviderValues(int instanceId)
+        public async Task<IEnumerable<ProviderInstanceProperty>> GetProviderValues(int instanceId)
         {
-            return await context
+            IEnumerable<ProviderInstanceProperty> providerInstanceProperties = await context
                 .ProviderInstances
                 .Where(pi => pi.ID == instanceId)
                 .SelectMany(pi => pi.Values)
                 .Include(v => v.Property)
-                .ToDictionaryAsync(k => k.Property.ID, v => v.Value);
+                .ToListAsync();
+
+            await databaseEncryptionHelper.Decrypt(providerInstanceProperties);
+            return providerInstanceProperties;
         }
     }
 }

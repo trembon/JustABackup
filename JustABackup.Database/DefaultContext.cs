@@ -18,6 +18,8 @@ namespace JustABackup.Database
 
         public DbSet<AuthenticatedSession> AuthenticatedSessions { get; set; }
 
+        public DbSet<Passphrase> Passphrase { get; set; }
+
         public DefaultContext(DbContextOptions options) : base(options)
         {
         }

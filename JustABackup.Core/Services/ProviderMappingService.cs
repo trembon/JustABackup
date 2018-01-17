@@ -86,7 +86,7 @@ namespace JustABackup.Core.Services
                     {
                         Type authenticatedClientType = typeof(AuthenticatedClient<>);
                         authenticatedClientType = authenticatedClientType.MakeGenericType(Type.GetType(genericType));
-                        return Activator.CreateInstance(authenticatedClientType, Convert.ToInt64(value), this, authenticatedSessionRepository);
+                        return Activator.CreateInstance(authenticatedClientType, Convert.ToInt32(value), this, authenticatedSessionRepository);
                     }
             }
 

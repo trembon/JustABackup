@@ -1,5 +1,6 @@
 ﻿using JustABackup.Database;
 using JustABackup.Database.Entities;
+using JustABackup.Database.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -25,10 +26,12 @@ namespace JustABackup.Database.Repositories
     public class AuthenticatedSessionRepository : IAuthenticatedSessionRepository
     {
         private DefaultContext context;
+        private IDatabaseEncryptionHelper databaseEncryptionHelper;
 
-        public AuthenticatedSessionRepository(DefaultContext context)
+        public AuthenticatedSessionRepository(DefaultContext context, IDatabaseEncryptionHelper databaseEncryptionHelper)
         {
             this.context = context;
+            this.databaseEncryptionHelper = databaseEncryptionHelper;
         }
 
         public async Task<int> Add(string name, string sessionData, ProviderInstance providerInstance)
@@ -37,6 +40,8 @@ namespace JustABackup.Database.Repositories
             session.Name = name;
             session.SessionData = sessionData;
             session.Provider = providerInstance;
+
+            await databaseEncryptionHelper.Encrypt(session);
 
             await context.AuthenticatedSessions.AddAsync(session);
             await context.SaveChangesAsync();
@@ -68,10 +73,12 @@ namespace JustABackup.Database.Repositories
 
         public async Task<bool> StoreSession(int sessionId, string sessionData)
         {
-            var session = await context.AuthenticatedSessions.FirstOrDefaultAsync(api => api.ID == sessionId);
+            AuthenticatedSession session = await context.AuthenticatedSessions.FirstOrDefaultAsync(api => api.ID == sessionId);
             if (session != null)
             {
                 session.SessionData = sessionData;
+                await databaseEncryptionHelper.Encrypt(session);
+
                 await context.SaveChangesAsync();
                 return true;
             }
@@ -81,10 +88,13 @@ namespace JustABackup.Database.Repositories
 
         public async Task<AuthenticatedSession> Get(int id)
         {
-            return await context
+            AuthenticatedSession session = await context
                 .AuthenticatedSessions
                 .Include(a => a.Provider)
                 .FirstOrDefaultAsync(a => a.ID == id);
+
+            await databaseEncryptionHelper.Decrypt(session);
+            return session;
         }
     }
 }
