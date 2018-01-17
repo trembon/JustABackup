@@ -20,6 +20,8 @@ namespace JustABackup.Database.Repositories
 
         Task<bool> UpdateHistory(int historyId, ExitCode status, string message);
 
+        Task<DateTime?> GetLastRun(int id);
+
         Task<IEnumerable<BackupJobHistory>> GetHistory(int limit);
 
         Task<int> AddOrUpdate(int? id, string name, IEnumerable<ProviderInstance> providerInstances);
@@ -93,6 +95,17 @@ namespace JustABackup.Database.Repositories
                 .Jobs
                 .OrderBy(j => j.Name)
                 .ToListAsync();
+        }
+
+        public async Task<DateTime?> GetLastRun(int id)
+        {
+            return await context
+                .JobHistory
+                .Include(jh => jh.Job)
+                .Where(jh => jh.Job.ID == id)
+                .OrderByDescending(jh => jh.Started)
+                .Select(jh => jh.Started)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<BackupJobHistory>> GetHistory(int limit)

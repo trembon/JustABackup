@@ -55,7 +55,8 @@ namespace JustABackup.Core.ScheduledJobs
                 foreach (var tp in providers.Where(p => p.Provider.Type == ProviderType.Transform))
                     transformProviders.Add(await providerMappingService.CreateProvider<ITransformProvider>(tp));
 
-                var items = await backupProvider.GetItems();
+                DateTime? lastRun = await backupJobRepository.GetLastRun(jobId);
+                var items = await backupProvider.GetItems(lastRun);
 
                 List<List<TransformBackupItem>> transformExecuteList = new List<List<TransformBackupItem>>(transformProviders.Count());
 

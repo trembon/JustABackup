@@ -22,7 +22,7 @@ namespace JustABackup.Plugin.FileSystem
         [Display(Name = "Subdirectories", Description = "If subdirectories should be included")]
         public bool Subdirectories { get; set; }
 
-        public Task<IEnumerable<BackupItem>> GetItems()
+        public Task<IEnumerable<BackupItem>> GetItems(DateTime? lastRun)
         {
             string[] foundFiles = new string[0];
             if(string.IsNullOrWhiteSpace(FileFilter))
