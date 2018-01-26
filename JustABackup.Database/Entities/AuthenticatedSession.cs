@@ -20,7 +20,7 @@ namespace JustABackup.Database.Entities
         [Required]
         public bool HasChangedModel { get; set; }
 
-        public string SessionData { get; set; }
+        public byte[] SessionData { get; set; }
         
         public List<ProviderInstanceProperty> Values { get; set; }
 

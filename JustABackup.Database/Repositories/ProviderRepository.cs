@@ -1,6 +1,5 @@
 ﻿using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
-using JustABackup.Database.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,12 +25,10 @@ namespace JustABackup.Database.Repositories
     public class ProviderRepository : IProviderRepository
     {
         private DefaultContext context;
-        private IDatabaseEncryptionHelper databaseEncryptionHelper;
 
-        public ProviderRepository(DefaultContext context, IDatabaseEncryptionHelper databaseEncryptionHelper)
+        public ProviderRepository(DefaultContext context)
         {
             this.context = context;
-            this.databaseEncryptionHelper = databaseEncryptionHelper;
         }
 
         public async Task<Provider> Get(int id)
@@ -60,8 +57,7 @@ namespace JustABackup.Database.Repositories
                 .ThenInclude(pip => pip.Property)
                 .ThenInclude(pp => pp.Attributes)
                 .FirstOrDefaultAsync(pi => pi.ID == id);
-
-            await databaseEncryptionHelper.Decrypt(providerInstance);
+            
             return providerInstance;
         }
 
@@ -86,9 +82,9 @@ namespace JustABackup.Database.Repositories
                 .Where(pi => pi.ID == instanceId)
                 .SelectMany(pi => pi.Values)
                 .Include(v => v.Property)
+                .ThenInclude(p => p.Attributes)
                 .ToListAsync();
-
-            await databaseEncryptionHelper.Decrypt(providerInstanceProperties);
+            
             return providerInstanceProperties;
         }
     }

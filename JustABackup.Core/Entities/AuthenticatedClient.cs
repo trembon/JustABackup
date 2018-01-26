@@ -11,12 +11,14 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Core.Entities
 {
+    [Serializable]
     public class AuthenticatedClient<T> : IAuthenticatedClient<T> where T : class
     {
-        private IProviderMappingService providerMappingService;
-        private IAuthenticatedSessionRepository authenticatedSessionRepository;
-
+        [NonSerialized]
         private T client;
+
+        [NonSerialized]
+        private Func<int, Task<object>> getClient;
 
         public int ID { get; }
 
@@ -25,25 +27,17 @@ namespace JustABackup.Core.Entities
             this.ID = id;
         }
 
-        public AuthenticatedClient(int id, IProviderMappingService providerMappingService, IAuthenticatedSessionRepository authenticatedSessionRepository)
-            : this(id)
-        {
-            this.providerMappingService = providerMappingService;
-            this.authenticatedSessionRepository = authenticatedSessionRepository;
-        }
-
         public async Task<T> GetClient()
         {
             if (client == null)
-            {
-                // TODO: place in service?
-                AuthenticatedSession session = await authenticatedSessionRepository.Get(ID);
-
-                IAuthenticationProvider<T> authenticationProvider = await providerMappingService?.CreateProvider<IAuthenticationProvider<T>>(session.Provider.ID);
-                client = authenticationProvider.GetAuthenticatedClient(session.SessionData);
-            }
+                client = await getClient?.Invoke(ID) as T;
 
             return client;
+        }
+
+        internal void SetLoadMethod(Func<int, Task<object>> getClient)
+        {
+            this.getClient = getClient;
         }
 
         public override string ToString()

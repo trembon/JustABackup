@@ -1,5 +1,4 @@
 ﻿using JustABackup.Database.Entities;
-using JustABackup.Database.Helpers;
 using JustABackup.Database.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,17 +29,16 @@ namespace JustABackup.Database.Repositories
     public class BackupJobRepository : IBackupJobRepository
     {
         private DefaultContext context;
-        private IDatabaseEncryptionHelper databaseEncryptionHelper;
 
-        public BackupJobRepository(DefaultContext context, IDatabaseEncryptionHelper databaseEncryptionHelper)
+        public BackupJobRepository(DefaultContext context)
         {
             this.context = context;
-            this.databaseEncryptionHelper = databaseEncryptionHelper;
         }
 
         public async Task<int> AddHistory(int id)
         {
             BackupJobHistory history = new BackupJobHistory();
+            history.Job = new BackupJob { ID = id };
             history.Started = DateTime.Now;
 
             context.JobHistory.Add(history);
@@ -67,8 +65,6 @@ namespace JustABackup.Database.Repositories
             job.Name = name;
             job.Providers.AddRange(providerInstances);
 
-            await databaseEncryptionHelper.Encrypt(job);
-
             await context.SaveChangesAsync();
 
             return job.ID;
@@ -84,8 +80,7 @@ namespace JustABackup.Database.Repositories
                 .ThenInclude(x => x.Values)
                 .ThenInclude(x => x.Property)
                 .FirstOrDefaultAsync(j => j.ID == id);
-
-            await databaseEncryptionHelper.Decrypt(job);
+            
             return job;
         }
 
@@ -112,6 +107,7 @@ namespace JustABackup.Database.Repositories
         {
             return await context
                 .JobHistory
+                .Include(jh => jh.Job)
                 .OrderByDescending(jh => jh.Started)
                 .Take(limit)
                 .ToListAsync();

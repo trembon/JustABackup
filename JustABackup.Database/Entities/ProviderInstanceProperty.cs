@@ -14,6 +14,6 @@ namespace JustABackup.Database.Entities
         [Required]
         public ProviderProperty Property { get; set; }
         
-        public string Value { get; set; }
+        public byte[] Value { get; set; }
     }
 }

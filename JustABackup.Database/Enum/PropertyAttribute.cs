@@ -8,6 +8,7 @@ namespace JustABackup.Database.Enum
     {
         GenericParameter,
         Password,
-        Validation
+        Validation,
+        Transform
     }
 }

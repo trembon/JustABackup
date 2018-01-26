@@ -20,21 +20,26 @@ namespace JustABackup.Core.Services
 
         Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class;
 
-        PropertyType GetTypeFromProperty(PropertyInfo property, out Type genericParameter);
-
         string GetTemplateFromType(PropertyType type);
+        
+        Task<object> GetValue(ProviderInstanceProperty property);
 
-        object GetObjectFromString(string value, PropertyType propertyType, string genericType = null);
+        Task<object> GetPresentationValue(ProviderInstanceProperty property);
+
+        Task<byte[]> Parse(string value, PropertyType propertyType, List<ProviderPropertyAttribute> attributes);
     }
 
     public class ProviderMappingService : IProviderMappingService
     {
+        private IEncryptionService encryptionService;
         private IProviderRepository providerRepository;
         private IAuthenticatedSessionRepository authenticatedSessionRepository;
 
-        public ProviderMappingService(IProviderRepository providerRepository, IAuthenticatedSessionRepository authenticatedSessionRepository)
+        public ProviderMappingService(IProviderRepository providerRepository, IAuthenticatedSessionRepository authenticatedSessionRepository, IEncryptionService encryptionService)
         {
+            this.encryptionService = encryptionService;
             this.providerRepository = providerRepository;
+            this.authenticatedSessionRepository = authenticatedSessionRepository;
         }
 
         public async Task<T> CreateProvider<T>(int providerInstanceId) where T : class
@@ -43,7 +48,7 @@ namespace JustABackup.Core.Services
 			return await CreateProvider<T>(providerInstance);
         }
 
-        public Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class
+        public async Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class
         {
             Type providerType = Type.GetType(providerInstance.Provider.Namespace);
             T convertedProvider = Activator.CreateInstance(providerType) as T;
@@ -51,46 +56,12 @@ namespace JustABackup.Core.Services
             foreach (var property in providerInstance.Values)
             {
                 PropertyInfo propertyInfo = providerType.GetProperty(property.Property.TypeName);
-
-                string genericType = property.Property.Attributes.Where(a => a.Name == PropertyAttribute.GenericParameter).Select(a => a.Value).FirstOrDefault();
-                object originalValueType = this.GetObjectFromString(property.Value, property.Property.Type, genericType);
-
+                
+                object originalValueType = await this.GetValue(property);
                 propertyInfo.SetValue(convertedProvider, originalValueType);
             }
 
-            return Task.FromResult(convertedProvider);
-        }
-
-        public object GetObjectFromString(string value, PropertyType propertyType, string genericType = null)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-
-            switch (propertyType)
-            {
-                case PropertyType.Bool:
-                    return Convert.ToBoolean(value);
-
-                case PropertyType.Number:
-                    return Convert.ToInt64(value);
-
-                case PropertyType.String:
-                    return value;
-
-                case PropertyType.Authentication:
-                    if (string.IsNullOrWhiteSpace(genericType))
-                    {
-                        return new AuthenticatedClient<object>(Convert.ToInt32(value), this, authenticatedSessionRepository);
-                    }
-                    else
-                    {
-                        Type authenticatedClientType = typeof(AuthenticatedClient<>);
-                        authenticatedClientType = authenticatedClientType.MakeGenericType(Type.GetType(genericType));
-                        return Activator.CreateInstance(authenticatedClientType, Convert.ToInt32(value), this, authenticatedSessionRepository);
-                    }
-            }
-
-            return null;
+            return convertedProvider;
         }
 
         public string GetTemplateFromType(PropertyType type)
@@ -106,29 +77,95 @@ namespace JustABackup.Core.Services
             }
         }
 
-        public PropertyType GetTypeFromProperty(PropertyInfo property, out Type genericParameter)
+        public async Task<object> GetValue(ProviderInstanceProperty property)
         {
-            genericParameter = null;
+            object value = await encryptionService.Decrypt<object>(property.Value);
 
-            if (property.PropertyType == typeof(string))
-                return PropertyType.String;
-
-            if (property.PropertyType == typeof(int))
-                return PropertyType.Number;
-
-            if (property.PropertyType == typeof(long))
-                return PropertyType.Number;
-
-            if (property.PropertyType == typeof(bool))
-                return PropertyType.Bool;
-
-            if (property.PropertyType.GetGenericTypeDefinition() == typeof(IAuthenticatedClient<>))
+            switch (property.Property.Type)
             {
-                genericParameter = property.PropertyType.GenericTypeArguments[0];
-                return PropertyType.Authentication;
+                case PropertyType.Authentication:
+                    ((dynamic)value).SetLoadMethod((Func<int, Task<object>>)GetAuthenticatedSessionClient);
+                    break;
             }
 
-            throw new ArgumentOutOfRangeException(nameof(property));
+            List<ProviderPropertyAttribute> attributes = property?.Property?.Attributes ?? new List<ProviderPropertyAttribute>();
+            if (attributes.Any(a => a.Name == PropertyAttribute.Transform))
+            {
+                switch (property.Property.Type)
+                {
+                    case PropertyType.String:
+                        value = TransformString(value);
+                        break;
+                }
+            }
+
+            return value;
+        }
+
+        public async Task<object> GetPresentationValue(ProviderInstanceProperty property)
+        {
+            return await encryptionService.Decrypt<object>(property.Value);
+        }
+
+        public async Task<byte[]> Parse(string value, PropertyType propertyType, List<ProviderPropertyAttribute> attributes)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return new byte[0];
+
+            attributes = attributes ?? new List<ProviderPropertyAttribute>();
+            string genericType = attributes.FirstOrDefault(a => a.Name == PropertyAttribute.GenericParameter)?.Value;
+
+            object parsedValue;
+            switch (propertyType)
+            {
+                case PropertyType.Bool:
+                    parsedValue = Convert.ToBoolean(value);
+                    break;
+
+                case PropertyType.Number:
+                    parsedValue = Convert.ToInt64(value);
+                    break;
+
+                case PropertyType.Authentication:
+                    Type authenticatedClientType = typeof(AuthenticatedClient<>);
+                    authenticatedClientType = authenticatedClientType.MakeGenericType(Type.GetType(genericType));
+                    parsedValue = Activator.CreateInstance(authenticatedClientType, Convert.ToInt32(value));
+
+                    ((dynamic)parsedValue).SetLoadMethod((Func<int, Task<object>>)GetAuthenticatedSessionClient);
+                    break;
+
+                default:
+                case PropertyType.String:
+                    parsedValue = value;
+                    break;
+            }
+
+            byte[] encryptedValue = await encryptionService.Encrypt(parsedValue);
+            return encryptedValue;
+        }
+
+        private object TransformString(object value)
+        {
+            if (value is string)
+            {
+                string data = value as string;
+                DateTime timestamp = DateTime.Now;
+
+                data = data.Replace("{date}", timestamp.ToShortDateString());
+
+                return data;
+            }
+
+            return value;
+        }
+
+        private async Task<object> GetAuthenticatedSessionClient(int authenticatedSessionId)
+        {
+            AuthenticatedSession session = await authenticatedSessionRepository.Get(authenticatedSessionId);
+            string decryptedSessionData = await encryptionService.Decrypt<string>(session.SessionData);
+
+            IAuthenticationProvider<object> authenticationProvider = await CreateProvider<IAuthenticationProvider<object>>(session.Provider.ID);
+            return authenticationProvider.GetAuthenticatedClient(decryptedSessionData);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace JustABackup.Controllers
     public class JobController : ControllerBase
     {
         private ISchedulerService schedulerService;
-        private IProviderMappingService typeMappingService;
+        private IProviderMappingService providerMappingService;
         private IBackupJobRepository backupJobRepository;
         private IProviderRepository providerRepository;
 
@@ -35,7 +35,7 @@ namespace JustABackup.Controllers
             this.backupJobRepository = backupJobRepository;
             this.providerRepository = providerRepository;
             this.schedulerService = schedulerService;
-            this.typeMappingService = typeMappingService;
+            this.providerMappingService = typeMappingService;
         }
 
         [HttpGet]
@@ -146,15 +146,19 @@ namespace JustABackup.Controllers
             CreateJobProviderModel model = null;
 
             Provider provider = await providerRepository.Get(createJob.ProviderIDs[index]);
-            Dictionary<int, string> values = new Dictionary<int, string>();
+            Dictionary<int, object> values = new Dictionary<int, object>();
             
             if (id > 0)
             {
                 model = CreateModel<ModifyJobProviderModel>("Modify Schedule");
                 model.ID = id;
 
-                var propertyValues = await providerRepository.GetProviderValues(id);
-                values = propertyValues.ToDictionary(k => k.Property.ID, v => v.Value);
+                IEnumerable<ProviderInstanceProperty> propertyValues = await providerRepository.GetProviderValues(id);
+                foreach(ProviderInstanceProperty propertyValue in propertyValues)
+                {
+                    object parsedValue = await providerMappingService.GetPresentationValue(propertyValue);
+                    values.Add(propertyValue.Property.ID, parsedValue);
+                }
             }
             else
             {
@@ -163,7 +167,7 @@ namespace JustABackup.Controllers
             
             model.CurrentIndex = index;
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, typeMappingService)).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, values.ContainsKey(x.ID) ? values[x.ID] : null, providerMappingService)).ToList();
 
             return View(model);
         }
@@ -205,7 +209,7 @@ namespace JustABackup.Controllers
             for (int i = 0; i < createJob.Providers.Count; i++)
             {
                 Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
-                ProviderInstance providerInstance = createJob.Providers[i].CreateProviderInstance(provider);
+                ProviderInstance providerInstance = await createJob.Providers[i].CreateProviderInstance(provider, providerMappingService);
                 providerInstance.Order = i;
                 providerInstances.Add(providerInstance);
             }

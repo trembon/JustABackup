@@ -29,21 +29,16 @@ namespace JustABackup.Models
         {
         }
 
-        public ProviderPropertyModel(ProviderProperty providerProperty, IProviderMappingService providerMappingService)
+        public ProviderPropertyModel(ProviderProperty providerProperty, object value, IProviderMappingService providerMappingService)
         {
             this.Name = providerProperty.Name;
             this.Description = providerProperty.Description;
             this.Template = providerMappingService.GetTemplateFromType(providerProperty.Type);
-
-            //var expandoObject = new ExpandoObject();
-            //foreach (var attribute in providerProperty.Attributes)
-            //    ((IDictionary<string, object>)expandoObject).Add(attribute.Name.ToString(), attribute.Value);
-
+            this.Value = value;
+            
             ViewData = new RouteValueDictionary();
             foreach (var attribute in providerProperty.Attributes)
                 ViewData.Add(attribute.Name.ToString(), attribute.Value);
-
-            //this.ViewData = providerProperty.Attributes.ToDictionary(k => k.Name.ToString(),  => v.Value);
         }
     }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Base
 {
+    // TODO: idisposable
     public interface IAuthenticationProvider<out T> where T : class
     {
         void Initialize(string callbackUrl, Action<string> storeSession);

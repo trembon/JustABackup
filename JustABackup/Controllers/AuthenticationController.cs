@@ -20,13 +20,15 @@ namespace JustABackup.Controllers
     public class AuthenticationController : ControllerBase
     {
         private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
-        
+
+        private IEncryptionService encryptionService;
         private IProviderRepository providerRepository;
         private IProviderMappingService providerMappingService;
         private IAuthenticatedSessionRepository authenticatedSessionRepository;
 
-        public AuthenticationController(IAuthenticatedSessionRepository authenticatedSessionRepository, IProviderRepository providerRepository, IProviderMappingService providerMappingService)
+        public AuthenticationController(IAuthenticatedSessionRepository authenticatedSessionRepository, IProviderRepository providerRepository, IProviderMappingService providerMappingService, IEncryptionService encryptionService)
         {
+            this.encryptionService = encryptionService;
             this.providerRepository = providerRepository;
             this.providerMappingService = providerMappingService;
             this.authenticatedSessionRepository = authenticatedSessionRepository;
@@ -88,7 +90,7 @@ namespace JustABackup.Controllers
             CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
             
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, providerMappingService)).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, null, providerMappingService)).ToList();
 
             return View(model);
         }
@@ -122,7 +124,7 @@ namespace JustABackup.Controllers
                 redirectId = Guid.NewGuid().ToString(); // TODO: move to create and store this in db
 
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = createSession.ProviderInstance.CreateProviderInstance(provider);
+                providerInstance = await createSession.ProviderInstance.CreateProviderInstance(provider, providerMappingService);
             }
             //else if(id > 0)
             //{
@@ -147,7 +149,7 @@ namespace JustABackup.Controllers
             if (createSession != null)
             {
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = createSession.ProviderInstance.CreateProviderInstance(provider);
+                providerInstance = await createSession.ProviderInstance.CreateProviderInstance(provider, providerMappingService);
             }
             //else if (id > 0)
             //{
@@ -167,7 +169,8 @@ namespace JustABackup.Controllers
                 // refresh the object
                 createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
 
-                await authenticatedSessionRepository.Add(createSession.Base.Name, createSession.SessionData, providerInstance);
+                byte[] encryptedSessionData = await encryptionService.Encrypt(createSession.SessionData);
+                await authenticatedSessionRepository.Add(createSession.Base.Name, encryptedSessionData, providerInstance);
 
                 HttpContext.Session.Clear();
             }
@@ -175,7 +178,7 @@ namespace JustABackup.Controllers
             return RedirectToAction("Index");
         }
 
-        private void StoreSession(int id, string sessionData)
+        private async void StoreSession(int id, string sessionData)
         {
             CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
             if (createSession != null)
@@ -185,7 +188,8 @@ namespace JustABackup.Controllers
             }
             else
             {
-                authenticatedSessionRepository.StoreSession(id, sessionData).Wait();
+                byte[] encryptedSessionData = await encryptionService.Encrypt(sessionData);
+                authenticatedSessionRepository.StoreSession(id, encryptedSessionData).Wait();
             }
         }
     }
