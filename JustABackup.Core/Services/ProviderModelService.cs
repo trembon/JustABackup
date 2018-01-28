@@ -1,4 +1,5 @@
 ﻿using JustABackup.Base;
+using JustABackup.Base.Attributes;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
@@ -187,7 +188,11 @@ namespace JustABackup.Core.Services
 
                             case PasswordPropertyTextAttribute ppta:
                                 providerProperty.Attributes.Add(new ProviderPropertyAttribute(PropertyAttribute.Password, bool.TrueString));
-                                    break;
+                                break;
+
+                            case TransformAttribute ta:
+                                providerProperty.Attributes.Add(new ProviderPropertyAttribute(PropertyAttribute.Transform, bool.TrueString));
+                                break;
                         }
                     }
 

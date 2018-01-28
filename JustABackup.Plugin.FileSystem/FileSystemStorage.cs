@@ -1,4 +1,5 @@
 ﻿using JustABackup.Base;
+using JustABackup.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +12,7 @@ namespace JustABackup.Plugin.FileSystem
     [DisplayName("File System Storage")]
     public class FileSystemStorage : IStorageProvider
     {
+        [Transform]
         [Display(Name = "Folder")]
         public string TargetFolder { get; set; }
 
