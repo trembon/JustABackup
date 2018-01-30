@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JustABackup.Models
+namespace JustABackup.Models.Job
 {
     public class ModifyJobProviderModel : CreateJobProviderModel
     {

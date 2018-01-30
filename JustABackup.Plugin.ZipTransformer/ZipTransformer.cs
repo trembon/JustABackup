@@ -1,4 +1,5 @@
 ﻿using JustABackup.Base;
+using JustABackup.Base.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +11,7 @@ namespace JustABackup.Plugin.ZipTransformer
 {
     public class ZipTransformer : ITransformProvider
     {
+        [Transform]
         [Display(Name = "Single output file (<name>.zip)")]
         public string OutputFile { get; set; }
 

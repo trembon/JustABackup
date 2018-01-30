@@ -1,9 +1,6 @@
-﻿using JustABackup.Database.Enum;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
-namespace JustABackup.Models
+namespace JustABackup.Models.Home
 {
     public class JobHistoryModel
     {
@@ -15,7 +12,7 @@ namespace JustABackup.Models
 
         public TimeSpan RunTime { get; set; }
 
-        public ExitCode Status { get; set; }
+        public string Status { get; set; }
 
         public string Message { get; set; }
     }

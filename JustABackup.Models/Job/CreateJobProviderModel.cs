@@ -1,10 +1,9 @@
-﻿using JustABackup.Database.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JustABackup.Models
+namespace JustABackup.Models.Job
 {
     public class CreateJobProviderModel : CreateProviderModel
     {

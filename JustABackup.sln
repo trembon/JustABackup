@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.Rijndael
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.OneDrive", "JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj", "{9DE019D0-FA38-4B71-8521-48966086377C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Models", "JustABackup.Models\JustABackup.Models.csproj", "{1AE59579-2253-47D8-A23E-0A48D2ECB058}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

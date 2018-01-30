@@ -18,6 +18,7 @@ using Quartz;
 using Quartz.Impl;
 using JustABackup.Core.Services;
 using JustABackup.Database.Repositories;
+using JustABackup.Models.Job;
 
 namespace JustABackup.Controllers
 {
@@ -167,7 +168,7 @@ namespace JustABackup.Controllers
             
             model.CurrentIndex = index;
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, values.ContainsKey(x.ID) ? values[x.ID] : null, providerMappingService)).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x.Name, x.Description, providerMappingService.GetTemplateFromType(x.Type), values.ContainsKey(x.ID) ? values[x.ID] : null, x.Attributes?.ToDictionary(k => k.Name.ToString(), v => v.Value))).ToList();
 
             return View(model);
         }
@@ -209,7 +210,7 @@ namespace JustABackup.Controllers
             for (int i = 0; i < createJob.Providers.Count; i++)
             {
                 Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
-                ProviderInstance providerInstance = await createJob.Providers[i].CreateProviderInstance(provider, providerMappingService);
+                ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, createJob.Providers[i]);
                 providerInstance.Order = i;
                 providerInstances.Add(providerInstance);
             }

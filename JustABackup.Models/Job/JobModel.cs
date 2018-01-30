@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JustABackup.Models
+namespace JustABackup.Models.Job
 {
     public class JobModel
     {

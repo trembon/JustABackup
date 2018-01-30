@@ -7,6 +7,7 @@ using JustABackup.Models;
 using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
 using JustABackup.Database.Repositories;
+using JustABackup.Models.Home;
 
 namespace JustABackup.Controllers
 {
@@ -32,7 +33,7 @@ namespace JustABackup.Controllers
                     JobName = jh.Job.Name,
                     Started = jh.Started,
                     RunTime = jh.Completed - jh.Started,
-                    Status = jh.Status,
+                    Status = jh.Status.ToString(),
                     Message = jh.Message
                 })
                 .ToList();

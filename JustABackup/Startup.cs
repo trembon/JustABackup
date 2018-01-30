@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using JustABackup.Database;
 using JustABackup.Core.Extensions;
 using JustABackup.Database.Repositories;
+using JustABackup.ModelBinders;
 
 namespace JustABackup
 {
@@ -24,7 +25,10 @@ namespace JustABackup
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new ProviderPropertyModelBinderProvider());
+            });
             services.AddSession();
 
             // register database context

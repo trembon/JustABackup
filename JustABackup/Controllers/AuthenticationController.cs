@@ -6,6 +6,8 @@ using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using JustABackup.Database.Repositories;
 using JustABackup.Models;
+using JustABackup.Models.Authentication;
+using JustABackup.Models.Job;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -90,7 +92,7 @@ namespace JustABackup.Controllers
             CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
             
             model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x, null, providerMappingService)).ToList();
+            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x.Name, x.Description, providerMappingService.GetTemplateFromType(x.Type), null, x.Attributes?.ToDictionary(k => k.Name.ToString(), v => v.Value))).ToList();
 
             return View(model);
         }
@@ -124,7 +126,7 @@ namespace JustABackup.Controllers
                 redirectId = Guid.NewGuid().ToString(); // TODO: move to create and store this in db
 
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = await createSession.ProviderInstance.CreateProviderInstance(provider, providerMappingService);
+                providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
             }
             //else if(id > 0)
             //{
@@ -149,7 +151,7 @@ namespace JustABackup.Controllers
             if (createSession != null)
             {
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = await createSession.ProviderInstance.CreateProviderInstance(provider, providerMappingService);
+                providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
             }
             //else if (id > 0)
             //{

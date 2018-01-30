@@ -4,6 +4,7 @@ using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using JustABackup.Database.Repositories;
+using JustABackup.Models.Job;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace JustABackup.Core.Services
         Task<object> GetPresentationValue(ProviderInstanceProperty property);
 
         Task<byte[]> Parse(string value, PropertyType propertyType, List<ProviderPropertyAttribute> attributes);
+
+        Task<ProviderInstance> CreateProviderInstance(Provider provider, CreateProviderModel createProviderModel);
     }
 
     public class ProviderMappingService : IProviderMappingService
@@ -166,6 +169,20 @@ namespace JustABackup.Core.Services
 
             IAuthenticationProvider<object> authenticationProvider = await CreateProvider<IAuthenticationProvider<object>>(session.Provider.ID);
             return authenticationProvider.GetAuthenticatedClient(decryptedSessionData);
+        }
+
+        public async Task<ProviderInstance> CreateProviderInstance(Provider provider, CreateProviderModel createProviderModel)
+        {
+            ProviderInstance backupProvider = new ProviderInstance();
+            backupProvider.Provider = provider;
+            foreach (var property in createProviderModel.Properties)
+            {
+                ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
+                instanceProperty.Property = provider.Properties.FirstOrDefault(p => p.Name == property.Name);
+                instanceProperty.Value = await Parse(property.Value.ToString(), instanceProperty.Property.Type, instanceProperty.Property.Attributes);
+                backupProvider.Values.Add(instanceProperty);
+            }
+            return backupProvider;
         }
     }
 }
