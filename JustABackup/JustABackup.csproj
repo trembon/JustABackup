@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.0.0-rtm-rc6" />
     <PackageReference Include="Quartz" Version="3.0.0-beta1" />
   </ItemGroup>
   <ItemGroup>
@@ -35,6 +36,11 @@
     <ProjectReference Include="..\JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj" />
     <ProjectReference Include="..\JustABackup.Plugin.RijndaelEncryptTransformer\JustABackup.Plugin.RijndaelEncryptTransformer.csproj" />
     <ProjectReference Include="..\JustABackup.Plugin.ZipTransformer\JustABackup.Plugin.ZipTransformer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@ using JustABackup.Database;
 using JustABackup.Core.Extensions;
 using JustABackup.Database.Repositories;
 using JustABackup.ModelBinders;
+using NLog.Extensions.Logging;
 
 namespace JustABackup
 {
@@ -36,6 +37,13 @@ namespace JustABackup
                 options.UseSqlite(Configuration.GetConnectionString("Default"))
             );
 
+            services.AddLogging(options =>
+            {
+                options.AddConfiguration(Configuration.GetSection("Logging"));
+                options.AddNLog();
+
+            });
+
             // register services
             services.AddScoped<IEncryptionService, EncryptionService>();
             services.AddScoped<IInitializationService, InitializationService>();
@@ -49,7 +57,7 @@ namespace JustABackup
             services.AddScoped<IBackupJobRepository, BackupJobRepository>();
             services.AddScoped<IPassphraseRepository, PassphraseRepository>();
             services.AddScoped<IProviderRepository, ProviderRepository>();
-
+            
             // add quartz after all services
             services.AddQuartz(options =>
             {
