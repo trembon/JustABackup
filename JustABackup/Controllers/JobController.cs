@@ -19,20 +19,25 @@ using Quartz.Impl;
 using JustABackup.Core.Services;
 using JustABackup.Database.Repositories;
 using JustABackup.Models.Job;
+using Microsoft.Extensions.Logging;
 
 namespace JustABackup.Controllers
 {
     public class JobController : ControllerBase
     {
+        private const string JOB_STORAGE_KEY = "ConfigureJob";
+
+        private ILogger<JobController> logger;
+
         private ISchedulerService schedulerService;
         private IProviderMappingService providerMappingService;
         private IBackupJobRepository backupJobRepository;
         private IProviderRepository providerRepository;
-
-        private const string JOB_STORAGE_KEY = "ConfigureJob";
-
-        public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService)
+        
+        public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService, ILogger<JobController> logger)
         {
+            this.logger = logger;
+
             this.backupJobRepository = backupJobRepository;
             this.providerRepository = providerRepository;
             this.schedulerService = schedulerService;
@@ -206,17 +211,24 @@ namespace JustABackup.Controllers
         
         private async Task SaveJob(CreateJob createJob)
         {
-            List<ProviderInstance> providerInstances = new List<ProviderInstance>(createJob.Providers.Count);
-            for (int i = 0; i < createJob.Providers.Count; i++)
+            try
             {
-                Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
-                ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, createJob.Providers[i]);
-                providerInstance.Order = i;
-                providerInstances.Add(providerInstance);
-            }
+                List<ProviderInstance> providerInstances = new List<ProviderInstance>(createJob.Providers.Count);
+                for (int i = 0; i < createJob.Providers.Count; i++)
+                {
+                    Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
+                    ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, createJob.Providers[i]);
+                    providerInstance.Order = i;
+                    providerInstances.Add(providerInstance);
+                }
 
-            int jobId = await backupJobRepository.AddOrUpdate(createJob.Base.ID, createJob.Base.Name, providerInstances);
-            await schedulerService.CreateOrUpdate(jobId, createJob.Base.CronSchedule);
+                int jobId = await backupJobRepository.AddOrUpdate(createJob.Base.ID, createJob.Base.Name, providerInstances);
+                await schedulerService.CreateOrUpdate(jobId, createJob.Base.CronSchedule);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Failed to save job '{createJob.Base.Name}' to database");
+            }
         }
 
         public async Task<IActionResult> Start(int[] ids)

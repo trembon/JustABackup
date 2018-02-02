@@ -11,6 +11,7 @@ using JustABackup.Models.Job;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +24,17 @@ namespace JustABackup.Controllers
     {
         private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
 
+        private ILogger<AuthenticationController> logger;
+
         private IEncryptionService encryptionService;
         private IProviderRepository providerRepository;
         private IProviderMappingService providerMappingService;
         private IAuthenticatedSessionRepository authenticatedSessionRepository;
 
-        public AuthenticationController(IAuthenticatedSessionRepository authenticatedSessionRepository, IProviderRepository providerRepository, IProviderMappingService providerMappingService, IEncryptionService encryptionService)
+        public AuthenticationController(IAuthenticatedSessionRepository authenticatedSessionRepository, IProviderRepository providerRepository, IProviderMappingService providerMappingService, IEncryptionService encryptionService, ILogger<AuthenticationController> logger)
         {
+            this.logger = logger;
+
             this.encryptionService = encryptionService;
             this.providerRepository = providerRepository;
             this.providerMappingService = providerMappingService;
@@ -162,19 +167,25 @@ namespace JustABackup.Controllers
                 return RedirectToAction("Index", "Home");
 
             IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
-            
-            authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
-            bool result = await authenticationProvider.Authenticate(Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()));
-
-            if(result && createSession != null)
+            try
             {
-                // refresh the object
-                createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
+                authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
+                bool result = await authenticationProvider.Authenticate(Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()));
 
-                byte[] encryptedSessionData = await encryptionService.Encrypt(createSession.SessionData);
-                await authenticatedSessionRepository.Add(createSession.Base.Name, encryptedSessionData, providerInstance);
+                if (result && createSession != null)
+                {
+                    // refresh the object
+                    createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
 
-                HttpContext.Session.Clear();
+                    byte[] encryptedSessionData = await encryptionService.Encrypt(createSession.SessionData);
+                    await authenticatedSessionRepository.Add(createSession.Base.Name, encryptedSessionData, providerInstance);
+
+                    HttpContext.Session.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Failed to complete authentication for '{createSession.Base.Name}'");
             }
 
             return RedirectToAction("Index");
