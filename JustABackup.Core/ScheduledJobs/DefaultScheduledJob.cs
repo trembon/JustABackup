@@ -1,10 +1,12 @@
 ﻿using JustABackup.Base;
+using JustABackup.Core.Entities;
 using JustABackup.Core.Services;
 using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using JustABackup.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -26,12 +28,16 @@ namespace JustABackup.Core.ScheduledJobs
 
             public int ID { get; set; }
         }
-        
+
+        private ILogger<DefaultScheduledJob> logger;
+
         private IBackupJobRepository backupJobRepository;
         private IProviderMappingService providerMappingService;
 
-        public DefaultScheduledJob(IBackupJobRepository backupJobRepository, IProviderMappingService providerMappingService)
+        public DefaultScheduledJob(IBackupJobRepository backupJobRepository, IProviderMappingService providerMappingService, ILogger<DefaultScheduledJob> logger)
         {
+            this.logger = logger;
+
             this.backupJobRepository = backupJobRepository;
             this.providerMappingService = providerMappingService;
         }
@@ -41,20 +47,29 @@ namespace JustABackup.Core.ScheduledJobs
             int jobId = int.Parse(context.JobDetail.Key.Name);
             int historyId = 0;
 
+            IDisposableList disposableList = new IDisposableList();
+
             try
             {
+                // load the job from the database and create a history point for this scheduled execution
                 BackupJob job = await backupJobRepository.Get(jobId);
                 historyId = await backupJobRepository.AddHistory(job.ID);
-
+                
+                // sort the providers so they are executed in the correct order
                 var providers = job.Providers.OrderBy(p => p.Order);
 
+                // load and create the backup and storage providers
                 IBackupProvider backupProvider = await providerMappingService.CreateProvider<IBackupProvider>(providers.FirstOrDefault());
                 IStorageProvider storageProvider = await providerMappingService.CreateProvider<IStorageProvider>(providers.LastOrDefault());
+                disposableList.AddRange(new IDisposable[] { backupProvider, storageProvider });
 
+                // load all the transform providers
                 List<ITransformProvider> transformProviders = new List<ITransformProvider>();
                 foreach (var tp in providers.Where(p => p.Provider.Type == ProviderType.Transform))
                     transformProviders.Add(await providerMappingService.CreateProvider<ITransformProvider>(tp));
+                disposableList.AddRange(transformProviders);
 
+                // fetch all items from the backup providers
                 DateTime? lastRun = await backupJobRepository.GetLastRun(jobId);
                 var items = await backupProvider.GetItems(lastRun);
 
@@ -77,7 +92,7 @@ namespace JustABackup.Core.ScheduledJobs
                                 Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
                                 foreach (var backupItem in mappedItem.Input)
                                 {
-                                    MemoryStream ms = new MemoryStream();
+                                    MemoryStream ms = disposableList.CreateAndAdd<MemoryStream>();
                                     var transformBackupItem = transformExecuteList[currentMappedIndex - 1].FirstOrDefault(x => x.MappedBackupItem.Output == backupItem);
                                     await transformBackupItem.Execute(ms);
                                     ms.Seek(0, SeekOrigin.Begin);
@@ -104,7 +119,10 @@ namespace JustABackup.Core.ScheduledJobs
                             {
                                 Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
                                 foreach (var backupItem in mappedItem.Input)
-                                    dictionary.Add(backupItem, await backupProvider.OpenRead(backupItem));
+                                {
+                                    Stream itemStream = await disposableList.CreateAndAdd(async () => await backupProvider.OpenRead(backupItem));
+                                    dictionary.Add(backupItem, itemStream);
+                                }
 
                                 await transformProviders[currentMappedIndex].TransformItem(mappedItem.Output, stream, dictionary);
                             };
@@ -119,50 +137,48 @@ namespace JustABackup.Core.ScheduledJobs
                 {
                     foreach (var mappedItem in transformExecuteList.Last())
                     {
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            await mappedItem.Execute(ms);
-                            ms.Seek(0, SeekOrigin.Begin);
-                            await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, ms);
-                        }
+                        MemoryStream ms = disposableList.CreateAndAdd<MemoryStream>();
+                        await mappedItem.Execute(ms);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, ms);
                     }
                 }
                 else
                 {
                     foreach (var item in items)
                     {
-                        using (var stream = await backupProvider.OpenRead(item))
-                        {
-                            await storageProvider.StoreItem(item, stream);
-                        }
+                        Stream itemStream = await disposableList.CreateAndAdd(async () => await backupProvider.OpenRead(item));
+                        await storageProvider.StoreItem(item, itemStream);
                     }
-                }
-
-                try
-                {
-                    backupProvider.Dispose();
-                }
-                catch { }
-                try
-                {
-                    storageProvider.Dispose();
-                }
-                catch { }
-                foreach(var transformProvider in transformProviders)
-                {
-                    try
-                    {
-                        transformProvider.Dispose();
-                    }
-                    catch { }
                 }
 
                 await backupJobRepository.UpdateHistory(historyId, ExitCode.Success, "Backup completed successfully.");
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, $"Backup failed with ID {jobId} and History ID {historyId}.");
+
                 if (historyId > 0)
                     await backupJobRepository.UpdateHistory(historyId, ExitCode.Failed, $"Backup failed with message: {ex.Message} ({ex.GetType()})");
+            }
+            finally
+            {
+                foreach(IDisposable item in disposableList)
+                {
+                    try
+                    {
+                        item?.Dispose();
+                    }
+                    catch (NotImplementedException)
+                    {
+                        // ignore this exception
+                    }
+                    catch(Exception ex)
+                    {
+                        // log every other error
+                        logger.LogError(ex, $"Failed to dispose item.");
+                    }
+                }
             }
         }
     }
