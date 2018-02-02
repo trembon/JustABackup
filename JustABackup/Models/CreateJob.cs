@@ -16,7 +16,10 @@ namespace JustABackup.Models
                 {
                     List<int> ids = new List<int>();
                     ids.Add(Base.BackupProvider);
-                    ids.AddRange(Base.TransformProvider);
+
+                    if (Base.TransformProvider != null)
+                        ids.AddRange(Base.TransformProvider);
+
                     ids.Add(Base.StorageProvider);
                     return ids.ToArray();
                 }

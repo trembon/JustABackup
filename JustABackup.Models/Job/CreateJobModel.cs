@@ -23,8 +23,7 @@ namespace JustABackup.Models.Job
 
         [Required]
         public int BackupProvider { get; set; }
-
-        [Required]
+        
         public int[] TransformProvider { get; set; }
 
         public SelectList StorageProviders { get; set; }
