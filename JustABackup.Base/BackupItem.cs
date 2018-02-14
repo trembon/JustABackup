@@ -5,12 +5,27 @@ using System.Text;
 
 namespace JustABackup.Base
 {
+    /// <summary>
+    /// Class to represent a file that should be backed up.
+    /// </summary>
     public class BackupItem
     {
+        /// <summary>
+        /// Name of the file.
+        /// Example: file1.txt
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// The path of folders to the file.
+        /// Example: /path/to/a/folder
+        /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// The full path of the file.
+        /// Example: /path/to/a/folder/file1.txt
+        /// </summary>
         public string FullPath => $"{Path}{Name}";
         
         public override string ToString()
