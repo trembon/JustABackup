@@ -27,7 +27,7 @@ namespace JustABackup.Plugin.ZipTransformer
                     ZipArchiveEntry entry = zipArchive.CreateEntry(file.Key.FullPath);
                     using (var entryStream = entry.Open())
                     {
-                        await file.Value.CopyToAsync(entryStream);
+                        await file.Value.CopyToAsync(entryStream, 4096);
                     }
                 }
             }

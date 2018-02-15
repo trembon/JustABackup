@@ -98,6 +98,7 @@ namespace JustABackup.Database.Repositories
                 .JobHistory
                 .Include(jh => jh.Job)
                 .Where(jh => jh.Job.ID == id)
+                .Where(jh => jh.Status == ExitCode.Success)
                 .OrderByDescending(jh => jh.Started)
                 .Select(jh => jh.Started)
                 .FirstOrDefaultAsync();

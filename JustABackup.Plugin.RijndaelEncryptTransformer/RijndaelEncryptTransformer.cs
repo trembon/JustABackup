@@ -11,6 +11,9 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
 {
     public class RijndaelEncryptTransformer : ITransformProvider
     {
+        private const int KEYSIZE = 128;
+        private const int ITERATIONS = 1000;
+
         private List<Stream> streams;
 
         [Display(Name = "Encryption key")]
@@ -23,25 +26,51 @@ namespace JustABackup.Plugin.RijndaelEncryptTransformer
 
         public async Task TransformItem(BackupItem output, Stream outputStream, Dictionary<BackupItem, Stream> inputFiles)
         {
-            byte[] key = Encoding.Unicode.GetBytes(EncyptionKey);
+            byte[] password = Encoding.Unicode.GetBytes(EncyptionKey);
+            byte[] salt = GenerateRandomBytes();
 
-            using (RijndaelManaged rmCrypto = new RijndaelManaged())
+            using (Rfc2898DeriveBytes encryptionKey = new Rfc2898DeriveBytes(password, salt, ITERATIONS))
             {
-                CryptoStream cs = new CryptoStream(outputStream, rmCrypto.CreateEncryptor(key, key), CryptoStreamMode.Write);
+                var keyBytes = encryptionKey.GetBytes(KEYSIZE / 8);
 
-                foreach (var input in inputFiles)
-                    await input.Value.CopyToAsync(cs);
+                using (RijndaelManaged rmCrypto = new RijndaelManaged())
+                {
+                    rmCrypto.BlockSize = KEYSIZE;
+                    rmCrypto.Mode = CipherMode.CBC;
+                    rmCrypto.Padding = PaddingMode.PKCS7;
 
-                cs.FlushFinalBlock();
-                streams.Add(cs);
+                    using (ICryptoTransform encryptor = rmCrypto.CreateEncryptor(keyBytes, salt))
+                    {
+                        outputStream.Write(salt, 0, salt.Length);
+
+                        CryptoStream cs = new CryptoStream(outputStream, encryptor, CryptoStreamMode.Write);
+
+                        foreach (var input in inputFiles)
+                            await input.Value.CopyToAsync(cs);
+
+                        cs.FlushFinalBlock();
+                        streams.Add(cs);
+                    }
+                }
             }
         }
 
+        private byte[] GenerateRandomBytes()
+        {
+            var randomBytes = new byte[KEYSIZE / 8];
+            using (var rngCsp = new RNGCryptoServiceProvider())
+            {
+                // Fill the array with cryptographically secure random bytes.
+                rngCsp.GetBytes(randomBytes);
+            }
+            return randomBytes;
+        }
+
         public Task<MappedBackupItemList> MapInput(IEnumerable<BackupItem> input)
-{
+        {
             MappedBackupItemList result = new MappedBackupItemList();
 
-            foreach(var file in input)
+            foreach (var file in input)
             {
                 BackupItem encryptedBackupItem = new BackupItem();
                 encryptedBackupItem.Name = $"{file.Name}.dat";

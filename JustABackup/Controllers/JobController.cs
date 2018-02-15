@@ -30,17 +30,17 @@ namespace JustABackup.Controllers
         private ILogger<JobController> logger;
 
         private ISchedulerService schedulerService;
-        private IProviderMappingService providerMappingService;
-        private IBackupJobRepository backupJobRepository;
         private IProviderRepository providerRepository;
-        
+        private IBackupJobRepository backupJobRepository;
+        private IProviderMappingService providerMappingService;
+
         public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService, ILogger<JobController> logger)
         {
             this.logger = logger;
 
-            this.backupJobRepository = backupJobRepository;
-            this.providerRepository = providerRepository;
             this.schedulerService = schedulerService;
+            this.providerRepository = providerRepository;
+            this.backupJobRepository = backupJobRepository;
             this.providerMappingService = typeMappingService;
         }
 

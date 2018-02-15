@@ -53,6 +53,7 @@ namespace JustABackup.Core.ScheduledJobs
             {
                 // load the job from the database and create a history point for this scheduled execution
                 BackupJob job = await backupJobRepository.Get(jobId);
+                DateTime? lastRun = await backupJobRepository.GetLastRun(jobId);
                 historyId = await backupJobRepository.AddHistory(job.ID);
                 
                 // sort the providers so they are executed in the correct order
@@ -70,7 +71,6 @@ namespace JustABackup.Core.ScheduledJobs
                 disposableList.AddRange(transformProviders);
 
                 // fetch all items from the backup providers
-                DateTime? lastRun = await backupJobRepository.GetLastRun(jobId);
                 var items = await backupProvider.GetItems(lastRun);
 
                 List<List<TransformBackupItem>> transformExecuteList = new List<List<TransformBackupItem>>(transformProviders.Count());
@@ -137,18 +137,30 @@ namespace JustABackup.Core.ScheduledJobs
                 {
                     foreach (var mappedItem in transformExecuteList.Last())
                     {
-                        MemoryStream ms = disposableList.CreateAndAdd<MemoryStream>();
-                        await mappedItem.Execute(ms);
-                        ms.Seek(0, SeekOrigin.Begin);
-                        await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, ms);
+                        //MemoryStream ms = disposableList.CreateAndAdd<MemoryStream>();
+                        //await mappedItem.Execute(ms);
+                        //ms.Seek(0, SeekOrigin.Begin);
+                        //await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, ms);
+
+                        using (PassThroughStream outputStream = new PassThroughStream())
+                        {
+                            Task<bool> storeItem = storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, outputStream);
+
+                            await mappedItem.Execute(outputStream);
+
+                            outputStream.SetComplete();
+                            storeItem.Wait();
+                        }
                     }
                 }
                 else
                 {
                     foreach (var item in items)
                     {
-                        Stream itemStream = await disposableList.CreateAndAdd(async () => await backupProvider.OpenRead(item));
-                        await storageProvider.StoreItem(item, itemStream);
+                        using (Stream itemStream = await backupProvider.OpenRead(item))
+                        {
+                            await storageProvider.StoreItem(item, itemStream);
+                        }
                     }
                 }
 
@@ -179,6 +191,9 @@ namespace JustABackup.Core.ScheduledJobs
                         logger.LogError(ex, $"Failed to dispose item.");
                     }
                 }
+
+                disposableList.Clear();
+                disposableList = null;
             }
         }
     }
