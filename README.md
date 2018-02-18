@@ -36,7 +36,7 @@ Every day at 03:00 AM the folder /important/data will be read, zipped into a sin
 * and more..
 
 ### Known issues
-* Memory usage is very high if working with large or many files, as they are stored in memory streams internally.
+* As the application is in an early stage, there should be some unknown bugs :)
 
 ## Installation
 ---
