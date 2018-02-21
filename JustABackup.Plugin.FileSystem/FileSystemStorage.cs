@@ -18,18 +18,15 @@ namespace JustABackup.Plugin.FileSystem
 
         public async Task<bool> StoreItem(BackupItem item, Stream source)
         {
-            try
+            string path = Path.Combine(TargetFolder, item.FullPath);
+            if (item.FullPath.StartsWith("/"))
+                path = Path.Combine(TargetFolder, item.FullPath.Substring(1));
+
+            using (Stream target = File.OpenWrite(path))
             {
-                using (Stream target = File.OpenWrite(Path.Combine(TargetFolder, item.Path, item.Name)))
-                {
-                    await source.CopyToAsync(target);
-                }
-                return true;
+                await source.CopyToAsync(target);
             }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return true;
         }
 
         public void Dispose()

@@ -27,7 +27,22 @@ namespace JustABackup.Base
         /// Example: /path/to/a/folder/file1.txt
         /// </summary>
         public string FullPath => $"{Path}{Name}";
-        
+
+        public BackupItem()
+        {
+        }
+
+        public BackupItem(string name)
+            : this(name, "/")
+        {
+        }
+
+        public BackupItem(string name, string path)
+        {
+            this.Name = name;
+            this.Path = path;
+        }
+
         public override string ToString()
         {
             return Name;

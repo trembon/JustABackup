@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.10-rc" />
+    <PackageReference Include="MySqlBackup.NET" Version="2.0.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
+  </ItemGroup>
+
+</Project>

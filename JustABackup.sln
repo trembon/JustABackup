@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup", "JustABackup\JustABackup.csproj", "{42BFF7FC-4AD2-466B-815F-D146F328FF40}"
 EndProject
@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.Rijndael
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.OneDrive", "JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj", "{9DE019D0-FA38-4B71-8521-48966086377C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Models", "JustABackup.Models\JustABackup.Models.csproj", "{1AE59579-2253-47D8-A23E-0A48D2ECB058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Models", "JustABackup.Models\JustABackup.Models.csproj", "{1AE59579-2253-47D8-A23E-0A48D2ECB058}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Plugin.MySQL", "JustABackup.Plugin.MySQL\JustABackup.Plugin.MySQL.csproj", "{11F77E6C-64A2-45C2-9ACB-6666F696FF47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
