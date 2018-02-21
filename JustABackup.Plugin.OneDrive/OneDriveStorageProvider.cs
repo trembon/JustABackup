@@ -16,10 +16,12 @@ namespace JustABackup.Plugin.OneDrive
 
         public async Task<bool> StoreItem(BackupItem item, Stream source)
         {
-            string itemPath = Path.Combine(Folder, item.FullPath);
+            string path = Path.Combine(Folder, item.FullPath);
+            if (item.FullPath.StartsWith("/"))
+                path = Path.Combine(Folder, item.FullPath.Substring(1));
 
             var client = await Client.GetClient();
-            await client.Drive.Root.ItemWithPath(itemPath).Content.Request().PutAsync<Item>(source);
+            await client.Drive.Root.ItemWithPath(path).Content.Request().PutAsync<Item>(source);
             return true;
         }
 
