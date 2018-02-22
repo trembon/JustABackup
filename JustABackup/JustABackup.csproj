@@ -5,10 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="bower.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="demo.db" />
     <None Remove="quartz.sqlite" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="2.6.362" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.0.0" />
@@ -28,6 +34,10 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="appsettings.Development.json" />
+    <None Include="bower.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
     <ProjectReference Include="..\JustABackup.Core\JustABackup.Core.csproj" />
     <ProjectReference Include="..\JustABackup.Database\JustABackup.Database.csproj" />
@@ -43,6 +53,11 @@
     <Content Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="quartz_tables_sqlite.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
