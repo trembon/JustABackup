@@ -46,7 +46,7 @@ namespace JustABackup.Plugin.OneDrive
             if (string.IsNullOrWhiteSpace(session.RefreshToken))
                 throw new ArgumentNullException(nameof(session.RefreshToken));
 
-            RefreshTokenAuthenticationProvider authenticationProvider = new RefreshTokenAuthenticationProvider(ClientID, ClientSecret, callbackUrl, session);
+            RefreshTokenAuthenticationProvider authenticationProvider = new RefreshTokenAuthenticationProvider(ClientID, ClientSecret, callbackUrl, session, this.storeSession);
             IOneDriveClient client = new OneDriveClient("https://api.onedrive.com/v1.0", authenticationProvider);
 
             return client;
