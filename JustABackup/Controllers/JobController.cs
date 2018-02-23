@@ -56,12 +56,15 @@ namespace JustABackup.Controllers
                 {
                     ID = j.ID,
                     Name = j.Name,
-                    LastRun = j.History.OrderByDescending(h => h.Started).Select(h => h.Started).FirstOrDefault(),
                     HasChangedModel = j.HasChangedModel
                 })
                 .ToList();
 
-            model.Jobs.ForEach(async j => j.NextRun = await schedulerService.GetNextRunTime(j.ID));
+            model.Jobs.ForEach(async j =>
+            {
+                j.NextRun = await schedulerService.GetNextRunTime(j.ID);
+                j.LastRun = await backupJobRepository.GetLastRun(j.ID);
+            });
 
             return View(model);
         }
