@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageProjectUrl>https://github.com/JustABackup/JustABackup</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/JustABackup/JustABackup/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/JustABackup/JustABackup</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +17,7 @@
 
   <ItemGroup>
     <Reference Include="System.Data.SqlClient">
-      <HintPath>..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.4.0\ref\netstandard2.0\System.Data.SqlClient.dll</HintPath>
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.4.0\ref\netstandard2.0\System.Data.SqlClient.dll</HintPath>
     </Reference>
   </ItemGroup>
 
