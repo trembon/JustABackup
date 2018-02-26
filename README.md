@@ -4,12 +4,12 @@ Currently its hosted by the Kestrel host in ASP.NET Core with a UI as a webpage.
 Currently in a very early stage in development. Feedback and ideas is much appreciated.
 
 ### Table of Content
+* The idea
 * TODO's
 * Installation
 * Creating a plugin
 
 ## The idea
----
 Currently the backup solution is based mainly on three provider types. **Backup**, **Transform** and **Storage**.
 A **backup** provider provides a list of files that should be backed up, for example a folder on a disk or a database.
 A **transform** provider will modify the input file or files before being backed up. A transform might be multiple files being zipped into a single file.
@@ -24,8 +24,9 @@ By design the providers do not know about each other and therefor the user
 #### Example
 Every day at 03:00 AM the folder /important/data will be read, zipped into a single file (backup.zip) and that zip file will be encrypted (backup.zip.enc), and lastly it will be stored in OneDrive.
 
-## TODO's
 ---
+
+## TODO's
 ### Planned features
 * Rewritten UI with a more API based framework
 * Plugin-store, to download plugins from a repository online
@@ -37,15 +38,23 @@ Every day at 03:00 AM the folder /important/data will be read, zipped into a sin
 
 ### Known issues
 * As the application is in an early stage, there should be some unknown bugs :)
+* Some plugins have dependencies on .Net Framework DLL's, and might not work on other platforms than Windows at the moment.
+
+---
 
 ## Installation
+1. Install the dotnet core runtime
+    * Can be downloaded here https://www.microsoft.com/net/download
+2. Unpack the .zip found under releases.
+3. run the command "dotnet JustABackup.dll" (or run.bat) to start the application.
+4. Open your browser and go to http://localhost:5000/.
+
 ---
-*coming with a release package*
 
 ## Creating a plugin
----
 The first step to creating a plugin is adding a reference to JustABackup.Base.dll.
 Depending on which provider you want to implement you need to implement the following interfaces.
+When you are done, just compile and add the DLL's to the root directory. Then just restart the application.
 
 ### Backup provider
 ```csharp
@@ -135,3 +144,31 @@ namespace JustABackup.Base
     }
 }
 ```
+
+### Adding properties
+Providers support custom properties, which are defined as properties in the Provider class.
+The properties also support attributes to define how the property should behave or be shown in the UI.
+
+```csharp
+namespace DemoPlugin
+{
+    public interface DemoProvider : IBackupProvider
+    {
+        [Display(Name = "Temporary Folder")]
+        public string TemporaryFolder { get; set; }
+    }
+}
+```
+
+Currently supported property types:
+* string
+* int
+* bool
+
+The following attributes are currently supported:
+* DisplayNameAttribute (Provider classes)
+* DisplayAttribute (Properties)
+* PasswordPropertyTextAttribute (Properties)
+* TransformAttribute (Properties) [Custom]
+
+---
