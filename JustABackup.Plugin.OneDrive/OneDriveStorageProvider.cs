@@ -2,12 +2,14 @@
 using Microsoft.OneDrive.Sdk;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.OneDrive
 {
+    [DisplayName("OneDrive Storage")]
     public class OneDriveStorageProvider : IStorageProvider
     {
         public string Folder { get; set; }

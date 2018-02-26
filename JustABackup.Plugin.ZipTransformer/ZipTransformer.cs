@@ -2,6 +2,7 @@
 using JustABackup.Base.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.IO.Compression;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.ZipTransformer
 {
+    [DisplayName("Zip Transformer")]
     public class ZipTransformer : ITransformProvider
     {
         [Transform]

@@ -1,6 +1,7 @@
 ﻿using JustABackup.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Security.Cryptography;
@@ -9,16 +10,18 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.RijndaelEncryptTransformer
 {
+    [DisplayName("Encryption Transformer (Rijndael)")]
     public class RijndaelEncryptTransformer : ITransformProvider
     {
+        [PasswordPropertyText]
+        [Display(Name = "Encryption key")]
+        public string EncyptionKey { get; set; }
+
         private const int KEYSIZE = 128;
         private const int ITERATIONS = 1000;
 
         private List<Stream> streams;
-
-        [Display(Name = "Encryption key")]
-        public string EncyptionKey { get; set; }
-
+        
         public RijndaelEncryptTransformer()
         {
             streams = new List<Stream>();

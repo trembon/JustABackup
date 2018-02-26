@@ -5,22 +5,26 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace JustABackup.Plugin.OneDrive
 {
+    [DisplayName("OneDrive Authentication")]
     public class OneDriveAuthenticationProvider : IAuthenticationProvider<IOneDriveClient>
     {
-        private string callbackUrl;
-
-        private Action<string> storeSession;
-        
+        [Display(Name = "Client ID")]
         public string ClientID { get; set; }
 
         [PasswordPropertyText]
+        [Display(Name = "Client Secret")]
         public string ClientSecret { get; set; }
+
+        private string callbackUrl;
+
+        private Action<string> storeSession;
 
         public void Initialize(string callbackUrl, Action<string> storeSession)
         {

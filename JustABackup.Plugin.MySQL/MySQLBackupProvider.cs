@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.MySQL
 {
+    [DisplayName("MySQL Backup")]
     public class MySQLBackupProvider : IBackupProvider
     {
         public string Server { get; set; }

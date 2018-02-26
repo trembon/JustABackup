@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.MSSQL
 {
+    [DisplayName("Microsoft SQL Backup")]
     public class MSSQLBackupProvider : IBackupProvider
     {
         public string Server { get; set; }
@@ -20,6 +22,7 @@ namespace JustABackup.Plugin.MSSQL
         [PasswordPropertyText]
         public string Password { get; set; }
 
+        [Display(Name = "Temporary .bak file", Description = "Temporary file stored on the SQL server")]
         public string TemporaryBakFile { get; set; }
 
 
