@@ -41,7 +41,7 @@ namespace JustABackup.Plugin.OneDrive
 
                 configure?.Invoke(parameters);
                 
-                var result = await client.PostAsync("https://login.live.com/oauth20_token.srf", new FormUrlEncodedContent(parameters));
+                var result = await client.PostAsync("https://login.microsoftonline.com/common/oauth2/v2.0/token", new FormUrlEncodedContent(parameters));
                 string resultString = await result.Content.ReadAsStringAsync();
 
                 JContainer container = JsonConvert.DeserializeObject(resultString) as JContainer;

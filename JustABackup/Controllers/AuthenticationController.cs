@@ -140,9 +140,10 @@ namespace JustABackup.Controllers
             if (providerInstance == null)
                 return RedirectToAction("Index", "Home");
 
-            IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
-            
-            authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={redirectId}", data => StoreSession(providerInstance.ID, data));
+            IAuthenticationProvider<object> authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
+
+            //authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?sessionId={redirectId}", data => StoreSession(providerInstance.ID, data));
+            authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication", data => StoreSession(providerInstance.ID, data));
             string redirectUrl = await authenticationProvider.GetOAuthUrl();
 
             return Redirect(redirectUrl);
@@ -169,7 +170,8 @@ namespace JustABackup.Controllers
             IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
             try
             {
-                authenticationProvider.Initialize($"http://localhost:53178/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
+                //authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
+                authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication", data => StoreSession(providerInstance.ID, data));
                 bool result = await authenticationProvider.Authenticate(Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()));
 
                 if (result && createSession != null)
