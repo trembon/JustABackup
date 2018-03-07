@@ -60,6 +60,9 @@ namespace JustABackup.Core.Services
 
         public async Task<T> Decrypt<T>(byte[] data)
         {
+            if (data == null || data.Length == 0)
+                return default(T);
+
             await Initialize();
 
             // validate data in size, so it contains the header
@@ -101,6 +104,9 @@ namespace JustABackup.Core.Services
 
         public async Task<byte[]> Encrypt<T>(T data)
         {
+            if (data == null)
+                return new byte[0];
+
             await Initialize();
 
             // serialize the object and generate a salt for the encryption
