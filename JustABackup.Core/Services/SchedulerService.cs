@@ -45,7 +45,11 @@ namespace JustABackup.Core.Services
             IEnumerable<ITrigger> triggers = await scheduler.GetTriggersOfJob(jobKey);
             if(triggers != null && triggers.Count() == 1)
             {
+                var triggerState = await scheduler.GetTriggerState(triggers.First().Key);
                 await scheduler.RescheduleJob(triggers.First().Key, trigger);
+
+                if (triggerState == TriggerState.Paused)
+                    await PauseJob(jobId);
             }
             else
             {

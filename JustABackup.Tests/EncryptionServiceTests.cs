@@ -57,5 +57,38 @@ namespace JustABackup.Tests
 
             Assert.Equal(param, decryptedObject);
         }
+
+        [Fact]
+        public async void DecryptNullAndEmptyWithoutError_String()
+        {
+            var service = SetupService();
+            string decryptedObjectNull = await service.Decrypt<string>(null);
+            string decryptedObjectEmpty = await service.Decrypt<string>(new byte[0]);
+
+            Assert.Null(decryptedObjectNull);
+            Assert.Null(decryptedObjectEmpty);
+        }
+
+        [Fact]
+        public async void DecryptNullAndEmptyWithoutError_Integer()
+        {
+            var service = SetupService();
+            int decryptedObjectNull = await service.Decrypt<int>(null);
+            int decryptedObjectEmpty = await service.Decrypt<int>(new byte[0]);
+
+            Assert.Equal(0, decryptedObjectNull);
+            Assert.Equal(0, decryptedObjectEmpty);
+        }
+
+        [Fact]
+        public async void DecryptNullAndEmptyWithoutError_Boolean()
+        {
+            var service = SetupService();
+            bool decryptedObjectNull = await service.Decrypt<bool>(null);
+            bool decryptedObjectEmpty = await service.Decrypt<bool>(new byte[0]);
+
+            Assert.False(decryptedObjectNull);
+            Assert.False(decryptedObjectEmpty);
+        }
     }
 }
