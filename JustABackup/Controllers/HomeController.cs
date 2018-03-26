@@ -32,7 +32,7 @@ namespace JustABackup.Controllers
                     JobID = jh.Job.ID,
                     JobName = jh.Job.Name,
                     Started = jh.Started,
-                    RunTime = jh.Completed - jh.Started,
+                    RunTime = jh.Completed == DateTime.MinValue ? null : (TimeSpan?)(jh.Completed - jh.Started),
                     Status = jh.Status.ToString(),
                     Message = jh.Message
                 })

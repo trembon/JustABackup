@@ -17,7 +17,7 @@ namespace JustABackup.Database.Entities
 
         public DateTime Started { get; set; }
 
-        public DateTime Completed { get; set; }
+        public DateTime Completed { get; set; } // TODO: make nullable
 
         public string Message { get; set; }
 

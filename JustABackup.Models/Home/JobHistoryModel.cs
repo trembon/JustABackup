@@ -10,7 +10,7 @@ namespace JustABackup.Models.Home
 
         public DateTime Started { get; set; }
 
-        public TimeSpan RunTime { get; set; }
+        public TimeSpan? RunTime { get; set; }
 
         public string Status { get; set; }
 
