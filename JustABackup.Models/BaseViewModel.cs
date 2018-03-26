@@ -8,5 +8,7 @@ namespace JustABackup.Models
     public abstract class BaseViewModel
     {
         public string Title { get; set; }
+
+        public string TitleDescription { get; set; }
     }
 }
