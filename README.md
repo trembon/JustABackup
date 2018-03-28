@@ -28,12 +28,14 @@ Every day at 03:00 AM the folder /important/data will be read, zipped into a sin
 
 ## TODO's
 ### Planned features
-* Rewritten UI with a more API based framework
-* Plugin-store, to download plugins from a repository online
-* Testable providers, for testing connection to its source
-* View logs in the UI
+* Rewritten UI with a more API based framework.
+* Plugin-store, to download plugins from a repository online.
+* Testable providers, for testing connection to its source.
+* View logs in the UI.
 * Validation of provider properties, like required, range and regex.
-* Host as a service in Windows
+* Host as a service in Windows.
+* Notification system in the UI, to get notification if jobs started, completed and/or generated error.
+* Notification providers, to be able to be notified when a job is completed through for example SMTP or Slack.
 * and more..
 
 ### Known issues
