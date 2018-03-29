@@ -5,4 +5,4 @@
     var selectItems = sessions.Select(kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value });
 }
 
-<select asp-for="@Model" asp-items="selectItems" class="form-control"></select>
+<select asp-for="@Model" asp-items="selectItems" class="form-control boxed"></select>

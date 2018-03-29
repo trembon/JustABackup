@@ -1,16 +1,24 @@
 ﻿@model CreateProviderModel
+@{
+    Model.TitleDescription = "Configure Provider - " + @Model.ProviderName;
+}
 
-<h4>Configure - @Model.ProviderName</h4>
-<hr />
-
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.EditorFor(m => m.Properties)
-            <div class="form-group text-right">
-                <input type="submit" value="Authenticate" class="btn btn-default" />
+<section class="section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-block">
+                    <section>
+                        <form method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.EditorFor(m => m.Properties)
+                            <div class="form-group text-right">
+                                <input type="submit" value="Authenticate" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </section>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</section>

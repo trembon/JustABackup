@@ -1,18 +1,27 @@
 ﻿@model CreateJobProviderModel
 
-<h4>Configure - @Model.ProviderName</h4>
-<hr />
+@{ 
+    Model.TitleDescription = "Configure Provider - " + @Model.ProviderName;
+}
 
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <form method="post">
-            <input type="hidden" asp-for="CurrentIndex" />
+<section class="section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-block">
+                    <section>
+                        <form method="post">
+                            <input type="hidden" asp-for="CurrentIndex" />
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.EditorFor(m => m.Properties)
-            <div class="form-group text-right">
-                <input type="submit" value="Continue" class="btn btn-default" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.EditorFor(m => m.Properties)
+                            <div class="form-group text-right">
+                                <input type="submit" value="Continue" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </section>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</section>

@@ -1,46 +1,45 @@
 ﻿@model CreateJobModel
 
-@if(Model.ID > 0){
-    <h4>Modify: @Model.Name</h4>
-    <hr />
-}
+<section class="section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-block">
+                    <section>
+                        <form asp-action="Configure">
+                            <input type="hidden" asp-for="ID" />
 
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <form asp-action="Configure">
-            <input type="hidden" asp-for="ID" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BackupProvider" class="control-label"></label>
-                <select asp-for="BackupProvider" asp-items="Model.BackupProviders" class="form-control"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="StorageProvider" class="control-label"></label>
-                <select asp-for="StorageProvider" asp-items="Model.StorageProviders" class="form-control"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TransformProvider" class="control-label"></label>
-                <select asp-for="TransformProvider" asp-items="Model.TransformProviders" class="form-control" multiple></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="CronSchedule">Schedule</label>
-                <div class="form-control no-height">
-                    <input class="cron-selector" type="hidden" asp-for="CronSchedule" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control boxed" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="BackupProvider" class="control-label"></label>
+                                <select asp-for="BackupProvider" asp-items="Model.BackupProviders" class="form-control boxed"></select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="StorageProvider" class="control-label"></label>
+                                <select asp-for="StorageProvider" asp-items="Model.StorageProviders" class="form-control boxed"></select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="TransformProvider" class="control-label"></label>
+                                <select asp-for="TransformProvider" asp-items="Model.TransformProviders" class="form-control boxed" multiple></select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CronSchedule">Schedule</label>
+                                <div class="form-control no-height">
+                                    <input class="cron-selector" type="hidden" asp-for="CronSchedule" />
+                                </div>
+                            </div>
+                            <div class="form-group text-right">
+                                <input type="submit" value="Continue" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </section>
                 </div>
             </div>
-            <div class="form-group text-right">
-                <input type="submit" value="Continue" class="btn btn-default" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+</section>
