@@ -15,35 +15,5 @@ $(function () {
     $('.cron-selector.read-only').each(function (i, el) {
         $(el).jqCronGetInstance().disable();
     });
-    $('#job-list').on('change', 'input[type="checkbox"]', function () {
-        var list = $('#job-list input[type="checkbox"]');
-        if (list.is(':checked')) {
-            $('#job-list-buttons .btn').removeAttr('disabled');
-        }
-        else {
-            $('#job-list-buttons .btn').attr('disabled', 'disabled');
-        }
-    });
-    $('#job-list-buttons a.btn').click(function () {
-        var $list = $('#job-list input[type="checkbox"]:checked');
-        if ($list.length === 0) {
-            return;
-        }
-        var $ids = $list.map(function (i, el) {
-            return 'ids=' + $(el).closest('tr').data('id');
-        });
-        $.getJSON('/job/' + $(this).data('action') + '/?' + $ids.get().join('&'), function (result) {
-            for (var job in result) {
-                var $col = $('#job-list tr[data-id="' + job + '"] td.next-run');
-                if (result[job] === null) {
-                    $col.text('Paused');
-                }
-                else {
-                    $col.text(new Date(result[job]).toLocaleString());
-                }
-            }
-        });
-        $('#job-list input[type="checkbox"]').prop('checked', false);
-    });
 });
 //# sourceMappingURL=jqcron.js.map
