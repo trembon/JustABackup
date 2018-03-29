@@ -4,9 +4,5 @@
   "dependencies": {
     "jqcron-quartz": "1.0.1",
     "jquery-validation-unobtrusive": "3.2.6"
-  },
-  "resolutions": {
-    "jquery": "3.3.1",
-    "bootstrap": "v4.0.0"
   }
 }
