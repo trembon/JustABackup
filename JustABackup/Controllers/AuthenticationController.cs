@@ -44,7 +44,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            ListAuthenticatedSessionModel model = CreateModel<ListAuthenticatedSessionModel>("Authenticated Sessions");
+            ListAuthenticatedSessionModel model = CreateModel<ListAuthenticatedSessionModel>();
 
             var sessions = await authenticatedSessionRepository.Get();
 
@@ -64,7 +64,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>("Create Authenticated Session");
+            CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>();
 
             var authenticationProviders = await providerRepository.Get(ProviderType.Authentication);
             model.AuthenticationProviders = new SelectList(authenticationProviders, "ID", "Name");
@@ -94,7 +94,7 @@ namespace JustABackup.Controllers
                 return RedirectToAction("Index", "Home");
             
             Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-            CreateProviderModel model = CreateModel<CreateProviderModel>("Create Authenticated Session");
+            CreateProviderModel model = CreateModel<CreateProviderModel>();
             
             model.ProviderName = provider.Name;
             model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x.Name, x.Description, providerMappingService.GetTemplateFromType(x.Type), null, x.Attributes?.ToDictionary(k => k.Name.ToString(), v => v.Value))).ToList();

@@ -47,7 +47,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            ListJobsModel model = CreateModel<ListJobsModel>("Scheduled Backups");
+            ListJobsModel model = CreateModel<ListJobsModel>();
 
             var jobs = await backupJobRepository.Get();
 

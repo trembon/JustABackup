@@ -22,7 +22,7 @@ namespace JustABackup.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var model = CreateModel<ListJobHistoryModel>("Backup History");
+            var model = CreateModel<ListJobHistoryModel>();
 
             var history = await backupJobRepository.GetHistory(15);
 
