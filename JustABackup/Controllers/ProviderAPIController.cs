@@ -42,7 +42,32 @@ namespace JustABackup.Controllers
             catch (Exception)
             {
                 // TODO: log
-                return StatusCode(500);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [Route("{providerID}/fields")]
+        public async Task<IActionResult> GetFields(int providerID)
+        {
+            try
+            {
+                Provider provider = await providerRepository.Get(providerID);
+                if (provider == null)
+                    return NotFound();
+
+                IEnumerable<ProviderFieldModel> fields = provider.Properties.Select(p => new ProviderFieldModel
+                {
+                    ID = p.TypeName,
+                    Name = p.Name,
+                    Type = p.Type.ToString().ToLowerInvariant()
+                });
+
+                return Ok(fields);
+            }
+            catch (Exception)
+            {
+                // TODO: log
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

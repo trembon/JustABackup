@@ -68,6 +68,8 @@
                 (<DropDownValues[]>data).forEach(val => {
                     $list.append(`<option value="${val.id}">${val.name}</option>`);
                 });
+
+                $list.val(field.value);
             });
         }
     }
@@ -86,6 +88,8 @@
                 (<DropDownValues[]>data).forEach(val => {
                     $list.append(`<option value="${val.id}">${val.name}</option>`);
                 });
+
+                $list.val(field.value);
             });
         }
     }

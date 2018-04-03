@@ -39,6 +39,8 @@ namespace DynamicForm {
     let activeSection: number;
     let sectionCount: number;
 
+    let providers: number[];
+
     export function initialize($element: JQuery): void {
         $form = $element;
 
@@ -46,12 +48,58 @@ namespace DynamicForm {
         configuration = <DynamicFormConfiguration>JSON.parse($form.find('script.configuration').text());
         console.log("config", configuration);
 
+        initializeSectionEvents();
+        initializeSubmitHandler();
+
         activeSection = 1;
         sectionCount = 1 + configuration.sectionProperties.length;
         renderSection(activeSection, configuration.fields);
     }
 
+    function initializeSubmitHandler(): void {
+        $form.submit(e => {
+            if (activeSection <= sectionCount) {
+                activeSection++;
+                $.getJSON(`/api/provider/${providers[activeSection - 2]}/fields`, data => {
+                    renderSection(activeSection, <DynamicFormField[]>data);
+                });
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    function initializeSectionEvents(): void {
+        if (configuration && configuration.sectionProperties && configuration.sectionProperties.length > 0) {
+            configuration.sectionProperties.forEach((val, i) => {
+                $form.on('change', `[name="${val}"]`, e => {
+                    providers = calculateProviders();
+                    sectionCount = providers.length + 1;
+                });
+            });
+        }
+    }
+
+    function calculateProviders(): number[] {
+        let providers = [];
+        configuration.sectionProperties.forEach(val => {
+            let value = $form.find(`[name="${val}"]`).val();
+            if (Array.isArray(value)) {
+                (<any[]>value).forEach(val => {
+                    providers.push(val);
+                });
+            } else if (value) {
+                providers.push(value);
+            }
+        });
+
+        return providers.map(val => parseInt(val));
+    }
+
     function renderSection(id: number, fields: DynamicFormField[]) {
+        $form.find("section").attr("hidden", "hidden");
+
         let $section = $(`<section data-id="${id}"></section>`);
 
         fields.forEach(field => {
@@ -68,6 +116,7 @@ namespace DynamicForm {
         $section.appendTo($form);
 
         cron.activateCron($section);
+        $.validator.unobtrusive.parse($form);
     }
 
 }
