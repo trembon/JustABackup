@@ -41,8 +41,8 @@
         let value = field.value ? field.value : "";
 
         console.log('generateHiddenInput', fieldName, field);
-        $wrapper.removeClass("form-group").addClass("hidden");
-        $wrapper.append(`<input type="hidden" name="${fieldName}" value="${value}" />`);
+        $wrapper.removeClass("form-group").attr("hidden", "hidden");
+        $wrapper.append(`<input type="hidden" name="${fieldName}" value="${value}" ${generateValidationAttributes(field)} />`);
     }
 
     function generateStringInput(field: DynamicFormField, $wrapper: JQuery, providerSection: number): void {
@@ -51,7 +51,7 @@
 
         console.log('generateStringInput', fieldName, field);
         appendLabel($wrapper, field.name, fieldName);
-        $wrapper.append(`<input class="form-control boxed" type="text" id="${fieldName}" name="${fieldName}" value="${value}">`);
+        $wrapper.append(`<input class="form-control boxed" type="text" id="${fieldName}" name="${fieldName}" value="${value}" ${generateValidationAttributes(field)}>`);
     }
 
     function generateDropdownInput(field: DynamicFormField, $wrapper: JQuery, providerSection: number): void {
@@ -60,7 +60,7 @@
         console.log('generateDropdownInput', fieldName, field);
         appendLabel($wrapper, field.name, fieldName);
 
-        let $list = $(`<select class="form-control boxed" id="${fieldName}" name="${fieldName}"></select>`);
+        let $list = $(`<select class="form-control boxed" id="${fieldName}" name="${fieldName}" ${generateValidationAttributes(field)}></select>`);
         $list.appendTo($wrapper);
 
         if (field.dataSource) {
@@ -80,7 +80,7 @@
         console.log('generateMultiSelectInput', fieldName, field);
         appendLabel($wrapper, field.name, fieldName);
 
-        let $list = $(`<select class="form-control boxed" multiple id="${fieldName}" name="${fieldName}"></select>`);
+        let $list = $(`<select class="form-control boxed" multiple id="${fieldName}" name="${fieldName}" ${generateValidationAttributes(field)}></select>`);
         $list.appendTo($wrapper);
 
         if (field.dataSource) {
@@ -100,7 +100,24 @@
 
         console.log('generateCronInput', fieldName, field);
         appendLabel($wrapper, field.name, fieldName);
-        $wrapper.append(`<div class="form-control boxed"><input class="cron" type="hidden" id="${fieldName}" name="${fieldName}" /></div>`);
+        $wrapper.append(`<div class="form-control boxed"><input class="cron" type="hidden" id="${fieldName}" name="${fieldName}" ${generateValidationAttributes(field)} /></div>`);
+    }
+
+    function generateValidationAttributes(field: DynamicFormField): string {
+        let attributes: string[] = [];
+        attributes.push('data-val="true"');
+
+        if (field.validation && field.validation.length > 0) {
+            field.validation.forEach(validation => {
+                switch (validation.toLowerCase()) {
+                    case 'required':
+                        attributes.push(`data-val-required="The field ${field.name} is required."`);
+                        break;
+                }
+            });
+        }
+
+        return attributes.join(' ');
     }
 
     function appendLabel($wrapper: JQuery, label: string, fieldName: string): void {
