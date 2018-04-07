@@ -28,6 +28,14 @@ namespace JustABackup.Models.Job
         
         public IEnumerable<Dictionary<string, string>> Providers { get; set; }
 
+        public Dictionary<int, int> ProviderInstances { get; set; }
+
+        public ConfigureJobModel()
+        {
+            ProviderInstances = new Dictionary<int, int>();
+            TransformProviders = new int[0];
+        }
+
         public int[] GetProviderIDs()
         {
             List<int> ids = new List<int>();

@@ -13,6 +13,16 @@ interface DynamicFormConfiguration {
 
     fields: DynamicFormField[];
 
+    providerInstances: NumberDictionary<number>;
+
+}
+
+interface StringDictionary<T> {
+    [Key: string]: T;
+}
+
+interface NumberDictionary<T> {
+    [Key: number]: T;
 }
 
 interface DynamicFormField {
@@ -91,7 +101,14 @@ namespace DynamicForm {
             
             if (activeSection < sectionCount) {
                 activeSection++;
-                $.getJSON(`/api/provider/${providers[activeSection - 2]}/fields`, data => {
+                let providerId = providers[activeSection - 2];
+
+                let instance = '';
+                if (configuration.providerInstances && configuration.providerInstances[providerId]) {
+                    instance = `?instanceID=${configuration.providerInstances[providerId]}`;
+                }
+
+                $.getJSON(`/api/provider/${providerId}/fields${instance}`, data => {
                     renderSection(activeSection, <DynamicFormField[]>data);
                 });
                 return false;
@@ -105,28 +122,28 @@ namespace DynamicForm {
         if (configuration && configuration.sectionProperties && Array.isArray(configuration.sectionProperties)) {
             configuration.sectionProperties.forEach((val, i) => {
                 $form.on('change', `[name="${val}"]`, e => {
-                    providers = calculateProviders();
-                    sectionCount = providers.length + 1;
+                    calculateProviders();
                 });
             });
         }
     }
 
-    function calculateProviders(): number[] {
-        let providers = [];
+    function calculateProviders(): void {
+        let list = [];
 
         configuration.sectionProperties.forEach(val => {
             let value = $form.find(`[name="${val}"]`).val();
             if (Array.isArray(value)) {
                 (<any[]>value).forEach(val => {
-                    providers.push(val);
+                    list.push(val);
                 });
             } else if (value) {
-                providers.push(value);
+                list.push(value);
             }
         });
 
-        return providers.map(val => parseInt(val));
+        providers = list.map(val => parseInt(val));
+        sectionCount = providers.length + 1;
     }
 
     function renderSection(id: number, fields: DynamicFormField[]) {
@@ -154,5 +171,4 @@ namespace DynamicForm {
         $form.removeData("validator").removeData("unobtrusiveValidation");
         $.validator.unobtrusive.parse($form);
     }
-
 }

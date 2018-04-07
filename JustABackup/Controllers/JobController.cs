@@ -32,14 +32,14 @@ namespace JustABackup.Controllers
         private IBackupJobRepository backupJobRepository;
         private IProviderMappingService providerMappingService;
 
-        public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService typeMappingService, ILogger<JobController> logger)
+        public JobController(IBackupJobRepository backupJobRepository, IProviderRepository providerRepository, ISchedulerService schedulerService, IProviderMappingService providerMappingService, ILogger<JobController> logger)
         {
             this.logger = logger;
 
             this.schedulerService = schedulerService;
             this.providerRepository = providerRepository;
             this.backupJobRepository = backupJobRepository;
-            this.providerMappingService = typeMappingService;
+            this.providerMappingService = providerMappingService;
         }
 
         [HttpGet]
@@ -109,6 +109,8 @@ namespace JustABackup.Controllers
                 model.BackupProvider = providers.FirstOrDefault().Provider.ID;
                 model.StorageProvider = providers.LastOrDefault().Provider.ID;
                 model.TransformProviders = providers.Where(p => p.Provider.Type == ProviderType.Transform).Select(tp => tp.Provider.ID).ToArray();
+
+                model.ProviderInstances = job.Providers.ToDictionary(k => k.Provider.ID, v => v.ID);
             }
             else
             {
@@ -145,7 +147,8 @@ namespace JustABackup.Controllers
                     logger.LogError(ex, $"Failed to save job '{model.Name}' to database");
                 }
             }
-            return View(model);
+
+            return RedirectToAction("Index");
         }
         
         public async Task<IActionResult> Start(int[] ids)

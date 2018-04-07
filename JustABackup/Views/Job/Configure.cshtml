@@ -14,21 +14,32 @@
                                 {
                                     "completeText": "Modify",
                                     "sectionProperties": [ "BackupProvider", "TransformProviders", "StorageProvider" ],
+                                    "providerInstances":
+                                        {
+                                            @for(int i = 0; i < Model.ProviderInstances.Count; i++)
+                                            {
+                                                <text>"@Model.ProviderInstances.Keys.ElementAt(i)": @Model.ProviderInstances.Values.ElementAt(i)@(i + 1 == Model.ProviderInstances.Count ? "": ",")</text>
+                                            }
+                                        }
+                                    ,
                                     "fields": [
                                         {
                                             "id": "ID",
-                                            "type": "hidden"
+                                            "type": "hidden",
+                                            "value": "@Model.ID"
                                         },
                                         {
                                             "id": "Name",
                                             "name": "Name",
                                             "type": "string",
+                                            "value": "@Model.Name",
                                             "validation": [ "required" ]
                                         },
                                         {
                                             "id": "BackupProvider",
                                             "name": "Backup Provider",
                                             "type": "dropdown",
+                                            "value": "@Model.BackupProvider",
                                             "validation": [ "required" ],
                                             "dataSource": "/api/provider?type=backup"
                                         },
@@ -36,6 +47,7 @@
                                             "id": "StorageProvider",
                                             "name": "Storage Provider",
                                             "type": "dropdown",
+                                            "value": "@Model.StorageProvider",
                                             "validation": [ "required" ],
                                             "dataSource": "/api/provider?type=storage"
                                         },
@@ -43,12 +55,14 @@
                                             "id": "TransformProviders",
                                             "name": "Transform Providers",
                                             "type": "multi-select",
+                                            "value": [ "@Html.Raw(string.Join("\",\"", Model.TransformProviders))" ],
                                             "dataSource": "/api/provider?type=transform"
                                         },
                                         {
                                             "id": "CronSchedule",
                                             "name": "Schedule",
                                             "type": "cron",
+                                            "value": "@Model.CronSchedule",
                                             "validation": [ "required" ]
                                         }
                                     ]

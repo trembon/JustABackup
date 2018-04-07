@@ -15,7 +15,7 @@ namespace JustABackup.Database.Repositories
 
         Task<AuthenticatedSession> Get(int id);
 
-        Task<Dictionary<int, string>> GetAuthenticatedSessions(string type);
+        Task<IEnumerable<AuthenticatedSession>> GetAll(string type);
 
         Task<int> Add(string name, byte[] sessionData, ProviderInstance providerInstance);
 
@@ -43,17 +43,15 @@ namespace JustABackup.Database.Repositories
 
             return session.ID;
         }
-
-        // TODO: better name and more generic return value?
-        // NOTE: is used in view for property
-        public async Task<Dictionary<int, string>> GetAuthenticatedSessions(string type)
+        
+        public async Task<IEnumerable<AuthenticatedSession>> GetAll(string type)
         {
             return await context
                 .AuthenticatedSessions
                 .Include(a => a.Provider)
                 .ThenInclude(p => p.Provider)
                 .Where(a => a.Provider.Provider.GenericType == type)
-                .ToDictionaryAsync(k => k.ID, v => v.Name);
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<AuthenticatedSession>> Get()

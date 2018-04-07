@@ -21,6 +21,11 @@
                 $field = generateStringInput(field, $wrapper, providerSection);
                 break;
 
+            case 'password':
+                $field = generateStringInput(field, $wrapper, providerSection);
+                $field.attr('type', 'password');
+                break;
+
             case 'bool':
                 $field = generateBooleanInput(field, $wrapper, providerSection);
                 break;
@@ -69,11 +74,11 @@
 
     function generateBooleanInput(field: DynamicFormField, $wrapper: JQuery, providerSection: number): JQuery {
         let fieldName = generateFieldName(field, providerSection);
-        let value = field.value ? field.value : '';
+        let checked = field.value && field.value.toLowerCase() === 'true' ? `checked="checked"` : '';
 
         $wrapper.removeClass('form-group');
 
-        $wrapper.append(`<label><input class="checkbox" type="checkbox" id="${fieldName}" name="${fieldName}"><span>${field.name}</span></label>`);
+        $wrapper.append(`<label><input class="checkbox" type="checkbox" id="${fieldName}" name="${fieldName}" value="true" ${checked} /><span>${field.name}</span></label>`);
 
         return $wrapper.find('input');
     }
@@ -92,7 +97,7 @@
                     $list.append(`<option value="${val.id}">${val.name}</option>`);
                 });
 
-                $list.val(field.value);
+                $list.val(field.value).change();
             });
         }
 
@@ -113,7 +118,8 @@
                     $list.append(`<option value="${val.id}">${val.name}</option>`);
                 });
 
-                $list.val(field.value);
+                console.log(field.value);
+                $list.val(field.value).change();
             });
         }
 
@@ -122,10 +128,10 @@
 
     function generateCronInput(field: DynamicFormField, $wrapper: JQuery, providerSection: number): JQuery {
         let fieldName = generateFieldName(field, providerSection);
-        let value = field.value ? field.value : "";
+        let value = field.value ? field.value : '';
         
         appendLabel($wrapper, field.name, fieldName);
-        $wrapper.append(`<div class="form-control boxed"><input class="cron" type="hidden" id="${fieldName}" name="${fieldName}" /></div>`);
+        $wrapper.append(`<div class="form-control boxed"><input class="cron" type="hidden" id="${fieldName}" name="${fieldName}" value="${value}" /></div>`);
 
         return $wrapper.find('input');
     }
