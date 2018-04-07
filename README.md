@@ -1,7 +1,7 @@
 # JustABackup
 A backup solution written in C# and ASP.NET Core, that bases its connections to sources and targets through plugins.
-Currently its hosted by the Kestrel host in ASP.NET Core with a UI as a webpage.
-Currently in a very early stage in development. Feedback and ideas is much appreciated.
+JustABackup is hosted by the Kestrel host in ASP.NET Core with a UI as a webpage and is in the very early stages of 
+development. Feedback and ideas are much appreciated.
 
 ### Table of Content
 * The idea
@@ -10,14 +10,14 @@ Currently in a very early stage in development. Feedback and ideas is much appre
 * Creating a plugin
 
 ## The idea
-Currently the backup solution is based mainly on three provider types. **Backup**, **Transform** and **Storage**.
-A **backup** provider provides a list of files that should be backed up, for example a folder on a disk or a database.
-A **transform** provider will modify the input file or files before being backed up. A transform might be multiple files being zipped into a single file.
-A **storage** provider will store files at a target connection, for example a folder or an online storage area like OneDrive.
+Currently the backup solution is based on three provider types. **Backup**, **Transform** and **Storage**.
+A **backup** provider generates a list of files that should be backed up, for example a folder on a disk or a database.
+A **transform** provider modifies the input file or files before being backed up. A transform might be multiple files being zipped into a single file.
+A **storage** provider stores files at a target connection. For example, a folder or an online storage area such as OneDrive.
 
 These three providers will together form a backup **job**, that will run on a schedule.
-A **job** is configured with one backup provider, zero or many tranform providers and a one storage provider.
-When a job is triggered by its schedule it will read all files from its backup provider, transform them with the configured transform provider (if any) and at last send them to the storage providers.
+A **job** is configured with one backup provider, zero or many tranform providers and one storage provider.
+When a job is triggered by its schedule it will read all files from its backup provider, transform them with the configured transform provider (if any) and send them to the storage providers.
 
 By design the providers do not know about each other and therefor the user
 
@@ -40,7 +40,7 @@ Every day at 03:00 AM the folder /important/data will be read, zipped into a sin
 
 ### Known issues
 * As the application is in an early stage, there should be some unknown bugs :)
-* Some plugins have dependencies on .Net Framework DLL's, and might not work on other platforms than Windows at the moment.
+* Some plugins have dependencies on .Net Framework DLL's, and might not work on other platforms than Windows.
 
 ---
 
