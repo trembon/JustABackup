@@ -29,7 +29,7 @@ namespace JustABackup.Core.Services
 
         Task<byte[]> Parse(string value, PropertyType propertyType, List<ProviderPropertyAttribute> attributes);
 
-        Task<ProviderInstance> CreateProviderInstance(Provider provider, CreateProviderModel createProviderModel);
+        Task<ProviderInstance> CreateProviderInstance(Provider provider, Dictionary<string, string> properties);
     }
 
     public class ProviderMappingService : IProviderMappingService
@@ -171,15 +171,17 @@ namespace JustABackup.Core.Services
             return authenticationProvider.GetAuthenticatedClient(decryptedSessionData);
         }
 
-        public async Task<ProviderInstance> CreateProviderInstance(Provider provider, CreateProviderModel createProviderModel)
+        public async Task<ProviderInstance> CreateProviderInstance(Provider provider, Dictionary<string, string> properties)
         {
             ProviderInstance backupProvider = new ProviderInstance();
             backupProvider.Provider = provider;
-            foreach (var property in createProviderModel.Properties)
+            foreach(var property in provider.Properties)
             {
+                string value = properties.ContainsKey(property.TypeName) ? properties[property.TypeName] : null;
+
                 ProviderInstanceProperty instanceProperty = new ProviderInstanceProperty();
-                instanceProperty.Property = provider.Properties.FirstOrDefault(p => p.Name == property.Name);
-                instanceProperty.Value = await Parse(property.Value.ToString(), instanceProperty.Property.Type, instanceProperty.Property.Attributes);
+                instanceProperty.Property = property;
+                instanceProperty.Value = await Parse(value, property.Type, property.Attributes);
                 backupProvider.Values.Add(instanceProperty);
             }
             return backupProvider;

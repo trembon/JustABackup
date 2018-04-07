@@ -17,8 +17,8 @@ namespace JustABackup.Models
                     List<int> ids = new List<int>();
                     ids.Add(Base.BackupProvider);
 
-                    if (Base.TransformProvider != null)
-                        ids.AddRange(Base.TransformProvider);
+                    if (Base.TransformProviders != null)
+                        ids.AddRange(Base.TransformProviders);
 
                     ids.Add(Base.StorageProvider);
                     return ids.ToArray();
@@ -28,7 +28,7 @@ namespace JustABackup.Models
             }
         }
 
-        public CreateJobModel Base { get; set; }
+        public ConfigureJobModel Base { get; set; }
 
         public List<CreateJobProviderModel> Providers { get; set; }
 

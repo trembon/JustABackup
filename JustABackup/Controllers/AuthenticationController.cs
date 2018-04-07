@@ -130,8 +130,9 @@ namespace JustABackup.Controllers
             {
                 redirectId = Guid.NewGuid().ToString(); // TODO: move to create and store this in db
 
+                // TODO: FIX
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
+                //providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
             }
             //else if(id > 0)
             //{
@@ -156,8 +157,9 @@ namespace JustABackup.Controllers
             CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
             if (createSession != null)
             {
+                // TODO: FIX
                 Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
+                //providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
             }
             //else if (id > 0)
             //{

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Models.Job
 {
-    public class CreateJobModel : BaseViewModel
+    public class ConfigureJobModel : BaseViewModel
     {
-        public virtual int ID { get; set; }
+        public int? ID { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
@@ -23,11 +23,21 @@ namespace JustABackup.Models.Job
 
         [Required]
         public int BackupProvider { get; set; }
-        
-        public int[] TransformProvider { get; set; }
 
-        public SelectList StorageProviders { get; set; }
-        public SelectList BackupProviders { get; set; }
-        public SelectList TransformProviders { get; set; }
+        public int[] TransformProviders { get; set; }
+        
+        public IEnumerable<Dictionary<string, string>> Providers { get; set; }
+
+        public int[] GetProviderIDs()
+        {
+            List<int> ids = new List<int>();
+            ids.Add(BackupProvider);
+
+            if (TransformProviders != null)
+                ids.AddRange(TransformProviders);
+
+            ids.Add(StorageProvider);
+            return ids.ToArray();
+        }
     }
 }

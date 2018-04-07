@@ -88,8 +88,8 @@ namespace DynamicForm {
                 // dont post when form is not valid
                 return false;
             }
-
-            if (activeSection <= sectionCount) {
+            
+            if (activeSection < sectionCount) {
                 activeSection++;
                 $.getJSON(`/api/provider/${providers[activeSection - 2]}/fields`, data => {
                     renderSection(activeSection, <DynamicFormField[]>data);
@@ -102,7 +102,7 @@ namespace DynamicForm {
     }
 
     function initializeSectionEvents(): void {
-        if (configuration && configuration.sectionProperties && configuration.sectionProperties.length > 0) {
+        if (configuration && configuration.sectionProperties && Array.isArray(configuration.sectionProperties)) {
             configuration.sectionProperties.forEach((val, i) => {
                 $form.on('change', `[name="${val}"]`, e => {
                     providers = calculateProviders();
@@ -114,6 +114,7 @@ namespace DynamicForm {
 
     function calculateProviders(): number[] {
         let providers = [];
+
         configuration.sectionProperties.forEach(val => {
             let value = $form.find(`[name="${val}"]`).val();
             if (Array.isArray(value)) {
@@ -146,7 +147,11 @@ namespace DynamicForm {
         $section.append(`<div class="form-group text-right"><input type="submit" value="${submitText}" class="btn btn-primary"></div>`);
         $section.appendTo($form);
 
+        // activate any cron fields in the form for the added section
         cron.activateCron($section);
+
+        // clear the current validation data, and reparse the form
+        $form.removeData("validator").removeData("unobtrusiveValidation");
         $.validator.unobtrusive.parse($form);
     }
 

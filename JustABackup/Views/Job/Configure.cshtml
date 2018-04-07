@@ -1,6 +1,6 @@
-﻿@model CreateJobModel
+﻿@model ConfigureJobModel
 @{
-    Model.TitleDescription = "Base configure for a scheduled job.";
+    Model.TitleDescription = "Base configuration for a scheduled job.";
 }
 
 <section class="section">
@@ -54,38 +54,6 @@
                                     ]
                                 }
                             </script>
-
-                            @*<section data-step="1">
-                                <input type="hidden" asp-for="ID" />
-
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                <div class="form-group">
-                                    <label asp-for="Name" class="control-label"></label>
-                                    <input asp-for="Name" class="form-control boxed" />
-                                    <span asp-validation-for="Name" class="text-danger"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="BackupProvider" class="control-label"></label>
-                                    <select asp-for="BackupProvider" asp-items="Model.BackupProviders" class="form-control boxed"></select>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="StorageProvider" class="control-label"></label>
-                                    <select asp-for="StorageProvider" asp-items="Model.StorageProviders" class="form-control boxed"></select>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="TransformProvider" class="control-label"></label>
-                                    <select asp-for="TransformProvider" asp-items="Model.TransformProviders" class="form-control boxed" multiple></select>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="CronSchedule">Schedule</label>
-                                    <div class="form-control boxed no-height">
-                                        <input class="cron" type="hidden" asp-for="CronSchedule" />
-                                    </div>
-                                </div>
-                                <div class="form-group text-right">
-                                    <input type="submit" value="Continue" class="btn btn-primary" />
-                                </div>
-                            </section>*@
                         </form>
                     </section>
                 </div>
