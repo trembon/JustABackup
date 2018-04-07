@@ -137,8 +137,6 @@
     }
 
     function addValidationAttributes($field: JQuery, field: DynamicFormField): void {
-        console.log($field, field);
-
         $field.attr('data-val', 'true');
 
         if (field.validation && Array.isArray(field.validation)) {

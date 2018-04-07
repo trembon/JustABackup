@@ -10,7 +10,7 @@
             <div class="card">
                 <div class="card-block">
                     <section>
-                        <form class="dynamic" asp-action="Configure">
+                        <form class="dynamic" method="post" asp-action="Configure">
                             <script type="application/json" class="configuration">
                                 {
                                     "completeText": "@(Model.ID.HasValue ? "Modify" : "Create")",

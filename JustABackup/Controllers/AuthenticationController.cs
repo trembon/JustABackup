@@ -62,134 +62,49 @@ namespace JustABackup.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>();
-
-            var authenticationProviders = await providerRepository.Get(ProviderType.Authentication);
-            model.AuthenticationProviders = new SelectList(authenticationProviders, "ID", "Name");
-
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult Create(CreateAuthenticatedSessionModel model)
+        public async Task<IActionResult> Create(CreateAuthenticatedSessionModel model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.ErrorCount == 0)
             {
-                CreateAuthenicatedSession createSession = new CreateAuthenicatedSession { Base = model };
-                HttpContext.Session.SetObject(AUTHENTICATED_SESSION_KEY, createSession);
-                
-                return RedirectToAction("ConfigureProvider");
+                Provider provider = await providerRepository.Get(model.AuthenticationProvider);
+                ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, model.Providers.FirstOrDefault());
+
+                int authenticatedSessionId = await authenticatedSessionRepository.Add(model.Name, null, providerInstance);
+
+                IAuthenticationProvider<object> authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
+                authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?id={authenticatedSessionId}", data => StoreSession(authenticatedSessionId, data));
+                string redirectUrl = await authenticationProvider.GetOAuthUrl();
+
+                return Redirect(redirectUrl);
             }
 
             return View(model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ConfigureProvider()
+        public async Task<IActionResult> CompleteAuthentication(int id)
         {
-            CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-            if (createSession == null)
-                return RedirectToAction("Index", "Home");
-            
-            Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-            CreateProviderModel model = CreateModel<CreateProviderModel>();
-            
-            model.ProviderName = provider.Name;
-            model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x.Name, x.Description, providerMappingService.GetTemplateFromType(x.Type), null, x.Attributes?.ToDictionary(k => k.Name.ToString(), v => v.Value))).ToList();
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public IActionResult ConfigureProvider(CreateProviderModel model)
-        {
-            CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-            if (createSession == null)
-                return RedirectToAction("Index", "Home");
-
-            if (ModelState.IsValid)
-            {
-                createSession.ProviderInstance = model;
-                HttpContext.Session.SetObject(AUTHENTICATED_SESSION_KEY, createSession);
-
-                return RedirectToAction("Authenticate");
-            }
-
-            return View(model);
-        }
-        
-        public async Task<IActionResult> Authenticate(long id = 0)
-        {
-            string redirectId = null;
-            ProviderInstance providerInstance = null;
-
-            CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-            if (createSession != null)
-            {
-                redirectId = Guid.NewGuid().ToString(); // TODO: move to create and store this in db
-
-                // TODO: FIX
-                Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                //providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
-            }
-            //else if(id > 0)
-            //{
-            //}
+            AuthenticatedSession authenticatedSession = await authenticatedSessionRepository.Get(id);
+            ProviderInstance providerInstance = await providerRepository.GetInstance(authenticatedSession.Provider.ID);
 
             if (providerInstance == null)
                 return RedirectToAction("Index", "Home");
 
             IAuthenticationProvider<object> authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
-
-            //authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?sessionId={redirectId}", data => StoreSession(providerInstance.ID, data));
-            authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication", data => StoreSession(providerInstance.ID, data));
-            string redirectUrl = await authenticationProvider.GetOAuthUrl();
-
-            return Redirect(redirectUrl);
-        }
-
-        public async Task<IActionResult> CompleteAuthentication(string sessionId)
-        {
-            ProviderInstance providerInstance = null;
-
-            CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-            if (createSession != null)
-            {
-                // TODO: FIX
-                Provider provider = await providerRepository.Get(createSession.Base.AuthenticationProvider);
-                //providerInstance = await providerMappingService.CreateProviderInstance(provider, createSession.ProviderInstance);
-            }
-            //else if (id > 0)
-            //{
-            //    redirectId = id.ToString();
-            //}
-
-            if (providerInstance == null)
-                return RedirectToAction("Index", "Home");
-
-            IAuthenticationProvider<object>  authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
             try
             {
-                //authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?sessionId={sessionId}", data => StoreSession(providerInstance.ID, data));
-                authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication", data => StoreSession(providerInstance.ID, data));
+                authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?id={id}", data => StoreSession(id, data));
                 bool result = await authenticationProvider.Authenticate(Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()));
-
-                if (result && createSession != null)
-                {
-                    // refresh the object
-                    createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-
-                    byte[] encryptedSessionData = await encryptionService.Encrypt(createSession.SessionData);
-                    await authenticatedSessionRepository.Add(createSession.Base.Name, encryptedSessionData, providerInstance);
-
-                    HttpContext.Session.Clear();
-                }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Failed to complete authentication for '{createSession.Base.Name}'");
+                logger.LogError(ex, $"Failed to complete authentication for '{authenticatedSession.Name}'.");
             }
 
             return RedirectToAction("Index");
@@ -197,17 +112,8 @@ namespace JustABackup.Controllers
 
         private async void StoreSession(int id, string sessionData)
         {
-            CreateAuthenicatedSession createSession = HttpContext.Session.GetObject<CreateAuthenicatedSession>(AUTHENTICATED_SESSION_KEY);
-            if (createSession != null)
-            {
-                createSession.SessionData = sessionData;
-                HttpContext.Session.SetObject(AUTHENTICATED_SESSION_KEY, createSession);
-            }
-            else
-            {
-                byte[] encryptedSessionData = await encryptionService.Encrypt(sessionData);
-                authenticatedSessionRepository.StoreSession(id, encryptedSessionData).Wait();
-            }
+            byte[] encryptedSessionData = await encryptionService.Encrypt(sessionData);
+            await authenticatedSessionRepository.StoreSession(id, encryptedSessionData);
         }
     }
 }

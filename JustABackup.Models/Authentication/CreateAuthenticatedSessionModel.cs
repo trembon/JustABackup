@@ -16,6 +16,6 @@ namespace JustABackup.Models.Authentication
         [Required]
         public int AuthenticationProvider { get; set; }
 
-        public SelectList AuthenticationProviders { get; set; }
+        public IEnumerable<Dictionary<string, string>> Providers { get; set; }
     }
 }

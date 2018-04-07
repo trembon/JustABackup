@@ -83,6 +83,10 @@ namespace JustABackup.Database.Repositories
             AuthenticatedSession session = await context
                 .AuthenticatedSessions
                 .Include(a => a.Provider)
+                .ThenInclude(p => p.Provider)
+                .Include(a => a.Provider)
+                .ThenInclude(p => p.Values)
+                .ThenInclude(v => v.Property)
                 .FirstOrDefaultAsync(a => a.ID == id);
             
             return session;
