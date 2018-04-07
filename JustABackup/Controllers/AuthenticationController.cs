@@ -22,8 +22,6 @@ namespace JustABackup.Controllers
 {
     public class AuthenticationController : ControllerBase
     {
-        private const string AUTHENTICATED_SESSION_KEY = "CreateAuthenticatedSession";
-
         private ILogger<AuthenticationController> logger;
 
         private IEncryptionService encryptionService;

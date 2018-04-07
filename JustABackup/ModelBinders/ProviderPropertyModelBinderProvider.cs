@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.ModelBinders
 {
+    // TODO: is this needed?
     public class ProviderPropertyModelBinderProvider : IModelBinderProvider
     {
         public IModelBinder GetBinder(ModelBinderProviderContext context)
@@ -15,8 +16,8 @@ namespace JustABackup.ModelBinders
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Metadata.ModelType == typeof(ProviderPropertyModel))
-                return new BinderTypeModelBinder(typeof(ProviderPropertyModelBinder));
+            //if (context.Metadata.ModelType == typeof(ProviderPropertyModel))
+            //    return new BinderTypeModelBinder(typeof(ProviderPropertyModelBinder));
 
             return null;
         }
