@@ -29,7 +29,7 @@
             return 'ids=' + $(el).closest('tr').data('id');
         });
 
-        $.getJSON('/job/' + $t.data('action') + '/?' + $ids.get().join('&'), function (result) {
+        $.getJSON('/api/job/' + $t.data('action') + '?' + $ids.get().join('&'), function (result) {
             for (let job in result) {
                 let $col = $card.find('tr[data-id="' + job + '"] td.next-run');
                 if (result[job] === null) {

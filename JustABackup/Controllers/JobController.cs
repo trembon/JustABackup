@@ -102,7 +102,7 @@ namespace JustABackup.Controllers
 
                 var providers = job.Providers.OrderBy(p => p.Order);
 
-                model = CreateModel<ConfigureJobModel>("Modify Schedule");
+                model = CreateModel<ConfigureJobModel>();
                 model.ID = job.ID;
                 model.Name = job.Name;
                 model.CronSchedule = await schedulerService.GetCronSchedule(id.Value);
@@ -114,7 +114,7 @@ namespace JustABackup.Controllers
             }
             else
             {
-                model = CreateModel<ConfigureJobModel>("Create Schedule");
+                model = CreateModel<ConfigureJobModel>();
             }
             
             return View(model);
@@ -149,40 +149,6 @@ namespace JustABackup.Controllers
             }
 
             return RedirectToAction("Index");
-        }
-        
-        public async Task<IActionResult> Start(int[] ids)
-        {
-            foreach (int id in ids)
-                await schedulerService.TriggerJob(id);
-
-            return Ok(true);
-        }
-
-        public async Task<IActionResult> Resume(int[] ids)
-        {
-            Dictionary<int, DateTime?> result = new Dictionary<int, DateTime?>(ids.Length);
-
-            foreach (int id in ids)
-            {
-                await schedulerService.ResumeJob(id);
-                result.Add(id, await schedulerService.GetNextRunTime(id));
-            }
-
-            return Ok(result);
-        }
-
-        public async Task<IActionResult> Pause(int[] ids)
-        {
-            Dictionary<int, DateTime?> result = new Dictionary<int, DateTime?>(ids.Length);
-
-            foreach (int id in ids)
-            {
-                await schedulerService.PauseJob(id);
-                result.Add(id, await schedulerService.GetNextRunTime(id));
-            }
-
-            return Ok(result);
         }
     }
 }

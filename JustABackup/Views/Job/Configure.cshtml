@@ -1,5 +1,6 @@
 ﻿@model ConfigureJobModel
 @{
+    Model.Title = Model.ID.HasValue ? "Modify Scheduled Job" : "Create Scheduled Job";
     Model.TitleDescription = "Base configuration for a scheduled job.";
 }
 
@@ -12,7 +13,7 @@
                         <form class="dynamic" asp-action="Configure">
                             <script type="application/json" class="configuration">
                                 {
-                                    "completeText": "Modify",
+                                    "completeText": "@(Model.ID.HasValue ? "Modify" : "Create")",
                                     "sectionProperties": [ "BackupProvider", "TransformProviders", "StorageProvider" ],
                                     "providerInstances":
                                         {
