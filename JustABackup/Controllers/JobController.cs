@@ -25,8 +25,6 @@ namespace JustABackup.Controllers
 {
     public class JobController : ControllerBase
     {
-        private const string JOB_STORAGE_KEY = "ConfigureJob";
-
         private ILogger<JobController> logger;
 
         private ISchedulerService schedulerService;
@@ -90,8 +88,7 @@ namespace JustABackup.Controllers
 
             return View(model);
         }
-
-        #region Create scheduled job
+        
         [HttpGet]
         public async Task<IActionResult> Configure(int? id = null)
         {
@@ -150,111 +147,7 @@ namespace JustABackup.Controllers
             }
             return View(model);
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> Configure(CreateJobModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        CreateJob createJob = new CreateJob { Base = model };
-        //        HttpContext.Session.SetObject(JOB_STORAGE_KEY, createJob);
-
-        //        int? firstProvider = await providerRepository.GetInstanceID(model.ID, 0);
-        //        return RedirectToAction("ConfigureJobProvider", new { id = firstProvider });
-        //    }
-
-        //    return View(model);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> ConfigureJobProvider(int index = 0, int id = 0)
-        //{
-        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>(JOB_STORAGE_KEY);
-        //    if (createJob == null)
-        //        return RedirectToAction("Index", "Home");
-
-        //    CreateJobProviderModel model = null;
-
-        //    Provider provider = await providerRepository.Get(createJob.ProviderIDs[index]);
-        //    Dictionary<int, object> values = new Dictionary<int, object>();
-
-        //    if (id > 0)
-        //    {
-        //        model = CreateModel<ModifyJobProviderModel>("Modify Schedule");
-        //        model.ID = id;
-
-        //        IEnumerable<ProviderInstanceProperty> propertyValues = await providerRepository.GetProviderValues(id);
-        //        foreach(ProviderInstanceProperty propertyValue in propertyValues)
-        //        {
-        //            object parsedValue = await providerMappingService.GetPresentationValue(propertyValue);
-        //            values.Add(propertyValue.Property.ID, parsedValue);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        model = CreateModel<CreateJobProviderModel>("Create Schedule");
-        //    }
-
-        //    model.CurrentIndex = index;
-        //    model.ProviderName = provider.Name;
-        //    model.Properties = provider.Properties.Select(x => new ProviderPropertyModel(x.Name, x.Description, providerMappingService.GetTemplateFromType(x.Type), values.ContainsKey(x.ID) ? values[x.ID] : null, x.Attributes?.ToDictionary(k => k.Name.ToString(), v => v.Value))).ToList();
-
-        //    return View(model);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> ConfigureJobProvider(CreateJobProviderModel model)
-        //{
-        //    CreateJob createJob = HttpContext.Session.GetObject<CreateJob>(JOB_STORAGE_KEY);
-        //    if (createJob == null)
-        //        return RedirectToAction("Index", "Home");
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        createJob.Providers.Add(model);
-        //        HttpContext.Session.SetObject(JOB_STORAGE_KEY, createJob);
-
-        //        int nextIndex = model.CurrentIndex + 1;
-        //        if (nextIndex >= createJob.ProviderIDs.Length)
-        //        {
-        //            await SaveJob(createJob);
-        //            HttpContext.Session.Clear();
-
-        //            return RedirectToAction("Index");
-        //        }
-        //        else
-        //        {
-        //            int? nextId = await providerRepository.GetInstanceID(createJob.Base.ID, nextIndex);
-        //            return RedirectToAction("ConfigureJobProvider", new { index = nextIndex, id = nextId });
-        //        }
-        //    }
-
-        //    return View(model);
-        //}
-        #endregion
         
-        //private async Task SaveJob(CreateJob createJob)
-        //{
-        //    try
-        //    {
-        //        List<ProviderInstance> providerInstances = new List<ProviderInstance>(createJob.Providers.Count);
-        //        for (int i = 0; i < createJob.Providers.Count; i++)
-        //        {
-        //            Provider provider = await providerRepository.Get(createJob.ProviderIDs[i]);
-        //            ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, createJob.Providers[i]);
-        //            providerInstance.Order = i;
-        //            providerInstances.Add(providerInstance);
-        //        }
-
-        //        int jobId = await backupJobRepository.AddOrUpdate(createJob.Base.ID, createJob.Base.Name, providerInstances);
-        //        await schedulerService.CreateOrUpdate(jobId, createJob.Base.CronSchedule);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        logger.LogError(ex, $"Failed to save job '{createJob.Base.Name}' to database");
-        //    }
-        //}
-
         public async Task<IActionResult> Start(int[] ids)
         {
             foreach (int id in ids)
