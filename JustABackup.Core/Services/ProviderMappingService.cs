@@ -20,8 +20,6 @@ namespace JustABackup.Core.Services
         Task<T> CreateProvider<T>(int providerInstanceId) where T : class;
 
         Task<T> CreateProvider<T>(ProviderInstance providerInstance) where T : class;
-
-        string GetTemplateFromType(PropertyType type);
         
         Task<object> GetValue(ProviderInstanceProperty property);
 
@@ -65,19 +63,6 @@ namespace JustABackup.Core.Services
             }
 
             return convertedProvider;
-        }
-
-        public string GetTemplateFromType(PropertyType type)
-        {
-            switch (type)
-            {
-                case PropertyType.String: return "String";
-                case PropertyType.Number: return "Number";
-                case PropertyType.Bool: return "Boolean";
-                case PropertyType.Authentication: return "AuthenticationProvider";
-
-                default: return "String";
-            }
         }
 
         public async Task<object> GetValue(ProviderInstanceProperty property)
