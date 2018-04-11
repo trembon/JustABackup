@@ -60,7 +60,7 @@ namespace JustABackup.Plugin.OneDrive
         {
             string encodingCallbackUrl = HttpUtility.UrlEncode(callbackUrl);
 
-            return Task.FromResult($"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={ClientID}&scope=files.readwrite offline_access&response_type=code&redirect_uri={encodingCallbackUrl}");
+            return Task.FromResult($"https://login.live.com/oauth20_authorize.srf?client_id={ClientID}&scope=onedrive.readwrite offline_access&response_type=code&redirect_uri={encodingCallbackUrl}");
         }
     }
 }
