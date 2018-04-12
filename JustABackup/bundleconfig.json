@@ -15,8 +15,12 @@
       "wwwroot/lib/jqcron-quartz/src/jqCron.en.js",
       "wwwroot/lib/jquery-validation-unobtrusive/jquery-validation-unobtrusive.js",
       "wwwroot/js/app.js",
+      "wwwroot/js/extensions.js",
+      "wwwroot/js/menu-handler.js",
       "wwwroot/js/jqcron.js",
-      "wwwroot/js/list-multiselect.js"
+      "wwwroot/js/list-multiselect.js",
+      "wwwroot/js/input-templates.js",
+      "wwwroot/js/dynamic-form.js"
     ],
     "minify": {
       "enabled": true,

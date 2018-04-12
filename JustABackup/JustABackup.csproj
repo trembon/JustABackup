@@ -26,6 +26,7 @@
     <None Remove="Scripts\extensions.ts" />
     <None Remove="Scripts\input-templates.ts" />
     <None Remove="Scripts\list-multiselect.ts" />
+    <None Remove="Scripts\menu-handler.ts" />
     <None Remove="Scripts\typings\jqcron.d.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +69,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\dynamic-form.ts" />
     <TypeScriptCompile Include="Scripts\extensions.ts" />
+    <TypeScriptCompile Include="Scripts\menu-handler.ts" />
     <TypeScriptCompile Include="Scripts\input-templates.ts" />
     <TypeScriptCompile Include="Scripts\jqcron.ts" />
     <TypeScriptCompile Include="Scripts\list-multiselect.ts" />
