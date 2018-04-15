@@ -17,7 +17,7 @@ namespace JustABackup.Database.Repositories
 
         Task<IEnumerable<AuthenticatedSession>> GetAll(string type);
 
-        Task<int> Add(string name, byte[] sessionData, ProviderInstance providerInstance);
+        Task<int> AddOrUpdate(int? id, string name, ProviderInstance providerInstance);
 
         Task<bool> StoreSession(int sessionId, byte[] sessionData);
     }
@@ -31,14 +31,23 @@ namespace JustABackup.Database.Repositories
             this.context = context;
         }
 
-        public async Task<int> Add(string name, byte[] sessionData, ProviderInstance providerInstance)
+        public async Task<int> AddOrUpdate(int? id, string name, ProviderInstance providerInstance)
         {
-            AuthenticatedSession session = new AuthenticatedSession();
+            AuthenticatedSession session = null;
+            if (id != null && id > 0)
+            {
+                session = await context.AuthenticatedSessions.FirstOrDefaultAsync(s => s.ID == id.Value);
+                session.HasChangedModel = false;
+            }
+            else
+            {
+                session = new AuthenticatedSession();
+                await context.AuthenticatedSessions.AddAsync(session);
+            }
+            
             session.Name = name;
-            session.SessionData = sessionData;
             session.Provider = providerInstance;
-
-            await context.AuthenticatedSessions.AddAsync(session);
+            
             await context.SaveChangesAsync();
 
             return session.ID;

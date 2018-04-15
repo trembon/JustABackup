@@ -92,7 +92,7 @@ namespace JustABackup.Controllers
         [HttpGet]
         public async Task<IActionResult> Configure(int? id = null)
         {
-            ConfigureJobModel model;
+            ConfigureJobModel model = CreateModel<ConfigureJobModel>();
 
             if (id.HasValue && id > 0)
             {
@@ -101,8 +101,7 @@ namespace JustABackup.Controllers
                     return NotFound();
 
                 var providers = job.Providers.OrderBy(p => p.Order);
-
-                model = CreateModel<ConfigureJobModel>();
+                
                 model.ID = job.ID;
                 model.Name = job.Name;
                 model.CronSchedule = await schedulerService.GetCronSchedule(id.Value);
@@ -111,10 +110,6 @@ namespace JustABackup.Controllers
                 model.TransformProviders = providers.Where(p => p.Provider.Type == ProviderType.Transform).Select(tp => tp.Provider.ID).ToArray();
 
                 model.ProviderInstances = job.Providers.ToDictionary(k => k.Provider.ID, v => v.ID);
-            }
-            else
-            {
-                model = CreateModel<ConfigureJobModel>();
             }
             
             return View(model);

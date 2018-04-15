@@ -75,21 +75,35 @@ namespace JustABackup.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Configure(int? id = null)
         {
-            CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>();
+            ConfigureAuthenticatedSessionModel model = CreateModel<ConfigureAuthenticatedSessionModel>();
+
+            if (id.HasValue && id > 0)
+            {
+                AuthenticatedSession authenticatedSession = await authenticatedSessionRepository.Get(id.Value);
+                if (authenticatedSession == null)
+                    return NotFound();
+                
+                model.ID = authenticatedSession.ID;
+                model.Name = authenticatedSession.Name;
+                model.AuthenticationProvider = authenticatedSession.Provider.Provider.ID;
+
+                model.ProviderInstances = new Dictionary<int, int> { { authenticatedSession.Provider.Provider.ID, authenticatedSession.Provider.ID } };
+            }
+
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateAuthenticatedSessionModel model)
+        public async Task<IActionResult> Configure(ConfigureAuthenticatedSessionModel model)
         {
             if (ModelState.ErrorCount == 0)
             {
                 Provider provider = await providerRepository.Get(model.AuthenticationProvider);
                 ProviderInstance providerInstance = await providerMappingService.CreateProviderInstance(provider, model.Providers.FirstOrDefault());
 
-                int authenticatedSessionId = await authenticatedSessionRepository.Add(model.Name, null, providerInstance);
+                int authenticatedSessionId = await authenticatedSessionRepository.AddOrUpdate(model.ID, model.Name, providerInstance);
 
                 IAuthenticationProvider<object> authenticationProvider = await providerMappingService.CreateProvider<IAuthenticationProvider<object>>(providerInstance);
                 authenticationProvider.Initialize($"http://{Request.Host}/Authentication/CompleteAuthentication?id={authenticatedSessionId}", data => StoreSession(authenticatedSessionId, data));
