@@ -60,6 +60,21 @@ namespace JustABackup.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            AuthenticatedSession authenticatedSession = await authenticatedSessionRepository.Get(id);
+            if (authenticatedSession == null)
+                return NotFound();
+
+            AuthenticationSessionDetailModel model = CreateModel<AuthenticationSessionDetailModel>("Scheduled Backup");
+            model.ID = id;
+            model.Name = authenticatedSession.Name;
+            model.Provider = authenticatedSession.Provider.Provider.Name;
+
+            return View(model);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             CreateAuthenticatedSessionModel model = CreateModel<CreateAuthenticatedSessionModel>();
