@@ -1,17 +1,11 @@
 ﻿$(() => {
     $('.card table').on('change', 'input[type="checkbox"]', e => {
         let $card = $(e.currentTarget).closest('.card');
-        console.log('card', $card);
 
         let $boxes = $card.find('table input[type="checkbox"]');
-        console.log('boxes', $boxes);
         if ($boxes.is(':checked')) {
-            console.log('boxes checked');
-            console.log('btns', $card.find('.header-block.pull-right .btn'));
             $card.find('.header-block.pull-right .btn').removeAttr('disabled').removeClass('disabled');
         } else {
-            console.log('boxes not checked');
-            console.log('btns', $card.find('.header-block.pull-right .btn'));
             $card.find('.header-block.pull-right .btn').attr('disabled', 'disabled').addClass('disabled');
         }
     });

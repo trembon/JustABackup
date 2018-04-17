@@ -16,6 +16,8 @@
     <Content Remove="appsettings.Development.json" />
     <Content Remove="bower.json" />
     <Content Remove="bundleconfig.json" />
+    <Content Remove="package.json" />
+    <Content Remove="tsconfig.json" />
     <Content Remove="wwwroot\js\custom.ts" />
   </ItemGroup>
 
@@ -53,6 +55,8 @@
     <None Include="appsettings.Development.json" />
     <None Include="bower.json" />
     <None Include="bundleconfig.json" />
+    <None Include="package.json" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />

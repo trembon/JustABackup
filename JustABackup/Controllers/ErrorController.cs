@@ -9,20 +9,20 @@ namespace JustABackup.Controllers
 {
     public class ErrorController : ControllerBase
     {
+        [Route("error/{statusCode}")]
+        public IActionResult Index(int statusCode)
+        {
+            StatusCodeModel model = CreateModel<StatusCodeModel>();
+            model.StatusCode = statusCode;
+
+            return View(model);
+        }
+
         [Route("error/exception")]
         public IActionResult Exception()
         {
             StatusCodeModel model = CreateModel<StatusCodeModel>();
             model.StatusCode = 500;
-
-            return View(model);
-        }
-
-        [Route("error/{statusCode}")]
-        public IActionResult StatusCode(int statusCode)
-        {
-            StatusCodeModel model = CreateModel<StatusCodeModel>();
-            model.StatusCode = statusCode;
 
             return View(model);
         }

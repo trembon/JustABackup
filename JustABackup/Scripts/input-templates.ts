@@ -117,8 +117,7 @@
                 (<DropDownValues[]>data).forEach(val => {
                     $list.append(`<option value="${val.id}">${val.name}</option>`);
                 });
-
-                console.log(field.value);
+                
                 $list.val(field.value).change();
             });
         }
