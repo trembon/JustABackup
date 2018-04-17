@@ -141,13 +141,16 @@
             <div class="mobile-menu-handle"></div>
 
             <article class="content">
-                <div class="title-block">
-                    <h1 class="title">@Model.Title</h1>
-                    @if (!string.IsNullOrWhiteSpace(Model.TitleDescription))
-                    {
-                        <p class="title-description">@Model.TitleDescription</p>
-                    }
-                </div>
+                @if (Context.Response.StatusCode == 200)
+                {
+                    <div class="title-block">
+                        <h1 class="title">@Model.Title</h1>
+                        @if (!string.IsNullOrWhiteSpace(Model.TitleDescription))
+                        {
+                            <p class="title-description">@Model.TitleDescription</p>
+                        }
+                    </div>
+                }
 
                 @RenderBody()
             </article>

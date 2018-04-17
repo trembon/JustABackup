@@ -82,8 +82,10 @@ namespace JustABackup
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error/Exception");
             }
+
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
             app.UseSession();
             app.UseStaticFiles();
