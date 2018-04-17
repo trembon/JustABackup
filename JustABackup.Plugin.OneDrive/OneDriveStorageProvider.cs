@@ -1,4 +1,5 @@
 ﻿using JustABackup.Base;
+using JustABackup.Base.Attributes;
 using Microsoft.OneDrive.Sdk;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace JustABackup.Plugin.OneDrive
     [DisplayName("OneDrive Storage")]
     public class OneDriveStorageProvider : IStorageProvider
     {
+        [Transform]
         public string Folder { get; set; }
 
         public IAuthenticatedClient<IOneDriveClient> Client { get; set; }

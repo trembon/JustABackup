@@ -78,7 +78,7 @@ namespace JustABackup.Core.Entities
         {
             base.Dispose(disposing);
 
-            internalBuffer.Clear();
+            internalBuffer?.Clear();
             internalBuffer = null;
 
             length = -1;

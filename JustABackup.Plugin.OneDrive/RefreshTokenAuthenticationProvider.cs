@@ -29,7 +29,7 @@ namespace JustABackup.Plugin.OneDrive
         {
             this.Session = session;
             this.ClientID = clientId;
-            this.ClientSecret = ClientSecret;
+            this.ClientSecret = clientSecret;
             this.RedirectUri = redirectUri;
             this.storeSession = storeSession;
         }
