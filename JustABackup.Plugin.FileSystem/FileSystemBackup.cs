@@ -33,7 +33,7 @@ namespace JustABackup.Plugin.FileSystem
             IEnumerable<BackupItem> result = foundFiles.Select(x => new BackupItem
             {
                 Name = Path.GetFileName(x),
-                Path = Path.GetDirectoryName(x).Substring(TargetFolder.Length)
+                Path = Path.GetDirectoryName(x).Substring(TargetFolder.Length).TrimStart('\\')
             });
 
             return Task.FromResult(result);
@@ -41,7 +41,7 @@ namespace JustABackup.Plugin.FileSystem
 
         public Task<Stream> OpenRead(BackupItem item)
         {
-            return Task.Run(() => File.OpenRead(Path.Combine(TargetFolder, item.Path, item.Name)) as Stream);
+            return Task.Run(() => File.OpenRead(Path.Combine(TargetFolder, item.FullPath)) as Stream);
         }
 
         public void Dispose()

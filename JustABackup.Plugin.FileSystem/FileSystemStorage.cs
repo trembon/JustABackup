@@ -22,6 +22,10 @@ namespace JustABackup.Plugin.FileSystem
             if (item.FullPath.StartsWith("/"))
                 path = Path.Combine(TargetFolder, item.FullPath.Substring(1));
 
+            string folder = Path.GetDirectoryName(path);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
             using (Stream target = File.OpenWrite(path))
             {
                 await source.CopyToAsync(target);

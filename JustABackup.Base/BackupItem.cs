@@ -26,7 +26,13 @@ namespace JustABackup.Base
         /// The full path of the file.
         /// Example: /path/to/a/folder/file1.txt
         /// </summary>
-        public string FullPath => $"{Path}{Name}";
+        public string FullPath
+        {
+            get
+            {
+                return System.IO.Path.Combine(Path, Name);
+            }
+        }
 
         public BackupItem()
         {
