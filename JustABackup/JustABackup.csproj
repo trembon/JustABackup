@@ -13,12 +13,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\**" />
+    <Content Remove="wwwroot\lib\**" />
+    <EmbeddedResource Remove="wwwroot\lib\**" />
+    <None Include="wwwroot\lib\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="wwwroot\js\typescript\**" />
+    <Content Remove="wwwroot\js\typescript\**" />
+    <EmbeddedResource Remove="wwwroot\js\typescript\**" />
+    <None Include="wwwroot\js\typescript\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="appsettings.Development.json" />
     <Content Remove="bower.json" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="package.json" />
-    <Content Remove="tsconfig.json" />
-    <Content Remove="wwwroot\js\custom.ts" />
+    <Content Remove="wwwroot\css\app.css" />
+    <Content Remove="wwwroot\css\vendor.css" />
+    <Content Remove="wwwroot\js\app.js" />
+    <Content Remove="wwwroot\js\vendor.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,7 +72,10 @@
     <None Include="bower.json" />
     <None Include="bundleconfig.json" />
     <None Include="package.json" />
-    <None Include="tsconfig.json" />
+    <None Include="wwwroot\css\app.css" />
+    <None Include="wwwroot\css\vendor.css" />
+    <None Include="wwwroot\js\app.js" />
+    <None Include="wwwroot\js\vendor.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
@@ -89,5 +108,23 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\js\typescript\" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir></TypeScriptOutDir>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
 
 </Project>
