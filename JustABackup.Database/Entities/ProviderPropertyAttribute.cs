@@ -6,7 +6,7 @@ using System.Text;
 
 namespace JustABackup.Database.Entities
 {
-    public class ProviderPropertyAttribute
+    public class ProviderPropertyAttribute : IEquatable<ProviderPropertyAttribute>
     {
         [Key]
         [Required]
@@ -26,5 +26,44 @@ namespace JustABackup.Database.Entities
             this.Name = name;
             this.Value = value;
         }
+
+        #region IEquatable<ProviderProperty>
+        public bool Equals(ProviderPropertyAttribute other)
+        {
+            return Equals(other, false);
+        }
+        
+        public bool Equals(ProviderPropertyAttribute other, bool includeId)
+        {
+            if (other == null)
+                return false;
+
+            if (includeId && ID != other.ID)
+                return false;
+
+            if (Name != other.Name)
+                return false;
+
+            if (Value != other.Value)
+                return false;
+
+            return true;
+        }
+        #endregion
+
+        #region Overrides
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ProviderPropertyAttribute);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -1338312766;
+            hashCode = hashCode * -1521134295 + Name.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Value);
+            return hashCode;
+        }
+        #endregion
     }
 }

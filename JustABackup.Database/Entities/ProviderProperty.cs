@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 
 namespace JustABackup.Database.Entities
@@ -58,7 +59,10 @@ namespace JustABackup.Database.Entities
             if (Type != other.Type)
                 return false;
 
-            // TODO: compare attributes
+            var firstNotSecond = Attributes.Except(other.Attributes).ToList();
+            var secondNotFirst = other.Attributes.Except(Attributes).ToList();
+            if (firstNotSecond.Any() || secondNotFirst.Any())
+                return false;
 
             return true;
         }

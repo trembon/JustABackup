@@ -65,6 +65,9 @@ namespace JustABackup.Database.Entities
             if (Version != other.Version)
                 return false;
 
+            if (GenericType != other.GenericType)
+                return false;
+
             return true;
         }
 
@@ -77,6 +80,7 @@ namespace JustABackup.Database.Entities
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FullName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Namespace);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(GenericType);
             return hashCode;
         }
         #endregion

@@ -76,7 +76,7 @@ namespace JustABackup.Core.Services
             provider.GenericType = genericType?.AssemblyQualifiedName;
             provider.Properties = GetProperties(type);
 
-            var existingProvider = dbContext.Providers.Include(p => p.Properties).FirstOrDefault(p => p.FullName.Equals(provider.FullName));
+            var existingProvider = dbContext.Providers.Include(p => p.Properties).ThenInclude(p => p.Attributes).FirstOrDefault(p => p.FullName.Equals(provider.FullName));
             if (existingProvider != null)
             {
                 bool modelHasChanged = false;
@@ -92,6 +92,7 @@ namespace JustABackup.Core.Services
                     existingProvider.Namespace = provider.Namespace;
                     existingProvider.Version = provider.Version;
                     existingProvider.Type = provider.Type;
+                    existingProvider.GenericType = provider.GenericType;
                 }
 
                 // check if the properties of the provider has changed
@@ -122,8 +123,8 @@ namespace JustABackup.Core.Services
                         existingProperty.Type = property.Type;
                         existingProperty.Description = property.Description;
 
-                        existingProperty.Attributes.Clear();
-                        existingProperty.Attributes = property.Attributes;
+                        existingProperty.Attributes.Clear(); // TODO: fully delete
+                        existingProperty.Attributes.AddRange(property.Attributes);
 
                         modelHasChanged = true;
                     }

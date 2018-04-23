@@ -89,27 +89,6 @@ namespace JustABackup.Core.ScheduledJobs
                             int currentMappedIndex = i;
                             Func<Stream, Task> action = async (stream) =>
                             {
-                                //Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
-                                //foreach (var backupItem in mappedItem.Input)
-                                //{
-                                //    PassThroughStream backupItemStream = disposableList.CreateAndAdd<PassThroughStream>();
-                                //    dictionary.Add(backupItem, backupItemStream);
-                                //}
-
-                                //Task transformTask = transformProviders[currentMappedIndex].TransformItem(mappedItem.Output, stream, dictionary);
-
-                                //foreach (var kvp in dictionary)
-                                //{
-                                //    PassThroughStream passThroughStream = kvp.Value as PassThroughStream;
-
-                                //    var transformBackupItem = transformExecuteList[currentMappedIndex - 1].FirstOrDefault(x => x.MappedBackupItem.Output == kvp.Key);
-                                //    await transformBackupItem.Execute(passThroughStream);
-
-                                //    passThroughStream.SetComplete();
-                                //}
-
-                                //transformTask.Wait();
-
                                 Dictionary<BackupItem, Stream> dictionary = new Dictionary<BackupItem, Stream>();
                                 foreach (var backupItem in mappedItem.Input)
                                 {
@@ -157,14 +136,11 @@ namespace JustABackup.Core.ScheduledJobs
                 {
                     foreach (var mappedItem in transformExecuteList.Last())
                     {
-                        using (WaitableByteBufferStream outputStream = new WaitableByteBufferStream())
+                        using (ByteBufferStream outputStream = new ByteBufferStream())
                         {
-                            Task<bool> storeItem = storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, outputStream);
-
                             await mappedItem.Execute(outputStream);
 
-                            outputStream.SetComplete();
-                            storeItem.Wait();
+                            bool storeItem = await storageProvider.StoreItem(mappedItem.MappedBackupItem.Output, outputStream);
                         }
                     }
                 }

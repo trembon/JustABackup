@@ -79,6 +79,7 @@ namespace JustABackup.Database.Repositories
                 .Include(j => j.Providers)
                 .ThenInclude(x => x.Values)
                 .ThenInclude(x => x.Property)
+                .ThenInclude(x => x.Attributes)
                 .FirstOrDefaultAsync(j => j.ID == id);
             
             return job;

@@ -64,8 +64,11 @@ namespace JustABackup.Controllers
 
                     foreach(ProviderInstanceProperty property in providerInstance.Values)
                     {
-                        object value = await providerMappingService.GetPresentationValue(property);
-                        propertyValues.Add(property.Property.TypeName, value?.ToString());
+                        try
+                        {
+                            object value = await providerMappingService.GetPresentationValue(property);
+                            propertyValues.Add(property.Property.TypeName, value?.ToString());
+                        }catch { }
                     }
                 }
                 else
