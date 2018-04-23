@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JustABackup.Plugin.OneDrive
 {
-    public class RefreshTokenAuthenticationProvider : IAuthenticationProvider
+    public class OneDriveClient
     {
         private Action<string> storeSession;
 
@@ -20,12 +19,12 @@ namespace JustABackup.Plugin.OneDrive
         
         public OAuthSession Session { get; private set; }
         
-        public RefreshTokenAuthenticationProvider(string clientId, string clientSecret, string redirectUri, string refreshToken)
+        public OneDriveClient(string clientId, string clientSecret, string redirectUri, string refreshToken)
             : this(clientId, clientSecret, redirectUri, new OAuthSession(refreshToken), null)
         {
         }
 
-        public RefreshTokenAuthenticationProvider(string clientId, string clientSecret, string redirectUri, OAuthSession session, Action<string> storeSession)
+        public OneDriveClient(string clientId, string clientSecret, string redirectUri, OAuthSession session, Action<string> storeSession)
         {
             this.Session = session;
             this.ClientID = clientId;

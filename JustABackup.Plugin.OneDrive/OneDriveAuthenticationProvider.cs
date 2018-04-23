@@ -1,5 +1,4 @@
 ﻿using JustABackup.Base;
-using Microsoft.OneDrive.Sdk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,7 +12,7 @@ using System.Web;
 namespace JustABackup.Plugin.OneDrive
 {
     [DisplayName("OneDrive Authentication")]
-    public class OneDriveAuthenticationProvider : IAuthenticationProvider<IOneDriveClient>
+    public class OneDriveAuthenticationProvider : IAuthenticationProvider<OneDriveClient>
     {
         [Display(Name = "Client ID")]
         public string ClientID { get; set; }
@@ -44,14 +43,13 @@ namespace JustABackup.Plugin.OneDrive
             return true;
         }
 
-        public IOneDriveClient GetAuthenticatedClient(string storedSession)
+        public OneDriveClient GetAuthenticatedClient(string storedSession)
         {
             OAuthSession session = JsonConvert.DeserializeObject<OAuthSession>(storedSession);
             if (string.IsNullOrWhiteSpace(session.RefreshToken))
                 throw new ArgumentNullException(nameof(session.RefreshToken));
 
-            RefreshTokenAuthenticationProvider authenticationProvider = new RefreshTokenAuthenticationProvider(ClientID, ClientSecret, callbackUrl, session, this.storeSession);
-            IOneDriveClient client = new OneDriveClient("https://api.onedrive.com/v1.0", authenticationProvider);
+            OneDriveClient client = new OneDriveClient(ClientID, ClientSecret, callbackUrl, session, this.storeSession);
 
             return client;
         }
