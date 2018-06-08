@@ -4,6 +4,7 @@ using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,9 +30,11 @@ namespace JustABackup.Core.Services
     public class ProviderModelService : IProviderModelService
     {
         private DefaultContext dbContext;
+        private ILogger<ProviderModelService> logger;
 
-        public ProviderModelService(DefaultContext dbContext)
+        public ProviderModelService(DefaultContext dbContext, ILogger<ProviderModelService> logger)
         {
+            this.logger = logger;
             this.dbContext = dbContext;
         }
 
@@ -154,9 +157,9 @@ namespace JustABackup.Core.Services
             {
                 await dbContext.SaveChangesAsync();
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: log
+                logger.LogError(ex, $"Failed to update provider ({type.Name}) in database.");
             }
         }
 

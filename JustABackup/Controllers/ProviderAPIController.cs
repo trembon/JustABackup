@@ -10,6 +10,7 @@ using JustABackup.Database.Repositories;
 using JustABackup.Models.Provider;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace JustABackup.Controllers
 {
@@ -17,11 +18,13 @@ namespace JustABackup.Controllers
     [Route("api/provider")]
     public class ProviderAPIController : Controller
     {
+        private ILogger<ProviderAPIController> logger;
         private IProviderRepository providerRepository;
         private IProviderMappingService providerMappingService;
 
-        public ProviderAPIController(IProviderRepository providerRepository, IProviderMappingService providerMappingService)
+        public ProviderAPIController(IProviderRepository providerRepository, IProviderMappingService providerMappingService, ILogger<ProviderAPIController> logger)
         {
+            this.logger = logger;
             this.providerRepository = providerRepository;
             this.providerMappingService = providerMappingService;
         }
@@ -43,9 +46,9 @@ namespace JustABackup.Controllers
 
                 return Ok(mappedProviders);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: log
+                logger.LogError(ex, $"Unable to fetch all providers of type '{type}'.");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -104,9 +107,9 @@ namespace JustABackup.Controllers
 
                 return Ok(fields);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: log
+                logger.LogError(ex, $"Unable to fetch all fields for provider '{providerID}' (Instance: {instanceID}).");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

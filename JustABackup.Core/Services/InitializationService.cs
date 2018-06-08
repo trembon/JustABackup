@@ -3,6 +3,7 @@ using JustABackup.Database;
 using JustABackup.Database.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,24 +26,26 @@ namespace JustABackup.Core.Services
     public class InitializationService : IInitializationService
     {
         private DefaultContext dbContext;
-        private IProviderModelService providerModelService;
         private IConfiguration configuration;
         private ISchedulerService schedulerService;
+        private ILogger<InitializationService> logger;
+        private IProviderModelService providerModelService;
 
-        public InitializationService(DefaultContext dbContext, IConfiguration configuration, IProviderModelService providerModelService, ISchedulerService schedulerService)
+        public InitializationService(DefaultContext dbContext, IConfiguration configuration, IProviderModelService providerModelService, ISchedulerService schedulerService, ILogger<InitializationService> logger)
         {
+            this.logger = logger;
             this.dbContext = dbContext;
             this.configuration = configuration;
-            this.providerModelService = providerModelService;
             this.schedulerService = schedulerService;
+            this.providerModelService = providerModelService;
         }
 
         public async Task VerifyDatabase()
         {
-            dbContext.Database.EnsureCreated();
-
             try
             {
+                dbContext.Database.EnsureCreated();
+
                 using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
                 {
                     await quartzConnection.OpenAsync();
@@ -59,9 +62,9 @@ namespace JustABackup.Core.Services
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                // TODO: log
+                logger.LogError(ex, $"Failed to verify and create databases");
             }
         }
 
@@ -105,9 +108,9 @@ namespace JustABackup.Core.Services
                         Assembly.Load(a);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO: log
+                    logger.LogError(ex, $"Failed to load and find providers (plugins).");
                 }
             }
         }

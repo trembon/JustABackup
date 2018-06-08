@@ -6,6 +6,7 @@ using JustABackup.Database.Repositories;
 using JustABackup.Models.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace JustABackup.Controllers
 {
@@ -13,10 +14,12 @@ namespace JustABackup.Controllers
     [Route("api/authentication")]
     public class AuthenticationAPIController : Controller
     {
+        private ILogger<AuthenticationAPIController> logger;
         private IAuthenticatedSessionRepository authenticatedSessionRepo;
 
-        public AuthenticationAPIController(IAuthenticatedSessionRepository authenticatedSessionRepo)
+        public AuthenticationAPIController(IAuthenticatedSessionRepository authenticatedSessionRepo, ILogger<AuthenticationAPIController> logger)
         {
+            this.logger = logger;
             this.authenticatedSessionRepo = authenticatedSessionRepo;
         }
 
@@ -36,9 +39,9 @@ namespace JustABackup.Controllers
 
                 return Ok(models);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: log
+                logger.LogError(ex, $"Unable to fetch all authenticated sessions.");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
