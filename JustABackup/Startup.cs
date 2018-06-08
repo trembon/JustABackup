@@ -9,7 +9,7 @@ using JustABackup.Database;
 using JustABackup.Core.Extensions;
 using JustABackup.Database.Repositories;
 using JustABackup.ModelBinders;
-using NLog.Extensions.Logging;
+using JustABackup.Core.Logging;
 
 namespace JustABackup
 {
@@ -40,8 +40,8 @@ namespace JustABackup
             services.AddLogging(options =>
             {
                 options.AddConfiguration(Configuration.GetSection("Logging"));
-                options.AddNLog();
-
+                options.AddConsole();
+                options.AddProvider(new SQLiteLoggerProvider(new DbContextOptionsBuilder<LoggingContext>().UseSqlite(Configuration.GetConnectionString("Logging")).Options));
             });
 
             // register services
