@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Content Remove="appsettings.Development.json" />
+    <Content Remove="package-lock.json" />
     <Content Remove="package.json" />
     <Content Remove="wwwroot\css\app.css" />
     <Content Remove="wwwroot\css\vendor.css" />
@@ -23,6 +24,8 @@
 
   <ItemGroup>
     <None Remove="demo.db" />
+    <None Remove="justabackup.sqlite" />
+    <None Remove="logs.sqlite" />
     <None Remove="quartz.sqlite" />
     <None Remove="Scripts\dynamic-form.ts" />
     <None Remove="Scripts\extensions.ts" />
@@ -51,6 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.Development.json" />
+    <None Include="package-lock.json">
+      <DependentUpon>package.json</DependentUpon>
+    </None>
     <None Include="package.json" />
     <None Include="wwwroot\app\app.css" />
     <None Include="wwwroot\app\vendor.css" />
