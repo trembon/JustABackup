@@ -10,6 +10,7 @@ using JustABackup.Core.Extensions;
 using JustABackup.Database.Repositories;
 using JustABackup.ModelBinders;
 using JustABackup.Core.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace JustABackup
 {
@@ -79,6 +80,12 @@ namespace JustABackup
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), @"node_modules")),
+                    RequestPath = new PathString("/npm")
+                });
             }
             else
             {
