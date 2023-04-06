@@ -1,0 +1,56 @@
+﻿@model ConfigureAuthenticatedSessionModel
+@{
+    Model.Title = "Create Authenticated Session";
+    Model.TitleDescription = "Create a new authenticated session.";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-block">
+                    <section>
+                        <form class="dynamic" method="post">
+                            <script type="application/json" class="configuration">
+                                {
+                                    "completeText": "Authenticate",
+                                    "sectionProperties": [ "AuthenticationProvider" ],
+                                    "providerInstances":
+                                        {
+                                            @for(int i = 0; i < Model.ProviderInstances.Count; i++)
+                                            {
+                                                <text>"@Model.ProviderInstances.Keys.ElementAt(i)": @Model.ProviderInstances.Values.ElementAt(i)@(i + 1 == Model.ProviderInstances.Count ? "": ",")</text>
+                                            }
+                                        }
+                                    ,
+                                    "fields": [
+                                        {
+                                            "id": "ID",
+                                            "type": "hidden",
+                                            "value": "@Model.ID"
+                                        },
+                                        {
+                                            "id": "Name",
+                                            "name": "Name",
+                                            "type": "string",
+                                            "value": "@Model.Name",
+                                            "validation": [ "required" ]
+                                        },
+                                        {
+                                            "id": "AuthenticationProvider",
+                                            "name": "Authentication Provider",
+                                            "type": "dropdown",
+                                            "value": "@Model.AuthenticationProvider",
+                                            "validation": [ "required" ],
+                                            "dataSource": "/api/provider?type=authentication"
+                                        }
+                                    ]
+                                }
+                            </script>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

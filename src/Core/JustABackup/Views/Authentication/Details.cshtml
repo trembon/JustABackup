@@ -1,0 +1,16 @@
+﻿@model AuthenticationSessionDetailModel
+@{
+    Model.Title = Model.Name;
+    Model.TitleDescription = "Details about the authenticated session; " + Model.Name;
+}
+
+<div class="card card-block">
+    <div class="form-group row">
+        <label class="col-sm-2 text-xs-right" asp-for="Provider"></label>
+        <div class="col-sm-10">
+            <p asp-for="Provider" class="form-control-static"></p>
+        </div>
+    </div>
+</div>
+
+<a asp-action="Configure" asp-route-id="@Model.ID" class="btn btn-success">Modify</a>

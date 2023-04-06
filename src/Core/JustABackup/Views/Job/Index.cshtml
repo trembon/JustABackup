@@ -1,0 +1,48 @@
+﻿@model ListJobsModel
+@{
+    Model.Title = "Scheduled Jobs";
+    Model.TitleDescription = "List of scheduled backup jobs.";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bordered">
+                    <div class="header-block pull-right">
+                        <a class="btn btn-sm btn-info disabled" data-action="start" disabled="disabled">Manual Start</a>
+                        <a class="btn btn-sm btn-info disabled" data-action="pause" disabled="disabled">Pause</a>
+                        <a class="btn btn-sm btn-info disabled" data-action="resume" disabled="disabled">Resume</a>
+                    </div>
+                </div>
+                <div class="card-block">
+                    <section>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Last run</th>
+                                        <th>Next time</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var job in Model.Jobs)
+                                    {
+                                        <tr data-id="@job.ID" class="@(job.HasChangedModel ? "table-danger" : null)">
+                                            <td><a asp-action="Details" asp-route-id="@job.ID">@job.Name</a></td>
+                                            <td>@(job.LastRun != null ? job.LastRun.ToString() : "Never")</td>
+                                            <td class="next-run">@(job.NextRun != null ? job.NextRun.ToString() : "Paused")</td>
+                                            <td><input type="checkbox" disabled="@(job.HasChangedModel ? "disabled" : null)" /></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
