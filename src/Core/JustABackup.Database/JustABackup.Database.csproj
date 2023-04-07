@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>net7.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/JustABackup/JustABackup</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/JustABackup/JustABackup/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/JustABackup/JustABackup</RepositoryUrl>
@@ -12,9 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.0" />
-    <PackageReference Include="Quartz" Version="3.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
   </ItemGroup>
 
 </Project>

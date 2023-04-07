@@ -1,12 +1,5 @@
 ﻿using JustABackup.Base;
-using JustABackup.Core.Services;
-using JustABackup.Database;
-using JustABackup.Database.Entities;
-using JustABackup.Database.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JustABackup.Core.Entities

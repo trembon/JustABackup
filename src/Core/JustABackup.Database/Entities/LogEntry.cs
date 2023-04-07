@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace JustABackup.Database.Entities.Logging
+namespace JustABackup.Database.Entities
 {
     public class LogEntry
     {
