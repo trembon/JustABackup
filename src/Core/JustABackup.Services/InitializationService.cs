@@ -44,7 +44,7 @@ namespace JustABackup.Services
         {
             try
             {
-                dbContext.Database.EnsureCreated();
+                bool result = dbContext.Database.EnsureCreated();
 
                 //using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
                 //{

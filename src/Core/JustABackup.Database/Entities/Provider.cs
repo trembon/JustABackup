@@ -27,7 +27,7 @@ namespace JustABackup.Database.Entities
         [Required]
         public string Version { get; set; }
 
-        public string GenericType { get; set; }
+        public string? GenericType { get; set; }
         
         public List<ProviderProperty> Properties { get; set; }
 
@@ -73,15 +73,7 @@ namespace JustABackup.Database.Entities
 
         public override int GetHashCode()
         {
-            var hashCode = 843130441;
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + Type.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FullName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Namespace);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(GenericType);
-            return hashCode;
+            return HashCode.Combine(ID, Name, Type, FullName, Namespace, Version, GenericType);
         }
         #endregion
     }

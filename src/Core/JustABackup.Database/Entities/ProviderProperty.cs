@@ -19,7 +19,7 @@ namespace JustABackup.Database.Entities
         [Required]
         public string TypeName { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         public PropertyType Type { get; set; }

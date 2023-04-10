@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\JustABackup.Plugin.FileSystem\JustABackup.Plugin.FileSystem.csproj" />
+    <ProjectReference Include="..\..\Plugins\JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj" />
+    <ProjectReference Include="..\..\Plugins\JustABackup.Plugin.RijndaelEncryptTransformer\JustABackup.Plugin.RijndaelEncryptTransformer.csproj" />
+    <ProjectReference Include="..\..\Plugins\JustABackup.Plugin.ZipTransformer\JustABackup.Plugin.ZipTransformer.csproj" />
     <ProjectReference Include="..\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj" />
     <ProjectReference Include="..\JustABackup.Database.SQLite\JustABackup.Database.SQLite.csproj" />
     <ProjectReference Include="..\JustABackup.Services\JustABackup.Services.csproj" />

@@ -1,7 +1,86 @@
 ﻿@page "/jobs/configure"
+@inject NavigationManager NavManager
+@inject IProviderRepository providerRepository
 
-<PageTitle>Just A Backup - Configure Job</PageTitle>
+<PageTitle>Just A Backup - @(jobId > 0 ? "Modify" : "Create") Job</PageTitle>
 
-<h1>configure jobs</h1>
+@code {
+    public string TextValue { get; set; }
 
-and some data asdsasa
+    private IEnumerable<int> options { get; set; } = new HashSet<int>() { };
+
+    int jobId = 0;
+
+    IEnumerable<Database.Entities.Provider> backupProviders;
+    IEnumerable<Database.Entities.Provider> storageProviders;
+    IEnumerable<Database.Entities.Provider> transformProviders;
+
+    protected override void OnInitialized()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("jobId", out var _jobId))
+        {
+            jobId = Convert.ToInt32(_jobId);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        backupProviders = await providerRepository.Get(Database.Enum.ProviderType.Backup);
+        storageProviders = await providerRepository.Get(Database.Enum.ProviderType.Storage);
+        transformProviders = await providerRepository.Get(Database.Enum.ProviderType.Transform);
+    }
+}
+
+<MudText Typo="Typo.h1">@(jobId > 0 ? "Modify" : "Create") Job</MudText>
+
+<div class="d-flex flex-grow-1 gap-4">
+    <MudPaper Class="flex-1 d-flex py-8" Elevation="0">
+        <MudTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text" HelperText="Some helping text" HelperTextOnFocus="true"></MudTextField>
+
+        <MudSelect T="int" Label="Backup Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var provider in backupProviders)
+            {
+                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="int" Label="Storage Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var provider in backupProviders)
+            {
+                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="int" Label="Transform Providers" MultiSelection="true" @bind-SelectedValues="options">
+            @foreach (var provider in transformProviders)
+            {
+                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </MudPaper>
+
+    <MudPaper Class="flex-none d-flex py-8 justify-center" Elevation="0" Width="400px">
+        <MudTimeline>
+            <MudTimelineItem Color="Color.Primary">
+                <MudText>Job Definition</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem>
+                <MudText>Configure backup provider</MudText>
+            </MudTimelineItem>
+            @foreach(var option in options)
+            {
+                <MudTimelineItem>
+                    <MudText>Configure transform provider @option</MudText>
+                </MudTimelineItem>
+            }
+            <MudTimelineItem>
+                <MudText>Configure storage provider</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem>
+                <MudText>Overview</MudText>
+            </MudTimelineItem>
+        </MudTimeline>
+    </MudPaper>
+
+</div>
