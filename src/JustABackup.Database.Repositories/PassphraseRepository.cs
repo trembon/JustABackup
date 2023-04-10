@@ -1,10 +1,6 @@
 ﻿using JustABackup.Database.Contexts;
 using JustABackup.Database.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JustABackup.Database.Repositories
 {
@@ -15,20 +11,22 @@ namespace JustABackup.Database.Repositories
 
     public class PassphraseRepository : IPassphraseRepository
     {
-        private DefaultContext context;
+        private readonly DefaultContext context;
 
         public PassphraseRepository(DefaultContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<string> GetOrAdd()
         {
-            Passphrase passphrase = await context.Passphrase.FirstOrDefaultAsync();
+            Passphrase? passphrase = await context.Passphrase.FirstOrDefaultAsync();
             if(passphrase == null)
             {
-                passphrase = new Passphrase();
-                passphrase.Key = Guid.NewGuid().ToString();
+                passphrase = new Passphrase
+                {
+                    Key = Guid.NewGuid().ToString()
+                };
 
                 await context.Passphrase.AddAsync(passphrase);
                 await context.SaveChangesAsync();

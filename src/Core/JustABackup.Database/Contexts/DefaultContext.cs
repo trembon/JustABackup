@@ -17,7 +17,7 @@ namespace JustABackup.Database.Contexts
 
         public DbSet<Passphrase> Passphrase { get; set; } = null!;
 
-        protected DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
+        protected DefaultContext(DbContextOptions options) : base(options)
         {
         }
     }

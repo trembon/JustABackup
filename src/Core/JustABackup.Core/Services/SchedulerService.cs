@@ -26,7 +26,7 @@ namespace JustABackup.Core.Services
 
     public class SchedulerService : ISchedulerService
     {
-        private IScheduler scheduler;
+        private readonly IScheduler scheduler;
 
         public SchedulerService(IScheduler scheduler)
         {

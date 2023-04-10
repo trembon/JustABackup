@@ -32,17 +32,20 @@ namespace JustABackup.Database.Entities
         }
 
         #region Overrides
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return Equals(obj as ProviderProperty);
+            if(obj is ProviderProperty pp)
+                return Equals(pp);
+
+            return false;
         }
 
-        public bool Equals(ProviderProperty other)
+        public bool Equals(ProviderProperty? other)
         {
             return Equals(other, true);
         }
 
-        public bool Equals(ProviderProperty other, bool includeId)
+        public bool Equals(ProviderProperty? other, bool includeId)
         {
             if (other == null)
                 return false;
@@ -69,12 +72,7 @@ namespace JustABackup.Database.Entities
 
         public override int GetHashCode()
         {
-            var hashCode = -1338312766;
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TypeName);
-            hashCode = hashCode * -1521134295 + Type.GetHashCode();
-            return hashCode;
+            return HashCode.Combine(ID, Name, TypeName, Type);
         }
         #endregion
     }

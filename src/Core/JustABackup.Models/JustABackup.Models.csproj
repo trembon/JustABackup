@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>net7.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/JustABackup/JustABackup</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/JustABackup/JustABackup/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/JustABackup/JustABackup</RepositoryUrl>

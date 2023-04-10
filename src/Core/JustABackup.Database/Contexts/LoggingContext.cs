@@ -7,7 +7,7 @@ namespace JustABackup.Database.Contexts
     {
         public DbSet<LogEntry> Logs { get; set; } = null!;
 
-        protected LoggingContext(DbContextOptions<LoggingContext> options) : base(options)
+        protected LoggingContext(DbContextOptions options) : base(options)
         {
         }
     }

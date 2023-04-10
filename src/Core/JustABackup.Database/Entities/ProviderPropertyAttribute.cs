@@ -28,12 +28,12 @@ namespace JustABackup.Database.Entities
         }
 
         #region IEquatable<ProviderProperty>
-        public bool Equals(ProviderPropertyAttribute other)
+        public bool Equals(ProviderPropertyAttribute? other)
         {
             return Equals(other, false);
         }
         
-        public bool Equals(ProviderPropertyAttribute other, bool includeId)
+        public bool Equals(ProviderPropertyAttribute? other, bool includeId)
         {
             if (other == null)
                 return false;
@@ -52,17 +52,17 @@ namespace JustABackup.Database.Entities
         #endregion
 
         #region Overrides
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return Equals(obj as ProviderPropertyAttribute);
+            if (obj is ProviderPropertyAttribute ppa)
+                return Equals(ppa);
+
+            return false;
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -1338312766;
-            hashCode = hashCode * -1521134295 + Name.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Value);
-            return hashCode;
+            return HashCode.Combine(Name, Value);
         }
         #endregion
     }

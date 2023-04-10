@@ -33,9 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2C534165-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup", "Core\JustABackup\JustABackup.csproj", "{A270AEA7-BBBC-410A-8F22-CF8EB6B2DFE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Database.SQLite", "Core\JustABackup.Database.SQLite\JustABackup.Database.SQLite.csproj", "{A7ACC1D0-244E-4883-BBC9-7A2F2EF3D02F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.SQLite", "Core\JustABackup.Database.SQLite\JustABackup.Database.SQLite.csproj", "{A7ACC1D0-244E-4883-BBC9-7A2F2EF3D02F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Database.Repositories", "JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj", "{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.Repositories", "JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj", "{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Services", "JustABackup.Services\JustABackup.Services.csproj", "{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,6 +123,7 @@ Global
 		{2BA79AC2-B097-40B4-981F-2E4919CDA66B} = {559D945A-A00C-4EBA-BBA2-17D80507B490}
 		{A7ACC1D0-244E-4883-BBC9-7A2F2EF3D02F} = {2C534165-8865-416F-9BEB-D467678F8161}
 		{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7} = {2C534165-8865-416F-9BEB-D467678F8161}
+		{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE} = {2C534165-8865-416F-9BEB-D467678F8161}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B69C2AE-CAF8-4801-BC08-EF880DE13DDA}

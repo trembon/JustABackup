@@ -12,12 +12,14 @@ namespace JustABackup.Database.Entities
         [Required]
         public int ID { get; set; }
 
-        [Required]
         public BackupJob Job { get; set; }
+
+        [Required]
+        public int JobID { get; set; }
 
         public DateTime Started { get; set; }
 
-        public DateTime Completed { get; set; } // TODO: make nullable
+        public DateTime? Completed { get; set; }
 
         public string Message { get; set; }
 

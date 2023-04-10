@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
+    <ProjectReference Include="..\..\Core\JustABackup.Base\JustABackup.Base.csproj" />
   </ItemGroup>
 
 </Project>

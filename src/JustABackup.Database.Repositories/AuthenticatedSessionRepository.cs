@@ -25,11 +25,11 @@ namespace JustABackup.Database.Repositories
 
     public class AuthenticatedSessionRepository : IAuthenticatedSessionRepository
     {
-        private DefaultContext context;
+        private readonly DefaultContext context;
 
         public AuthenticatedSessionRepository(DefaultContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<int> AddOrUpdate(int? id, string name, ProviderInstance providerInstance)

@@ -29,18 +29,20 @@ namespace JustABackup.Database.Repositories
 
     public class BackupJobRepository : IBackupJobRepository
     {
-        private DefaultContext context;
+        private readonly DefaultContext context;
 
         public BackupJobRepository(DefaultContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<int> AddHistory(int id)
         {
-            BackupJobHistory history = new BackupJobHistory();
-            history.Job = new BackupJob { ID = id };
-            history.Started = DateTime.Now;
+            BackupJobHistory history = new()
+            {
+                JobID = id,
+                Started = DateTime.Now
+            };
 
             context.JobHistory.Add(history);
             await context.SaveChangesAsync();
