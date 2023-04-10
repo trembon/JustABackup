@@ -4,7 +4,6 @@ using JustABackup.Database;
 using JustABackup.Database.Entities;
 using JustABackup.Database.Enum;
 using JustABackup.Database.Repositories;
-using JustABackup.Models.Job;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Services
+namespace JustABackup.Services
 {
     public interface IProviderMappingService
     {

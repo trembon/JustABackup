@@ -1,5 +1,4 @@
 ﻿using JustABackup.Database;
-using JustABackup.Database.Entities.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,14 +9,14 @@ namespace JustABackup.Core.Logging
 {
     public class SQLiteLogger : ILogger
     {
-        private string categoryName;
-        private DbContextOptions<LoggingContext> dbContextOptions;
+        //private string categoryName;
+        //private DbContextOptions<LoggingContext> dbContextOptions;
 
-        public SQLiteLogger(string categoryName, DbContextOptions<LoggingContext> dbContextOptions)
-        {
-            this.categoryName = categoryName;
-            this.dbContextOptions = dbContextOptions;
-        }
+        //public SQLiteLogger(string categoryName, DbContextOptions<LoggingContext> dbContextOptions)
+        //{
+        //    this.categoryName = categoryName;
+        //    this.dbContextOptions = dbContextOptions;
+        //}
 
         public IDisposable BeginScope<TState>(TState state)
         {
@@ -33,33 +32,33 @@ namespace JustABackup.Core.Logging
         {
             try
             {
-                using (LoggingContext db = new LoggingContext(dbContextOptions))
-                {
-                    LogEntry entry = new LogEntry();
-                    entry.Level = logLevel;
-                    entry.Category = categoryName;
-                    entry.EventID = eventId.Id;
-                    entry.Message = formatter(state, exception);
+                //using (LoggingContext db = new LoggingContext(dbContextOptions))
+                //{
+                //    LogEntry entry = new LogEntry();
+                //    entry.Level = logLevel;
+                //    entry.Category = categoryName;
+                //    entry.EventID = eventId.Id;
+                //    entry.Message = formatter(state, exception);
 
-                    Exception ex = exception;
-                    for (int i = 0; ex != null; i++)
-                    {
-                        LogException logException = new LogException();
-                        logException.Order = i;
-                        logException.Type = ex.GetType().FullName;
-                        logException.Message = ex.Message;
-                        logException.StackTrace = ex.StackTrace;
-                        logException.Source = ex.Source;
-                        logException.HelpLink = ex.HelpLink;
+                //    Exception ex = exception;
+                //    for (int i = 0; ex != null; i++)
+                //    {
+                //        LogException logException = new LogException();
+                //        logException.Order = i;
+                //        logException.Type = ex.GetType().FullName;
+                //        logException.Message = ex.Message;
+                //        logException.StackTrace = ex.StackTrace;
+                //        logException.Source = ex.Source;
+                //        logException.HelpLink = ex.HelpLink;
 
-                        entry.Exceptions.Add(logException);
+                //        entry.Exceptions.Add(logException);
 
-                        ex = ex.InnerException;
-                    }
+                //        ex = ex.InnerException;
+                //    }
 
-                    db.Add(entry);
-                    db.SaveChanges();
-                }
+                //    db.Add(entry);
+                //    db.SaveChanges();
+                //}
             }
             catch (Exception ex)
             {

@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Services
+namespace JustABackup.Services
 {
     public interface IProviderModelService
     {

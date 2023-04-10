@@ -10,20 +10,21 @@ namespace JustABackup.Core.Logging
 {
     public class SQLiteLoggerProvider : ILoggerProvider
     {
-        private DbContextOptions<LoggingContext> dbContextOptions;
+        //private DbContextOptions<LoggingContext> dbContextOptions;
         private readonly ConcurrentDictionary<string, SQLiteLogger> loggers = new ConcurrentDictionary<string, SQLiteLogger>();
 
-        public SQLiteLoggerProvider(DbContextOptions<LoggingContext> dbContextOptions)
-        {
-            this.dbContextOptions = dbContextOptions;
+        //public SQLiteLoggerProvider(DbContextOptions<LoggingContext> dbContextOptions)
+        //{
+        //    this.dbContextOptions = dbContextOptions;
 
-            using (LoggingContext db = new LoggingContext(dbContextOptions))
-                db.Database.EnsureCreated();
-        }
+        //    using (LoggingContext db = new LoggingContext(dbContextOptions))
+        //        db.Database.EnsureCreated();
+        //}
 
         public ILogger CreateLogger(string categoryName)
         {
-            return loggers.GetOrAdd(categoryName, name => new SQLiteLogger(name, dbContextOptions));
+            return null;
+            //return loggers.GetOrAdd(categoryName, name => new SQLiteLogger(name, dbContextOptions));
         }
 
         public void Dispose()

@@ -10,4 +10,10 @@
     <PackageReference Include="MudBlazor" Version="6.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj" />
+    <ProjectReference Include="..\JustABackup.Database.SQLite\JustABackup.Database.SQLite.csproj" />
+    <ProjectReference Include="..\JustABackup.Services\JustABackup.Services.csproj" />
+  </ItemGroup>
+
 </Project>

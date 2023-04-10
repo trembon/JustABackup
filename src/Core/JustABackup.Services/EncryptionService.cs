@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Services
+namespace JustABackup.Services
 {
     public interface IEncryptionService
     {
@@ -144,22 +144,26 @@ namespace JustABackup.Core.Services
 
         private byte[] SerializeObject(object data)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, data);
-                return ms.ToArray();
-            }
+            // TODO: fix with new logic
+            return default;
+            //BinaryFormatter bf = new BinaryFormatter();
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    bf.Serialize(ms, data);
+            //    return ms.ToArray();
+            //}
         }
 
         private T DeserializeObject<T>(byte[] data)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream(data))
-            {
-                object obj = bf.Deserialize(ms);
-                return (T)obj;
-            }
+            // TODO: fix with new logic
+            return default;
+            //BinaryFormatter bf = new BinaryFormatter();
+            //using (MemoryStream ms = new MemoryStream(data))
+            //{
+            //    object obj = bf.Deserialize(ms);
+            //    return (T)obj;
+            //}
         }
 
         private byte[] GenerateRandomBytes()

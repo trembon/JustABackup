@@ -26,7 +26,6 @@
     <ProjectReference Include="..\..\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj" />
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
     <ProjectReference Include="..\JustABackup.Database\JustABackup.Database.csproj" />
-    <ProjectReference Include="..\JustABackup.Models\JustABackup.Models.csproj" />
   </ItemGroup>
 
 </Project>

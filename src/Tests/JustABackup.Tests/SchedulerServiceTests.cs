@@ -1,4 +1,4 @@
-﻿using JustABackup.Core.Services;
+﻿using JustABackup.Services;
 using JustABackup.Tests.Helpers;
 using Quartz;
 using System;

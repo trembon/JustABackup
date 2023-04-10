@@ -1,4 +1,5 @@
 ﻿using JustABackup.Database;
+using JustABackup.Database.Contexts;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +18,7 @@ namespace JustABackup.Tests.Helpers
             var options = new DbContextOptionsBuilder<DatabaseTestContext>().UseSqlite(connection).Options;
 
             DatabaseTestContext context = new DatabaseTestContext(options);
-            context.Database.EnsureCreated();
+            //context.Database.EnsureCreated();
 
             return context;
         }

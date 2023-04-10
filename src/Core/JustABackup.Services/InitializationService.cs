@@ -2,7 +2,6 @@
 using JustABackup.Database;
 using JustABackup.Database.Contexts;
 using JustABackup.Database.Entities;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Services
+namespace JustABackup.Services
 {
     public interface IInitializationService
     {
@@ -47,21 +46,21 @@ namespace JustABackup.Core.Services
             {
                 dbContext.Database.EnsureCreated();
 
-                using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
-                {
-                    await quartzConnection.OpenAsync();
+                //using (SqliteConnection quartzConnection = new SqliteConnection(configuration.GetConnectionString("quartz")))
+                //{
+                //    await quartzConnection.OpenAsync();
 
-                    if (new FileInfo(quartzConnection.DataSource).Length == 0)
-                    {
-                        string script = File.ReadAllText(configuration["Quartz:SchemaFile"]);
+                //    if (new FileInfo(quartzConnection.DataSource).Length == 0)
+                //    {
+                //        string script = File.ReadAllText(configuration["Quartz:SchemaFile"]);
 
-                        using (var command = quartzConnection.CreateCommand())
-                        {
-                            command.CommandText = script;
-                            await command.ExecuteNonQueryAsync();
-                        }
-                    }
-                }
+                //        using (var command = quartzConnection.CreateCommand())
+                //        {
+                //            command.CommandText = script;
+                //            await command.ExecuteNonQueryAsync();
+                //        }
+                //    }
+                //}
             }
             catch(Exception ex)
             {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JustABackup.Core.Services
+namespace JustABackup.Services
 {
     public interface ISchedulerService
     {
@@ -53,11 +53,12 @@ namespace JustABackup.Core.Services
             }
             else
             {
-                IJobDetail jobDetail = JobBuilder.Create<DefaultScheduledJob>()
-                        .WithIdentity(jobId.ToString())
-                        .Build();
+                // TODO: fix
+                //IJobDetail jobDetail = JobBuilder.Create<DefaultScheduledJob>()
+                //        .WithIdentity(jobId.ToString())
+                //        .Build();
 
-                await scheduler.ScheduleJob(jobDetail, trigger);
+                //await scheduler.ScheduleJob(jobDetail, trigger);
             }
         }
 

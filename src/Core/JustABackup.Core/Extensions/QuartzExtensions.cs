@@ -34,7 +34,7 @@ namespace JustABackup.Core.Extensions
             
             services.AddSingleton(scheduler);
 
-            services.AddTransient<DefaultScheduledJob>();
+            //services.AddTransient<DefaultScheduledJob>();
 
             var jobFactory = new JobFactory(services.BuildServiceProvider());
             scheduler.JobFactory = jobFactory;

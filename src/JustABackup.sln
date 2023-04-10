@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.Rijndael
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.OneDrive", "Plugins\JustABackup.Plugin.OneDrive\JustABackup.Plugin.OneDrive.csproj", "{9DE019D0-FA38-4B71-8521-48966086377C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Models", "Core\JustABackup.Models\JustABackup.Models.csproj", "{1AE59579-2253-47D8-A23E-0A48D2ECB058}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.MySQL", "Plugins\JustABackup.Plugin.MySQL\JustABackup.Plugin.MySQL.csproj", "{11F77E6C-64A2-45C2-9ACB-6666F696FF47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Plugin.MSSQL", "Plugins\JustABackup.Plugin.MSSQL\JustABackup.Plugin.MSSQL.csproj", "{6F781790-CF94-4685-B086-6E4ED8462102}"
@@ -35,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup", "Core\JustABa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.SQLite", "Core\JustABackup.Database.SQLite\JustABackup.Database.SQLite.csproj", "{A7ACC1D0-244E-4883-BBC9-7A2F2EF3D02F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.Repositories", "JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj", "{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.Repositories", "Core\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj", "{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Services", "JustABackup.Services\JustABackup.Services.csproj", "{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Services", "Core\JustABackup.Services\JustABackup.Services.csproj", "{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,10 +71,6 @@ Global
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE019D0-FA38-4B71-8521-48966086377C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1AE59579-2253-47D8-A23E-0A48D2ECB058}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11F77E6C-64A2-45C2-9ACB-6666F696FF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -117,7 +111,6 @@ Global
 		{801A63A9-E7EB-4DD2-AF97-D408BB4690BE} = {6CFDD6E6-2BC3-46CF-8A38-D4C524C6F89B}
 		{7942E937-F73B-4828-BEB7-F9141F9A791C} = {6CFDD6E6-2BC3-46CF-8A38-D4C524C6F89B}
 		{9DE019D0-FA38-4B71-8521-48966086377C} = {6CFDD6E6-2BC3-46CF-8A38-D4C524C6F89B}
-		{1AE59579-2253-47D8-A23E-0A48D2ECB058} = {2C534165-8865-416F-9BEB-D467678F8161}
 		{11F77E6C-64A2-45C2-9ACB-6666F696FF47} = {6CFDD6E6-2BC3-46CF-8A38-D4C524C6F89B}
 		{6F781790-CF94-4685-B086-6E4ED8462102} = {6CFDD6E6-2BC3-46CF-8A38-D4C524C6F89B}
 		{2BA79AC2-B097-40B4-981F-2E4919CDA66B} = {559D945A-A00C-4EBA-BBA2-17D80507B490}
