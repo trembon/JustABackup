@@ -34,53 +34,56 @@
 
 <MudText Typo="Typo.h1">@(jobId > 0 ? "Modify" : "Create") Job</MudText>
 
-<div class="d-flex flex-grow-1 gap-4">
-    <MudPaper Class="flex-1 d-flex py-8" Elevation="0">
-        <MudTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text" HelperText="Some helping text" HelperTextOnFocus="true"></MudTextField>
+<MudGrid Spacing="2">
+    <MudItem xs="9">
+        <MudPaper Class="pa-5" Elevation="0">
+            <MudTextField Class="my-3" @bind-Value="TextValue" Label="Standard" Variant="Variant.Filled" HelperText="Some helping text" HelperTextOnFocus="false" />
 
-        <MudSelect T="int" Label="Backup Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var provider in backupProviders)
-            {
-                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
-            }
-        </MudSelect>
+            <MudSelect Class="my-3" T="int?" Label="Backup Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
+                @foreach (var provider in backupProviders)
+                {
+                    <MudSelectItem T="int?" Value="@provider.ID">@provider.Name</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudSelect T="int" Label="Storage Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var provider in backupProviders)
-            {
-                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
-            }
-        </MudSelect>
+            <MudSelect Class="my-3" T="int?" Label="Storage Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
+                @foreach (var provider in backupProviders)
+                {
+                    <MudSelectItem T="int?" Value="@provider.ID">@provider.Name</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudSelect T="int" Label="Transform Providers" MultiSelection="true" @bind-SelectedValues="options">
-            @foreach (var provider in transformProviders)
-            {
-                <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
-            }
-        </MudSelect>
-    </MudPaper>
+            <MudSelect Class="my-3" T="int" Label="Transform Providers" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" MultiSelection="true" @bind-SelectedValues="options" HelperText="Some helping text" HelperTextOnFocus="false">
+                @foreach (var provider in transformProviders)
+                {
+                    <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudPaper>
+    </MudItem>
 
-    <MudPaper Class="flex-none d-flex py-8 justify-center" Elevation="0" Width="400px">
-        <MudTimeline>
-            <MudTimelineItem Color="Color.Primary">
-                <MudText>Job Definition</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem>
-                <MudText>Configure backup provider</MudText>
-            </MudTimelineItem>
-            @foreach(var option in options)
-            {
-                <MudTimelineItem>
-                    <MudText>Configure transform provider @option</MudText>
+    <MudItem xs="3">
+        <MudPaper Class="flex-none d-flex pa-5 justify-center" Elevation="0">
+            <MudTimeline>
+                <MudTimelineItem Color="Color.Primary">
+                    <MudText>Job Definition</MudText>
                 </MudTimelineItem>
-            }
-            <MudTimelineItem>
-                <MudText>Configure storage provider</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem>
-                <MudText>Overview</MudText>
-            </MudTimelineItem>
-        </MudTimeline>
-    </MudPaper>
-
-</div>
+                <MudTimelineItem>
+                    <MudText>Configure backup provider</MudText>
+                </MudTimelineItem>
+                @foreach (var option in options)
+                {
+                    <MudTimelineItem>
+                        <MudText>Configure transform provider @option</MudText>
+                    </MudTimelineItem>
+                }
+                <MudTimelineItem>
+                    <MudText>Configure storage provider</MudText>
+                </MudTimelineItem>
+                <MudTimelineItem>
+                    <MudText>Overview</MudText>
+                </MudTimelineItem>
+            </MudTimeline>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
