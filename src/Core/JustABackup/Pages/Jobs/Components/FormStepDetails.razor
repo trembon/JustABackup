@@ -1,0 +1,44 @@
+﻿@using JustABackup.Database.Entities;
+@inject IProviderRepository providerRepository
+
+@code {
+    public Provider? BackupProvider { get; set; }
+    public Provider? StorageProvider { get; set; }
+    public IEnumerable<Provider> TransformProviders { get; set; } = new List<Provider>();
+
+    string? nameValue;
+
+    IEnumerable<Database.Entities.Provider> backupProviders = null!;
+    IEnumerable<Database.Entities.Provider> storageProviders = null!;
+    IEnumerable<Database.Entities.Provider> transformProviders = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        backupProviders = await providerRepository.Get(Database.Enum.ProviderType.Backup);
+        storageProviders = await providerRepository.Get(Database.Enum.ProviderType.Storage);
+        transformProviders = await providerRepository.Get(Database.Enum.ProviderType.Transform);
+    }
+}
+
+<MudTextField Class="my-3" @bind-Value="nameValue" Label="Standard" Variant="Variant.Filled" HelperText="Some helping text" HelperTextOnFocus="false" name="Details_Name" />
+
+<MudSelect Class="my-3" T="Provider" @bind-Value="BackupProvider" Label="Backup Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
+    @foreach (var provider in backupProviders)
+    {
+        <MudSelectItem T="Provider" Value="@provider">@provider.Name</MudSelectItem>
+    }
+</MudSelect>
+
+<MudSelect Class="my-3" T="Provider" @bind-Value="StorageProvider" Label="Storage Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
+    @foreach (var provider in storageProviders)
+    {
+        <MudSelectItem T="Provider" Value="@provider">@provider.Name</MudSelectItem>
+    }
+</MudSelect>
+
+<MudSelect Class="my-3" T="Provider" @bind-SelectedValues="TransformProviders" Label="Transform Providers" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true MultiSelection="true" HelperText="Some helping text" HelperTextOnFocus="false">
+    @foreach (var provider in transformProviders)
+    {
+        <MudSelectItem T="Provider" Value="@provider">@provider.Name</MudSelectItem>
+    }
+</MudSelect>

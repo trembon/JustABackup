@@ -1,19 +1,16 @@
 ﻿@page "/jobs/configure"
+@using JustABackup.Components.Forms;
+@using JustABackup.Pages.Jobs.Components;
 @inject NavigationManager NavManager
 @inject IProviderRepository providerRepository
 
 <PageTitle>Just A Backup - @(jobId > 0 ? "Modify" : "Create") Job</PageTitle>
 
 @code {
-    public string TextValue { get; set; }
-
-    private IEnumerable<int> options { get; set; } = new HashSet<int>() { };
-
     int jobId = 0;
+    ExtendedMudForm form = null!;
 
-    IEnumerable<Database.Entities.Provider> backupProviders;
-    IEnumerable<Database.Entities.Provider> storageProviders;
-    IEnumerable<Database.Entities.Provider> transformProviders;
+    FormStepDetails? detailsStep;
 
     protected override void OnInitialized()
     {
@@ -24,11 +21,9 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private void OnSubmit()
     {
-        backupProviders = await providerRepository.Get(Database.Enum.ProviderType.Backup);
-        storageProviders = await providerRepository.Get(Database.Enum.ProviderType.Storage);
-        transformProviders = await providerRepository.Get(Database.Enum.ProviderType.Transform);
+        // do something
     }
 }
 
@@ -37,28 +32,11 @@
 <MudGrid Spacing="2">
     <MudItem xs="9">
         <MudPaper Class="pa-5" Elevation="0">
-            <MudTextField Class="my-3" @bind-Value="TextValue" Label="Standard" Variant="Variant.Filled" HelperText="Some helping text" HelperTextOnFocus="false" />
+            <ExtendedMudForm @ref="form" OnValidSubmit="OnValidSubmit">
+                <JustABackup.Pages.Jobs.Components.FormStepDetails @ref="detailsStep" />
 
-            <MudSelect Class="my-3" T="int?" Label="Backup Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
-                @foreach (var provider in backupProviders)
-                {
-                    <MudSelectItem T="int?" Value="@provider.ID">@provider.Name</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudSelect Class="my-3" T="int?" Label="Storage Provider" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" Clearable=true HelperText="Some helping text" HelperTextOnFocus="false">
-                @foreach (var provider in backupProviders)
-                {
-                    <MudSelectItem T="int?" Value="@provider.ID">@provider.Name</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudSelect Class="my-3" T="int" Label="Transform Providers" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter" MultiSelection="true" @bind-SelectedValues="options" HelperText="Some helping text" HelperTextOnFocus="false">
-                @foreach (var provider in transformProviders)
-                {
-                    <MudSelectItem T="int" Value="@provider.ID">@provider.Name</MudSelectItem>
-                }
-            </MudSelect>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>OnSubmit())">Validate</MudButton>
+            </ExtendedMudForm>
         </MudPaper>
     </MudItem>
 
@@ -71,11 +49,14 @@
                 <MudTimelineItem>
                     <MudText>Configure backup provider</MudText>
                 </MudTimelineItem>
-                @foreach (var option in options)
+                @if (detailsStep != null)
                 {
-                    <MudTimelineItem>
-                        <MudText>Configure transform provider @option</MudText>
-                    </MudTimelineItem>
+                    foreach (var option in detailsStep.TransformProviders)
+                    {
+                        <MudTimelineItem>
+                            <MudText>Configure transform provider @option.Name</MudText>
+                        </MudTimelineItem>
+                    }
                 }
                 <MudTimelineItem>
                     <MudText>Configure storage provider</MudText>

@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.SQLite
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Database.Repositories", "Core\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj", "{7D7F1BD0-5082-48ED-A6B0-83D247B04EF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustABackup.Services", "Core\JustABackup.Services\JustABackup.Services.csproj", "{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JustABackup.Services", "Core\JustABackup.Services\JustABackup.Services.csproj", "{93AC58EE-822F-4B9A-81E0-1F4CC64F46DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
