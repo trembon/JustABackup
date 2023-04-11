@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj" />
+    <ProjectReference Include="..\JustABackup.Database.Repositories\JustABackup.Database.Repositories.csproj" />
     <ProjectReference Include="..\JustABackup.Base\JustABackup.Base.csproj" />
     <ProjectReference Include="..\JustABackup.Database\JustABackup.Database.csproj" />
   </ItemGroup>
